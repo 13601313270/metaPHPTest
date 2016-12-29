@@ -1,0 +1,3 @@
+[submodule "metaPHP"]
+	path = metaPHP
+	url = https://github.com/13601313270/metaPHP.git
