@@ -1,1 +1,5 @@
 
+[submodule "metaPHP"]
+	path = metaPHP
+	url = https://13601313270@github.com/13601313270/metaPHP.git
+	branch = master
