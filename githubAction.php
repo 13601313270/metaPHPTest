@@ -25,14 +25,12 @@ class temp extends githubAction{
         $this->checkout($this->runLocalBranch);
     }
     public function main(){
-//        $newBranchName = '创建临时分支';
-//        $this->createBranch($newBranchName);
-//        $parentClass = classAction::createClass('tempParentClass','','','autoLoadClass');
-//        $parentClass->save();
-//        $this->checkout($this->runLocalBranch);
-//        $this->mergeBranch($newBranchName);
-//        $class = classAction::createClass('classTestClass','tempParentClass','','autoLoadClass');
-//        $class->save();
+        $newBranchName = '创建临时分支';
+        $this->createBranch($newBranchName);
+        $parentClass = classAction::createClass('tempParentClass','','','autoLoadClass');
+        $parentClass->save();
+        $this->checkout($this->runLocalBranch);
+        $this->mergeBranch($newBranchName);
     }
 }
 $a = new temp();
