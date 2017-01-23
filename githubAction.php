@@ -25,7 +25,7 @@ class temp extends githubAction{
         $this->checkout($this->runLocalBranch);
     }
     public function main(){
-        $newBranchName = '创建临时分支';
+        $newBranchName = 'metaPHPRobot';
         $this->deleteBranch($newBranchName);
 //        $this->createBranch($newBranchName);
 //        mkdir('include');
