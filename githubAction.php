@@ -26,7 +26,6 @@ class temp extends githubAction{
     }
     public function main(){
         $newBranchName = '创建临时分支';
-        
         $this->deleteBranch($newBranchName);
 //        $this->createBranch($newBranchName);
 //        mkdir('include');
