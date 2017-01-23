@@ -7,6 +7,7 @@
  */
 ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE);
+include_once('./include.php');
 include_once('./metaPHP/githubAction.php');
 class temp extends githubAction{
     public $webRootDir = '/var/www/html/metaPHPTest';
@@ -15,6 +16,16 @@ class temp extends githubAction{
         'refs/heads/master',
         'refs/heads/develop'
     );
+    public function run()
+    {
+        parent::run();
+        $this->createBranch('创建临时分支');
+//        $parentClass = classAction::createClass('tempParentClass','','','autoLoadClass');
+//        $parentClass->save();
+//
+//        $class = classAction::createClass('classTestClass','tempParentClass','','autoLoadClass');
+//        $class->save();
+    }
 }
 $a = new temp();
 $a->run();
