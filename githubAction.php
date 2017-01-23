@@ -20,13 +20,17 @@ class temp extends githubAction{
     );
     public function run()
     {
+        if(empty($this->listenBranch)){exit;}
+        if(empty($this->webRootDir)){exit;}
+        $response = json_decode(file_get_contents('php://input'));
+        if(!in_array($response->ref,$this->listenBranch)){exit;}
         parent::pull();
         $this->main();
         $this->checkout($this->runLocalBranch);
     }
     public function main(){
-        $newBranchName = 'metaPHPRobot';
-        $this->deleteBranch($newBranchName);
+//        $newBranchName = 'metaPHPRobot';
+//        $this->deleteBranch($newBranchName);
 //        $this->createBranch($newBranchName);
 //        mkdir('include');
 //        $parentClass = classAction::createClass('tempParentClass','','','autoLoadClass');
