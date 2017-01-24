@@ -42,7 +42,8 @@ class temp extends githubAction{
             }
             $this->checkout($this->runLocalBranch);
             parent::pull();
-            header("Location: ".$_SERVER['REQUEST_URI']);exit;
+            var_dump('cd ' .dirname(__FILE__) . ';php '.__FILE__);
+            exec('cd ' .dirname(__FILE__) . ';php '.__FILE__);
         }
     }
 }
