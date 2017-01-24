@@ -301,3 +301,4 @@
 创建分支:develop;结果["M\t.gitmodules","M\tREADME.md","D\tceshi.txt","M\tgithubAction.php","M\tinclude.php","M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/mergeBranch.log","M\ttestRun.php","M\twikiwebHooks.png"]
 创建分支:develop;结果["M\tceshi.txt","M\tgithubAction.php","M\tmetaPHP","Your branch is ahead of 'origin\/develop' by 1 commit.","  (use \"git push\" to publish your local commits)"]
 创建分支:[删除多余文件]并切换到在此分支;结果[]
+创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","Your branch is ahead of 'origin\/develop' by 2 commits.","  (use \"git push\" to publish your local commits)"]
