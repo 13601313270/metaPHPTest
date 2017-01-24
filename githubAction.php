@@ -48,7 +48,7 @@ class temp extends githubAction{
             ))){
                 exit;
             }
-            if(count($response->commits)==0 || $response->commits[0]['author']=='metaPHPRobot'){
+            if(count($response->commits)==0 || $response->commits[0]->author=='metaPHPRobot'){
                 exit;
             }
             $this->checkout($this->runLocalBranch);
