@@ -18,19 +18,19 @@ class temp extends githubAction{
     public function main(){
         $newBranchName = '删除多余文件';
 
-//        $this->createBranch($newBranchName);
+        $this->createBranch($newBranchName);
 //        classAction::createClass('parentClass','','','autoLoadClass');
-//        unlink('ceshi.txt');
-//        $this->commit('删除了ceshi.txt');
+        unlink('ceshi.txt');
+        $this->commit('删除了ceshi.txt');
         var_dump("==========提交==========\n");
-//        $this->checkout($this->runLocalBranch);
+        $this->checkout($this->runLocalBranch);
         var_dump("==========合并==========\n");
-//        $this->mergeBranch($newBranchName);
+        $this->mergeBranch($newBranchName);
         var_dump("==========commit==========\n");
         $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
 //        $this->deleteBranch($newBranchName);
-//        var_dump("==========push==========\n");
-//        $this->push();
+        var_dump("==========push==========\n");
+        $this->push();
     }
     public function run()
     {
