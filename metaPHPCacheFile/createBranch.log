@@ -267,3 +267,10 @@
 创建分支:[去掉了ceshi.txt]并切换到在此分支;结果M	metaPHP
 创建分支:[去掉了ceshi.txt]并切换到在此分支;结果A	metaPHPCacheFile/mergeBranch.log
 创建分支:[去掉了ceshi.txt]并切换到在此分支;结果A	metaPHPCacheFile/mergeBranch.log
+创建分支:[去掉了ceshi.txt]并切换到在此分支;结果
+创建分支:[去掉了ceshi.txt]并切换到在此分支;结果
+创建分支:[去掉了ceshi.txt]并切换到在此分支;结果
+创建分支:develop;结果M	metaPHPCacheFile/githubReceive.log
+创建分支:[添加一个通用父类]并切换到在此分支;结果M	metaPHPCacheFile/githubReceive.log
+创建分支:develop;结果M	metaPHPCacheFile/mergeBranch.log
+创建分支:develop;结果M	metaPHPCacheFile/mergeBranch.log
