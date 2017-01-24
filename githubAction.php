@@ -26,8 +26,7 @@ class temp extends githubAction{
 //        var_dump("==========合并==========\n");
         $this->mergeBranch($newBranchName);
 //        var_dump("==========commit==========\n");
-        $result = $this->exec('cd ' . $this->webRootDir . ';git add --all;');
-//        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
+        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
 //        $this->deleteBranch($newBranchName);
 //        var_dump("==========push==========\n");
         $this->push();
