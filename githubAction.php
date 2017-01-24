@@ -18,7 +18,6 @@ class temp extends githubAction{
     public function main(){
         $newBranchName = '删除多余文件';
         $this->createBranch($newBranchName);
-        
 //        classAction::createClass('parentClass','','','autoLoadClass');
         unlink('ceshi.txt');
         $this->commit('删除了ceshi.txt');
