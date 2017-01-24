@@ -11,9 +11,6 @@ date_default_timezone_set('PRC');
 function autoLoadClass($className){
     return 'include/'.$className.'.php';
 }
-//闭合
-
-
 spl_autoload_register(function($class){
     $classPath = autoLoadClass($class);
     include_once($classPath);
