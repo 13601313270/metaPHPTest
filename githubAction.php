@@ -9,25 +9,26 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE);
 include_once('./include.php');
 include_once('./metaPHP/githubAction.php');
+include_once('./metaPHP/classAction.php');
 class temp extends githubAction{
     public $runLocalBranch = 'develop';
     public $webRootDir = '/var/www/html/metaPHPTest';
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
-        $this->deleteBranch('去掉了ceshi.txt');
-//        $newBranchName = '去掉了ceshi.txt';
-//        $this->createBranch($newBranchName);
-//        unlink($this->webRootDir.'/ceshi.txt');
-//        $this->commit('删除了ceshi.txt');
-//        $this->checkout($this->runLocalBranch);
-//        $this->mergeBranch($newBranchName);
-//        $this->push();
+        $newBranchName = '添加一个通用父类';
+        $this->createBranch($newBranchName);
+        classAction::createClass('parentClass','','','autoLoadClass');
+        $this->commit('增加了通用父类');
+        $this->checkout($this->runLocalBranch);
+        $this->mergeBranch($newBranchName);
+        $this->push();
     }
     public function run()
     {
         $input = file_get_contents('php://input');
         if(empty($input)){
+            //第二次被命令行触发,进入这里
             $this->checkout($this->runLocalBranch);
             $this->main();
             $this->checkout($this->runLocalBranch);
@@ -42,8 +43,6 @@ class temp extends githubAction{
             }
             $this->checkout($this->runLocalBranch);
             parent::pull();
-            
-            var_dump('cd ' .dirname(__FILE__) . ';php '.__FILE__);
             exec('cd ' .dirname(__FILE__) . ';php '.__FILE__);
         }
     }
