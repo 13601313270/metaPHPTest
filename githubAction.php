@@ -17,20 +17,18 @@ class temp extends githubAction{
 
     public function main(){
         $newBranchName = '增加了内容';
-//        $this->createBranch($newBranchName);
-//        $this->branchClean();
-//        $this->checkout($newBranchName);
-        file_put_contents('ceshi.txt','3'."\n",FILE_APPEND);
+        $this->createBranch($newBranchName);
+        file_put_contents('ceshi.txt','1'."\n",FILE_APPEND);
         $this->commit('删除了ceshi.txt');
         var_dump("==========提交==========\n");
-//        $this->checkout($this->runLocalBranch);
+        $this->checkout($this->runLocalBranch);
         var_dump("==========合并==========\n");
-//        $this->mergeBranch($newBranchName);
+        $this->mergeBranch($newBranchName);
         var_dump("==========commit==========\n");
-//        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
-//        $this->deleteBranch($newBranchName);
+        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
+        $this->deleteBranch($newBranchName);
         var_dump("==========push==========\n");
-//        $this->push();
+        $this->push();
     }
     public function run()
     {
