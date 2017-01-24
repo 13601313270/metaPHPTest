@@ -308,8 +308,14 @@
 创建分支:[删除多余文件]并切换到在此分支;结果[]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log"]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log","M\tmetaPHPCacheFile\/mergeBranch.log"]
+<<<<<<< HEAD
 创建分支:develop;结果["M\tmetaPHP"]
 创建分支:develop;结果["M\tmetaPHP","M\tmetaPHPCacheFile\/githubReceive.log"]
 创建分支:[删除多余文件]并切换到在此分支;结果[]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log"]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log","M\tmetaPHPCacheFile\/mergeBranch.log"]
+=======
+创建分支:develop;结果["M\tmetaPHP","M\tmetaPHPCacheFile\/githubReceive.log"]
+创建分支:[删除多余文件]并切换到在此分支;结果["M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log"]
+创建分支:develop;结果["M\tmetaPHP","M\tmetaPHPCacheFile\/createBranch.log","M\tmetaPHPCacheFile\/githubReceive.log"]
+>>>>>>> 删除多余文件

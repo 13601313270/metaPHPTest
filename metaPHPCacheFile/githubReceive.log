@@ -15,4 +15,8 @@ Already up-to-date.
  1 file changed, 1 insertion(+), 1 deletion(-)
 Already up-to-date.
 ["Already up-to-date."]
+<<<<<<< HEAD
 ["Already up-to-date."]
+=======
+["Updating 9916e0a..df9b654","Fast-forward"," ceshi.txt | 1 +"," 1 file changed, 1 insertion(+)"," create mode 100644 ceshi.txt"]
+>>>>>>> 删除多余文件
