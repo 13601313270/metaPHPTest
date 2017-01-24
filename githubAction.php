@@ -15,6 +15,7 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
+        $this->deleteBranch('去掉了ceshi.txt');
 //        $newBranchName = '去掉了ceshi.txt';
 //        $this->createBranch($newBranchName);
 //        unlink($this->webRootDir.'/ceshi.txt');
