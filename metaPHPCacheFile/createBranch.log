@@ -303,3 +303,4 @@
 创建分支:[删除多余文件]并切换到在此分支;结果[]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP","Your branch is ahead of 'origin\/develop' by 2 commits.","  (use \"git push\" to publish your local commits)"]
 创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP"]
+创建分支:develop;结果["D\tceshi.txt","M\tmetaPHP"]
