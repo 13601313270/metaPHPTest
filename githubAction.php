@@ -15,13 +15,13 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
-        $newBranchName = '去掉了ceshi.txt';
-        $this->createBranch($newBranchName);
-        unlink($this->webRootDir.'/ceshi.txt');
-        $this->commit('删除了ceshi.txt');
-        $this->checkout($this->runLocalBranch);
-        $this->mergeBranch($newBranchName);
-        $this->push();
+//        $newBranchName = '去掉了ceshi.txt';
+//        $this->createBranch($newBranchName);
+//        unlink($this->webRootDir.'/ceshi.txt');
+//        $this->commit('删除了ceshi.txt');
+//        $this->checkout($this->runLocalBranch);
+//        $this->mergeBranch($newBranchName);
+//        $this->push();
     }
     public function run()
     {
