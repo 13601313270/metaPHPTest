@@ -25,17 +25,24 @@ class temp extends githubAction{
     }
     public function run()
     {
-        $response = json_decode(file_get_contents('php://input'));
-        if(!in_array($response->ref,array(
-            'refs/heads/master',
-            'refs/heads/develop'
-        ))){
-            exit;
+        $input = file_get_contents('php://input');
+        if(empty($input)){
+            $this->checkout($this->runLocalBranch);
+            $this->main();
+            $this->checkout($this->runLocalBranch);
+        }else{
+            //第一次触发,进入这里,拉取代码,然后重新跳转到自己,执行新加载的代码
+            $response = json_decode($input);
+            if(!in_array($response->ref,array(
+                'refs/heads/master',
+                'refs/heads/develop'
+            ))){
+                exit;
+            }
+            $this->checkout($this->runLocalBranch);
+            parent::pull();
+            header("Location: ".$_SERVER['REQUEST_URI']);exit;
         }
-        $this->checkout($this->runLocalBranch);
-        parent::pull();
-        $this->main();
-        $this->checkout($this->runLocalBranch);
     }
 }
 $a = new temp();
