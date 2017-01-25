@@ -16,6 +16,7 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
+        
         $newBranchName = '创建新的父类';
         $this->createBranch($newBranchName);
         $newParentClass = classAction::createClass('parentTempClass','','','autoLoadClass');
