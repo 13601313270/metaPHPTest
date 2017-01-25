@@ -16,10 +16,11 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
-        $newBranchName = '删除ceshi.txt文件';
+        $newBranchName = '创建新的父类';
         $this->createBranch($newBranchName);
-        unlink('ceshi.txt');
-        $this->commit('删除了ceshi.txt');
+        $newParentClass = classAction::createClass('parentTempClass','','','autoLoadClass');
+        $newParentClass->save();
+        $this->commit('创建了父类');
         $this->checkout($this->runLocalBranch);
         $this->mergeBranch($newBranchName);
         $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
