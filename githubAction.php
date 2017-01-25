@@ -16,20 +16,14 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
-        $newBranchName = '增加了内容';
-        $this->branchClean();
-        var_dump("\n==========创建分支==========\n");
+        $newBranchName = '删除ceshi.txt文件';
         $this->createBranch($newBranchName);
-        file_put_contents('ceshi.txt','4'."\n",FILE_APPEND);
+        unlink('ceshi.txt');
         $this->commit('删除了ceshi.txt');
-        var_dump("\n==========提交==========\n");
         $this->checkout($this->runLocalBranch);
-        var_dump("\n==========合并==========\n");
         $this->mergeBranch($newBranchName);
-        var_dump("\n==========commit==========\n");
         $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
         $this->deleteBranch($newBranchName);
-        var_dump("\n==========push==========\n");
         $this->push();
     }
     public function run()
@@ -38,6 +32,7 @@ class temp extends githubAction{
         if(empty($input)){
             //第二次被命令行触发,进入这里
             $this->checkout($this->runLocalBranch);
+            $this->branchClean();
             $this->main();
             $this->checkout($this->runLocalBranch);
         }else{
