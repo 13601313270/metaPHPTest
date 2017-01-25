@@ -3,7 +3,7 @@
  * Created by metaPHP.
  * User: metaPHPRobot
  * Date: 2017-01-25
- * Time: 09:51:13
+ * Time: 09:51:30
  */
 class parentTempClass2{
 }
