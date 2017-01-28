@@ -54,4 +54,4 @@ class temp extends githubAction{
     }
 }
 $a = new temp();
-$a->main();
+$a->run();
