@@ -25,6 +25,7 @@ class temp extends githubAction{
         $this->mergeBranch($newBranchName);
         $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
         $this->push();
+        
     }
     public function run()
     {
