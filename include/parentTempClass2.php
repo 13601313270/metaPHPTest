@@ -2,8 +2,8 @@
 /**
  * Created by metaPHP.
  * User: metaPHPRobot
- * Date: 2017-01-26
- * Time: 14:31:56
+ * Date: 2017-01-28
+ * Time: 22:47:17
  */
 class parentTempClass2{
 }
