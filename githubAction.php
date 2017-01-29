@@ -18,9 +18,9 @@ class temp extends githubAction{
     public function main(){
         $newBranchName = '父类操作分支';
         $this->createBranch($newBranchName);
-        $tempParentClass = classAction::createClass('parentTempClass2','','','autoLoadClass');
-        $tempParentClass->save();
-        $this->commit('新建了另一个类');
+        $tempParentClass = new classAction('parentTempClass2');
+        $tempParentClass->remove();
+        $this->commit('删除了parentTempClass2');
         $this->checkout($this->runLocalBranch);
         $this->mergeBranch($newBranchName);
         $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
