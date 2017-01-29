@@ -16,16 +16,16 @@ class temp extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 
     public function main(){
-//        $newBranchName = '父类操作分支';
-//        $this->createBranch($newBranchName);
-//        $tempParentClass = classAction::createClass('parentTempClass','','','autoLoadClass');
-//        $tempParentClass->save();
-//        $this->commit('创建了一个通用父类');
-//        $this->checkout($this->runLocalBranch);
-//        $this->mergeBranch($newBranchName);
-//        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
-//        $this->deleteBranch($newBranchName);
-//        $this->push();
+        $newBranchName = '父类操作分支';
+        $this->createBranch($newBranchName);
+        $tempParentClass = classAction::createClass('parentTempClass','','','autoLoadClass');
+        $tempParentClass->save();
+        $this->commit('创建了一个通用父类');
+        $this->checkout($this->runLocalBranch);
+        $this->mergeBranch($newBranchName);
+        $this->commit('合并分支:'.$newBranchName.'到'.$this->runLocalBranch);
+        $this->deleteBranch($newBranchName);
+        $this->push();
     }
     public function run()
     {
