@@ -34,7 +34,11 @@ class temp extends githubAction{
             //第二次被命令行触发,进入这里
             $this->checkout($this->runLocalBranch);
             $this->branchClean();
-            $this->main();
+            try{
+                $this->main();
+            }catch (Exception $e){
+                print_r($e);
+            }
             $this->checkout($this->runLocalBranch);
         }else{
             //第一次触发,进入这里,拉取代码,然后重新跳转到自己,执行新加载的代码
