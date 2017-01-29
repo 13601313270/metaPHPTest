@@ -54,6 +54,7 @@ class temp extends githubAction{
                 exit;
             }
             $this->checkout($this->runLocalBranch);
+            $this->branchClean();
             parent::pull();
             exec('cd ' .dirname(__FILE__) . ';php '.__FILE__);
         }
