@@ -39,6 +39,7 @@ class temp extends githubAction{
             }catch (Exception $e){
                 print_r($e);
             }
+            $this->branchClean();
             $this->checkout($this->runLocalBranch);
         }else{
             //第一次触发,进入这里,拉取代码,然后重新跳转到自己,执行新加载的代码
