@@ -18,7 +18,7 @@ class temp extends githubAction{
     public function main(){
         $newBranchName = '父类操作分支';
         $this->createBranch($newBranchName);
-        $tempParentClass = new classAction('parentTempClass');
+        $tempParentClass = new classAction('parentTempClass2');
         $tempParentClass->remove();
         $this->commit('删除了刚才创建的通用父类');
         $this->checkout($this->runLocalBranch);
