@@ -1,3 +1,6 @@
 [submodule "metaPHP"]
 	path = metaPHP
 	url = https://13601313270@github.com/13601313270/metaPHP.git
+[submodule "kod"]
+	path = kod
+	url = https://github.com/13601313270/kod.git
