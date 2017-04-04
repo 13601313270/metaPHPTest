@@ -4,12 +4,47 @@
  * User: 王浩然
  * Date: 2017/1/23
  * Time: 下午2:56
+ *
+ * $a = array();
  */
+
+
+
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE);
+set_time_limit(60);
 include_once('./include.php');
 include_once('./metaPHP/githubAction.php');
 include_once('./metaPHP/classAction.php');
+include_once('./metaPHP/phpInterpreter.php');
+
+$content = implode('',file('./metaPHP/phpInterpreter2.php'));
+//phpInterpreter类是一个php解析器,把代码解析成一个数组的类型,这时代码被数据化
+$daoFileMetaCode = new phpInterpreter($content);
+
+$result = &$daoFileMetaCode->search('[extends]');
+$result = 1;
+print_r($daoFileMetaCode->codeMeta);exit;
+print_r($result);exit;
+
+
+$result = array_search_re('bar 3', $foo);
+print_r($daoFileMetaCode->getCode());exit;
+
+
+
+$content = implode('',@file('./metaPHP/classAction.php'));
+
+//$classActionClass = new classAction('classAction');
+$classActionClass = classAction::createClass('ss');
+$classActionClass->setProperty('key','value','private');
+var_dump($classActionClass->phpInterpreter->getCode());
+exit;
+
+//判断返回回来的数据是否是一样的
+print_r($array);exit;
+
 class temp extends githubAction{
     public $runLocalBranch = 'develop';
     public $webRootDir = '/var/www/html/metaPHPTest';
@@ -19,6 +54,7 @@ class temp extends githubAction{
         $newBranchName = '父类操作分支';
         $this->createBranch($newBranchName);
         $tempParentClass = new classAction('parentTempClass');
+//        $tempParentClass->getProperties()
         $tempParentClass->remove();
         $this->commit('删除了parentTempClass');
         $this->checkout($this->runLocalBranch);
