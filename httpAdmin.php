@@ -92,7 +92,6 @@ $searchApi = new metaSearch($searchBase);
 $re = $searchApi->search('.= .new')->parent()->parent()->toArray();
 print_r($re);exit;
 
-
 print_r($searchBase);
 
 //用中括号包裹的含义,代表查找包含某个属性的元素,[object2]就代表包含object2属性的元素
