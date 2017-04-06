@@ -8,6 +8,7 @@
 include_once('include.php');
 class githubClass extends githubAction{
     public $runLocalBranch = 'develop';
+    public $originBranch = 'origin/develop';
     public $webRootDir = '/var/www/html/metaPHPTest';
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 }
