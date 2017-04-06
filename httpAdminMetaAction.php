@@ -41,7 +41,7 @@ if($_GET['action']=='rename'){
         $gitAction->checkout($gitAction->runLocalBranch);
         $gitAction->branchClean();
         $gitAction->pull();
-        file_get_contents('./httpAdmin.php',$metaApi->getCode());
+        file_put_contents('./httpAdmin.php',$metaApi->getCode());
         $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_GET['name'].'改为'.$_GET['title']);
         $gitAction->push();
         $gitAction->branchClean();
