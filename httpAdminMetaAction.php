@@ -41,14 +41,10 @@ if($_GET['action']=='rename'){
         $gitAction->checkout($gitAction->runLocalBranch);
         $gitAction->branchClean();
         $gitAction->pull();
-
-
+        file_get_contents('./httpAdmin.php',$metaApi->getCode());
         $gitAction->commit('一次测试提交');
         $gitAction->push();
         $gitAction->branchClean();
         $gitAction->checkout($gitAction->runLocalBranch);
-
-        print_r($gitAction);exit;
-        echo $metaApi->getCode();
     }
 }
