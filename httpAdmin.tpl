@@ -55,8 +55,10 @@
                 if(newName!==null){
                     $('#actionProgress>div').css('width','0%');
                     var interval = setInterval(function(){
-                        var nowPosition = parseInt($('#actionProgress>div').css('width'));
-                        if(nowPosition<98){
+                        var nowPosition = parseInt($('#actionProgress>div').attr('aria-valuenow'));
+                        nowPosition++;
+                        if(nowPosition<90){
+                            $('#actionProgress>div').attr('aria-valuenow',nowPosition);
                             $('#actionProgress>div').css('width',(nowPosition+1)+'%');
                         }else{
                             clearInterval(interval);
