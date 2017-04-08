@@ -74,9 +74,7 @@
                         $('#console .panel-body .accordion-inner').append($('<div>'+data+'</div>'));
                         clearInterval(interval);
                         $('#actionProgress>div').css('width','100%');
-                        setTimeout(function(){
-                            $('#actionProgress>div').css('width','0%');
-                        },200);
+                        location.href = location.href;
                     });
                 }
             });
