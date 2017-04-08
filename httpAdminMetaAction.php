@@ -16,24 +16,24 @@ $metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
 $search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
 $kod_web_pageObj = $search[0]['object1']['name'];
 $httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
-if($_GET['action']=='rename'){
-    if(in_array($_GET['name'],scandir('./http/'))){
+if($_POST['action']=='rename'){
+    if(in_array($_POST['name'],scandir('./http/'))){
         $isHasExist = new metaSearch($httpFileConfig[0]['object2']);
-        $isHasExist = $isHasExist->search('child .arrayValue key:filter([data='.$_GET['name'].'])')->parent()->toArray();
+        $isHasExist = $isHasExist->search('child .arrayValue key:filter([data='.$_POST['name'].'])')->parent()->toArray();
         if(count($isHasExist)>0){
-            $isHasExist[0]['value']['data'] = $_GET['title'];
+            $isHasExist[0]['value']['data'] = $_POST['title'];
         }else{
             $httpFileConfig[0]['object2']['child'][] = array(
                 'type'=>'arrayValue',
                 'key'=>array(
                     'type'=>'string',
                     'borderStr'=>"'",
-                    'data'=>$_GET['name'],
+                    'data'=>$_POST['name'],
                 ),
                 'value'=>array(
                     'type'=>'string',
                     'borderStr'=>"'",
-                    'data'=>$_GET['title'],
+                    'data'=>$_POST['title'],
                 ),
             );
         }
@@ -42,7 +42,7 @@ if($_GET['action']=='rename'){
         $gitAction->branchClean();
         $gitAction->pull();
         file_put_contents('./httpAdmin.php',$metaApi->getCode());
-        $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_GET['name'].'改为'.$_GET['title']);
+        $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
         $gitAction->push();
         $gitAction->branchClean();
         $gitAction->checkout($gitAction->runLocalBranch);
