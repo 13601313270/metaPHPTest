@@ -15,6 +15,19 @@
         #fileList>table>tbody>tr>.fileName:hover span{
             opacity: 1;
         }
+        #console{
+            position:fixed;
+            width: 100%;
+            bottom:0px;
+            margin-bottom: 1px;
+        }
+        #console .panel-body{
+            padding: 0 15px;
+        }
+        #console .panel-body .accordion-inner{
+            max-height: 300px;
+            overflow-y: scroll;
+        }
     </style>
 </head>
 <body>
@@ -41,11 +54,23 @@
                         name:$(this).data('id'),
                         title:newName
                     },function(data){
-                        console.log(data);
+                        $('#console .panel-body .accordion-inner').append($('<div>'+data+'</div>'));
                     });
                 }
             });
         </script>
+    </section>
+    <section id="console"  class="panel panel-default">
+        <div class="panel-heading" data-toggle="collapse" href="#collapseOne">操作日志</div>
+        <div class="panel-body">
+            <div id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner">
+                </div>
+            </div>
+            {*<div>*}
+                {*<input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">*}
+            {*</div>*}
+        </div>
     </section>
 </body>
 </html>

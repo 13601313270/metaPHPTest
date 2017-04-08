@@ -38,13 +38,21 @@ if($_POST['action']=='rename'){
             );
         }
         $gitAction = new githubClass();
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->checkout($gitAction->runLocalBranch);
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->branchClean();
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->pull();
+        echo date('Y-m-d H:i:s')."\n";
         file_put_contents('./httpAdmin.php',$metaApi->getCode());
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->push();
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->branchClean();
+        echo date('Y-m-d H:i:s')."\n";
         $gitAction->checkout($gitAction->runLocalBranch);
     }
 }
