@@ -31,6 +31,9 @@
     </style>
 </head>
 <body>
+    <div id="actionProgress" class="progress" style="height: 10px;border-radius: 0;">
+        <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+    </div>
     <section id="fileList">
         <table class="table table-striped">
             <thead></thead>
@@ -46,18 +49,36 @@
             </tbody>
         </table>
         <script>
+            {literal}
             $('.fileName .btn').click(function(){
                 var newName = prompt('请输入文件名');
                 if(newName!==null){
+                    $('#actionProgress>div').css('width','0%');
+                    var interval = setInterval(function(){
+                        var nowPosition = parseInt($('#actionProgress>div').css('width'));
+                        if(nowPosition<98){
+                            $('#actionProgress>div').css('width',(nowPosition+1)+'%');
+                        }else{
+                            clearInterval(interval);
+                        }
+                    },100);
                     $.post('httpAdminMetaAction.php',{
                         action:'rename',
                         name:$(this).data('id'),
                         title:newName
                     },function(data){
+                        data = data.replace(/\n/g,'<br/>');
+                        data = data.replace(/\s/g,'&nbsp;');
                         $('#console .panel-body .accordion-inner').append($('<div>'+data+'</div>'));
+                        clearInterval(interval);
+                        $('#actionProgress>div').css('width','100%');
+                        setTimeout(function(){
+                            $('#actionProgress>div').css('width','0%');
+                        },200);
                     });
                 }
             });
+            {/literal}
         </script>
     </section>
     <section id="console"  class="panel panel-default">
