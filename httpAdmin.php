@@ -11,5 +11,5 @@ include_once('include.php');
 $page=new kod_web_page();
 $page2=new stdClass();
 $page->fileList=scandir('./http/');
-$page->httpFileConfig=array('index.php' => '新名字2');
+$page->httpFileConfig=array('index.php' => 'new');
 $page->fetch('httpAdmin.tpl');
