@@ -11,5 +11,8 @@ include_once('include.php');
 $page=new kod_web_page();
 $page2=new stdClass();
 $page->fileList=scandir('./http/');
-$page->httpFileConfig=array('index.php' => '首页');
+$page->httpFileConfig=array(
+    'index.php' => '首页',
+    'index.tpl' => '首页模板'
+);
 $page->fetch('httpAdmin.tpl');
