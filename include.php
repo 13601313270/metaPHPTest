@@ -15,7 +15,7 @@ date_default_timezone_set('PRC');
 define("webDIR",dirname(__FILE__)."/http/");//网站根目录
 define("KOD_SMARTY_TEMPLATE_DIR",dirname(__FILE__)."/http/");
 define("KOD_REWRITE_HTML_LINK",true);
-define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/html/smarty_cache');
+define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/smarty_cache');
 
 define('KOD_MYSQL_SERVER','118.190.95.219');
 define('KOD_MYSQL_USER','root');
