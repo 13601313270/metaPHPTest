@@ -47,6 +47,7 @@ if($_POST['action']=='rename'){
         echo date('Y-m-d H:i:s')."\n";
         file_put_contents('./httpAdmin.php',$metaApi->getCode());
         echo date('Y-m-d H:i:s')."\n";
+        $gitAction->add('--all');
         $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
         echo date('Y-m-d H:i:s')."\n";
         $gitAction->push();
