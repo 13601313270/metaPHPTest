@@ -6,6 +6,7 @@
  * Time: 下午4:02
  */
 $hook_log = json_decode(file_get_contents('php://input'));
+echo "得到请求\n";
 print_r($hook_log);
 
 //收到的事件,比如push
