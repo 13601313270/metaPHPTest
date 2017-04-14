@@ -7,3 +7,11 @@
  */
 $hook_log = json_decode(file_get_contents('php://input'));
 print_r($hook_log);
+
+//收到的事件,比如push
+$event = $hook_log->events;
+var_dump($event);
+
+//项目名称
+$repositoryName = $hook_log->repository->name;
+var_dump($repositoryName);
