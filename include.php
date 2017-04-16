@@ -27,9 +27,6 @@ define('KOD_SMARTY_CSS_HOST','http://118.190.95.234/metaPHPTest/cssCreate/');
 
 define('KOD_METAPHP_OPEN',false);
 include_once('metaPHP/include.php');
-
-
-
 spl_autoload_register(function($model){
     $classAutoLoad = array(
         'projectClass' => 'include/project.php',
