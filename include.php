@@ -17,9 +17,9 @@ define("KOD_SMARTY_TEMPLATE_DIR",dirname(__FILE__)."/http/");
 define("KOD_REWRITE_HTML_LINK",true);
 define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/smarty_cache');
 
-define('KOD_MYSQL_SERVER','118.190.95.219');
-define('KOD_MYSQL_USER','root');
-define('KOD_MYSQL_PASSWORD','1082322$%&whr309568486');
+define('KOD_MYSQL_SERVER','****');
+define('KOD_MYSQL_USER','****');
+define('KOD_MYSQL_PASSWORD','**');
 define('KOD_COMMENT_MYSQLDB','dbName');
 
 define("KOD_SMARTY_CSS_DIR",dirname(__FILE__)."/cssCreate/");
