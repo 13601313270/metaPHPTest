@@ -56,4 +56,13 @@ if($_POST['action']=='rename'){
         echo date('Y-m-d H:i:s')."\n";
         $gitAction->checkout($gitAction->runLocalBranch);
     }
+}elseif($_POST['action']=='getBranch'){
+    $gitAction = new githubClass();
+    $result = $gitAction->createBranch('',false);
+    echo json_encode($result);
+}elseif($_POST['action']=='checkout'){
+    $gitAction = new githubClass();
+    $gitAction->branchClean();
+    $result = $gitAction->checkout($_POST['sName']);
+    echo json_encode($result);
 }
