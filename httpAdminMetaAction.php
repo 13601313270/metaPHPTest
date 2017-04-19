@@ -58,11 +58,16 @@ if($_POST['action']=='rename'){
     }
 }elseif($_POST['action']=='getBranch'){
     $gitAction = new githubClass();
-    $result = $gitAction->createBranch('',false);
+    $result = $gitAction->createBranch('-a',false);
     echo json_encode($result);
 }elseif($_POST['action']=='checkout'){
     $gitAction = new githubClass();
     $gitAction->branchClean();
-    $result = $gitAction->checkout($_POST['sName']);
-    echo json_encode($result);
+    $branchName = $_POST['sName'];
+    $allExistBranch = $gitAction->createBranch('-a',false);
+    if(in_array('  '.$branchName,$allExistBranch)){
+        $branchName = str_replace('remotes/origin/','',$branchName);
+        $result = $gitAction->checkout($branchName);
+        echo json_encode($result);
+    }
 }

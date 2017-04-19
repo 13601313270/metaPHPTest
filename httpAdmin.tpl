@@ -90,13 +90,17 @@
                             for(var i=0;i<data.length;i++){
                                 var branchItem = data[i];
                                 if(branchItem.substring(0,1)!=='*'){
-                                    $('#floatDom').append('<li><a href="#">'+branchItem.substring(2)+'</a></li>');
+                                    if(branchItem.substring(0,16)=='  remotes/origin'){
+                                        $('#floatDom').append('<li><a href="#" value="'+branchItem.substring(2)+'">公共:'+branchItem.substring(17)+'</a></li>');
+                                    }else{
+                                        $('#floatDom').append('<li><a href="#" value="'+branchItem.substring(2)+'">本地:'+branchItem.substring(2)+'</a></li>');
+                                    }
                                 }
                             }
                         });
                     });
                     $('#floatDom').on('click','>li',function(){
-                        var selectBranch = $(this).find('>a').html();
+                        var selectBranch = $(this).find('>a').attr('value');
                         $.post('httpAdminMetaAction.php',{
                             action:'checkout',
                             sName:selectBranch
@@ -105,7 +109,6 @@
                             console.log(data);
                             initGitState();
                         });
-                        console.log(selectBranch);
                     });
                     function initGitState(){
                         $.post('httpAdminMetaAction.php',{
