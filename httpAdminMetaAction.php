@@ -70,9 +70,10 @@ if($_POST['action']=='rename'){
     }
 }elseif($_POST['action']=='updateBranch'){
     $gitAction->pull(true);
-    $gitAction->exec('cd ' . $gitAction->webRootDir . ';git remote prune origin');
+    $result = $gitAction->exec('cd ' . $gitAction->webRootDir . ';git remote prune origin');
+    echo json_encode($result);
 }elseif($_POST['action']=='pull'){
-    $gitAction->pull(true);
+    echo json_encode($gitAction->pull(true));
 }elseif($_POST['action']=='githubClean'){
     $result = $gitAction->branchClean();
     echo json_encode($result);
