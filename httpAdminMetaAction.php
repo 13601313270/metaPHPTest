@@ -16,6 +16,7 @@ $metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
 $search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
 $kod_web_pageObj = $search[0]['object1']['name'];
 $httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
+$gitAction = new githubClass();
 if($_POST['action']=='rename'){
     if(in_array($_POST['name'],scandir('./http/'))){
         $isHasExist = new metaSearch($httpFileConfig[0]['object2']);
@@ -37,7 +38,6 @@ if($_POST['action']=='rename'){
                 ),
             );
         }
-        $gitAction = new githubClass();
         echo date('Y-m-d H:i:s')."\n";
         $gitAction->checkout($gitAction->runLocalBranch);
         echo date('Y-m-d H:i:s')."\n";
@@ -57,11 +57,9 @@ if($_POST['action']=='rename'){
         $gitAction->checkout($gitAction->runLocalBranch);
     }
 }elseif($_POST['action']=='getBranch'){
-    $gitAction = new githubClass();
     $result = $gitAction->createBranch('-a',false);
     echo json_encode($result);
 }elseif($_POST['action']=='checkout'){
-    $gitAction = new githubClass();
     $gitAction->branchClean();
     $branchName = $_POST['sName'];
     $allExistBranch = $gitAction->createBranch('-a',false);
@@ -70,4 +68,6 @@ if($_POST['action']=='rename'){
         $result = $gitAction->checkout($branchName);
         echo json_encode($result);
     }
+}elseif($_POST['action']=='pullAndSave'){
+    $gitAction->pull(true);
 }

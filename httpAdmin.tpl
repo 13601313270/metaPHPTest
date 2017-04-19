@@ -97,18 +97,35 @@
                                     }
                                 }
                             }
+                            $('#floatDom').append('<li role="separator" class="divider"></li>');
+                            $('#floatDom').append('<li><a href="#" active="pull">分支找不到?需要点击同步一下远程</a></li>');
+
+//                            <li role="separator" class="divider"></li>
+//                                    <li><a href="#">Separated link</a></li>
                         });
                     });
                     $('#floatDom').on('click','>li',function(){
                         var selectBranch = $(this).find('>a').attr('value');
-                        $.post('httpAdminMetaAction.php',{
-                            action:'checkout',
-                            sName:selectBranch
-                        },function(data){
-                            data = JSON.parse(data);
-                            console.log(data);
-                            initGitState();
-                        });
+                        if(selectBranch==undefined){
+                            $.post('httpAdminMetaAction.php',{
+                                action:'pullAndSave',
+                                sName:selectBranch
+                            },function(data){
+                                data = JSON.parse(data);
+                                console.log(data);
+                                initGitState();
+                            });
+                        }else{
+                            $.post('httpAdminMetaAction.php',{
+                                action:'checkout',
+                                sName:selectBranch
+                            },function(data){
+                                data = JSON.parse(data);
+                                console.log(data);
+                                initGitState();
+                            });
+                        }
+                        console.log(selectBranch);
                     });
                     function initGitState(){
                         $.post('httpAdminMetaAction.php',{
