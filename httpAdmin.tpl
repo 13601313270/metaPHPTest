@@ -153,8 +153,8 @@
                         },function(data){
                             data = JSON.parse(data);
                             console.log(data);
-//                            initGitState();
-//                            stopProgress();
+                            initGitState();
+                            stopProgress();
                         });
                     });
                     function initGitState(){
