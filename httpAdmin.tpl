@@ -78,6 +78,7 @@
                             <ul id="floatDom" class="dropdown-menu"></ul>
                         </div>
                         <button type="button" class="btn btn-default">重置</button>
+                        <button id="githubPull" type="button" class="btn btn-default">拉取</button>
                     </div>
                 </div>
                 <script>
@@ -133,6 +134,15 @@
                             });
                         }
                         console.log(selectBranch);
+                    });
+                    $('#githubPull').click(function(){
+                        $.post('httpAdminMetaAction.php',{
+                            action:'pull'
+                        },function(data){
+                            data = JSON.parse(data);
+                            console.log(data);
+                            initGitState();
+                        });
                     });
                     function initGitState(){
                         $.post('httpAdminMetaAction.php',{

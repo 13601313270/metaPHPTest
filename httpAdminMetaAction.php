@@ -71,4 +71,6 @@ if($_POST['action']=='rename'){
 }elseif($_POST['action']=='updateBranch'){
     $gitAction->pull(true);
     $gitAction->exec('cd ' . $gitAction->webRootDir . ';git remote prune origin');
+}elseif($_POST['action']=='pull'){
+    $gitAction->pull(true);
 }
