@@ -108,7 +108,7 @@
                         var selectBranch = $(this).find('>a').attr('value');
                         if(selectBranch==undefined){
                             $.post('httpAdminMetaAction.php',{
-                                action:'pullAndSave',
+                                action:'updateBranch',
                                 sName:selectBranch
                             },function(data){
                                 data = JSON.parse(data);
