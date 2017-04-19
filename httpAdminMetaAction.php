@@ -73,4 +73,7 @@ if($_POST['action']=='rename'){
     $gitAction->exec('cd ' . $gitAction->webRootDir . ';git remote prune origin');
 }elseif($_POST['action']=='pull'){
     $gitAction->pull(true);
+}elseif($_POST['action']=='githubClean'){
+    $result = $gitAction->branchClean();
+    echo json_encode($result);
 }

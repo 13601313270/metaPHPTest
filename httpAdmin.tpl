@@ -77,7 +77,7 @@
                             </button>
                             <ul id="floatDom" class="dropdown-menu"></ul>
                         </div>
-                        <button type="button" class="btn btn-default">重置</button>
+                        <button id="githubClean" type="button" class="btn btn-default">重置</button>
                         <button id="githubPull" type="button" class="btn btn-default">拉取</button>
                     </div>
                 </div>
@@ -107,13 +107,11 @@
                             }
                             $('#floatDom').append('<li role="separator" class="divider"></li>');
                             $('#floatDom').append('<li><a href="#" active="pull">分支找不到?需要点击同步一下远程</a></li>');
-
-//                            <li role="separator" class="divider"></li>
-//                                    <li><a href="#">Separated link</a></li>
                         });
                     });
                     $('#floatDom').on('click','>li',function(){
                         var selectBranch = $(this).find('>a').attr('value');
+                        beginProgress(2);
                         if(selectBranch==undefined){
                             $.post('httpAdminMetaAction.php',{
                                 action:'updateBranch',
@@ -122,6 +120,7 @@
                                 data = JSON.parse(data);
                                 console.log(data);
                                 initGitState();
+                                stopProgress();
                             });
                         }else{
                             $.post('httpAdminMetaAction.php',{
@@ -131,17 +130,31 @@
                                 data = JSON.parse(data);
                                 console.log(data);
                                 initGitState();
+                                stopProgress();
                             });
                         }
                         console.log(selectBranch);
                     });
                     $('#githubPull').click(function(){
+                        beginProgress(4);
                         $.post('httpAdminMetaAction.php',{
                             action:'pull'
                         },function(data){
                             data = JSON.parse(data);
                             console.log(data);
                             initGitState();
+                            stopProgress();
+                        });
+                    });
+                    $('#githubClean').click(function(){
+                        beginProgress(2);
+                        $.post('httpAdminMetaAction.php',{
+                            action:'githubClean'
+                        },function(data){
+                            data = JSON.parse(data);
+                            console.log(data);
+//                            initGitState();
+//                            stopProgress();
                         });
                     });
                     function initGitState(){
@@ -171,6 +184,26 @@
     </div>
     <script>
         {literal}
+        function beginProgress(time){
+            $('#actionProgress>div').css('width','0%');
+            window.interval = setInterval(function(){
+                var nowPosition = parseFloat($('#actionProgress>div').attr('aria-valuenow'));
+                nowPosition +=(1/time);
+                if(nowPosition<90){
+                    $('#actionProgress>div').attr('aria-valuenow',nowPosition);
+                    $('#actionProgress>div').css('width',parseInt(nowPosition)+'%');
+                }else{
+                    clearInterval(interval);
+                }
+            },10);
+        }
+        function stopProgress(){
+            clearInterval(interval);
+            $('#actionProgress>div').css('width','100%');
+            setTimeout(function(){
+                $('#actionProgress>div').css('width','0%');
+            },1000);
+        }
         $('.fileName .btn').click(function(){
             var newName = prompt('请输入文件名');
             if(newName!==null){
