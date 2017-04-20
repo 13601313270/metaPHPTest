@@ -160,8 +160,10 @@
                                 action:'checkout',
                                 sName:selectBranch
                             },function(data){
-                                data = JSON.parse(data);
-                                console.log(data);
+                                if(data!=''){
+                                    data = JSON.parse(data);
+                                    console.log(data);
+                                }
                                 initGitState();
                                 stopProgress();
                             });
