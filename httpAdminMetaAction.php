@@ -62,6 +62,7 @@ if($_POST['action']=='rename'){
 }elseif($_POST['action']=='checkout'){
     $gitAction->branchClean();
     $branchName = $_POST['sName'];
+    var_dump($branchName);exit;
     $allExistBranch = $gitAction->createBranch('-a',false);
     if(in_array('  '.$branchName,$allExistBranch)){
         $branchName = str_replace('remotes/origin/','',$branchName);
@@ -76,5 +77,8 @@ if($_POST['action']=='rename'){
     echo json_encode($gitAction->pull(true));
 }elseif($_POST['action']=='githubClean'){
     $result = $gitAction->branchClean();
+    echo json_encode($result);
+}elseif($_POST['action'] == 'commitlog'){
+    $result = $gitAction->exec('cd ' . $gitAction->webRootDir . ';git log --graph --pretty=format:"%h (%p) (%s) %an %ai"');
     echo json_encode($result);
 }

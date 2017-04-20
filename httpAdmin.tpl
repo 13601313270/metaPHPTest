@@ -28,6 +28,29 @@
             max-height: 300px;
             overflow-y: scroll;
         }
+        .dropdown-menu>ul {
+            padding: 0;
+        }
+        .dropdown-menu>ul>li{
+            list-style: none;
+        }
+        .dropdown-menu>ul>li>a {
+            display: block;
+            padding: 3px 20px;
+            clear: both;
+            font-weight: 400;
+            line-height: 1.42857143;
+            color: #333;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .dropdown-menu>ul>li>a:hover {
+            color: #262626;
+            text-decoration: none;
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 <body>
@@ -73,9 +96,18 @@
                         当前正在<span id="githubState"></span>版本
                         <div class="btn-group">
                             <button id="githubStateChange" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                切换到 <span class="caret"></span>
+                                切换到分支<span class="caret"></span>
                             </button>
                             <ul id="floatDom" class="dropdown-menu"></ul>
+                        </div>
+                        <div class="btn-group">
+                            <button id="commitlog" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                重置到节点<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu" style="height:400px;overflow-y: scroll;width: 400px;">
+                                <canvas style="position:absolute;left:0;"></canvas>
+                                <ul id="floatDom"></ul>
+                            </div>
                         </div>
                         <button id="githubClean" type="button" class="btn btn-default">重置</button>
                         <button id="githubPull" type="button" class="btn btn-default">拉取</button>
@@ -111,6 +143,7 @@
                     });
                     $('#floatDom').on('click','>li',function(){
                         var selectBranch = $(this).find('>a').attr('value');
+                        console.log(selectBranch);
                         beginProgress(2);
                         if(selectBranch==undefined){
                             $.post('httpAdminMetaAction.php',{
@@ -146,6 +179,147 @@
                             stopProgress();
                         });
                     });
+                    {literal}
+                    $('#commitlog').click(function(){
+                        $('#commitlog').parent().find('ul').html('');
+                        beginProgress(2);
+                        $.post('httpAdminMetaAction.php',{
+                            action:'commitlog'
+                        },function(data){
+                            data = JSON.parse(data);
+                            var commithashList = {};
+                            for(var i=0;i<data.length;i++){
+                                data[i] = data[i].match(/^([\*|\\|\||\/|\s]+)((\S{7}) \(([^\)]*)\) \(([^\)]+)\) (\S+) (\S+ \S+))?/).slice(3);
+                                if(data[i][0]!=undefined){
+                                    var parent = data[i][1].split(' ');
+                                    commithashList[data[i][0]] = {
+                                        parent:parent,
+                                        title:data[i][2],
+                                        author:data[i][3],
+                                        time:data[i][4],
+                                        child:[],
+                                    }
+                                }
+                            }
+                            for(var i in commithashList){
+                                for(var j=0;j<commithashList[i].parent.length;j++){
+                                    if(commithashList[i].parent[j]!==''){
+                                        commithashList[commithashList[i].parent[j]].child.push(i);
+                                    }
+                                }
+                            }
+                            var isTabUse = [];//是否占着tab位
+                            var isTabUseColor = [];
+                            var isTabMaxUse = 0;
+                            $('#commitlog').parent().find('.dropdown-menu>canvas').attr('height', data.length*26  );
+                            $('#commitlog').parent().find('.dropdown-menu>canvas').attr('width',30);
+                            var cxt=$('#commitlog').parent().find('.dropdown-menu>canvas')[0].getContext("2d");
+                            cxt.clearRect(0,0,cxt.canvas.width,cxt.canvas.height);
+                            function getRandomColor(){
+                                function getPer(){
+                                    return '0123456789abcdef'[Math.floor(Math.random()*16)];
+                                }
+                                var colorBase = ['ff','97',getPer()+getPer()];
+                                colorBase = colorBase.sort(function(){ return 0.5 - Math.random() })
+                                return '#'+colorBase.join('');
+                            }
+                            for(var i=0;i<data.length-1;i++){
+                                var commitHash = data[i][0];
+                                if(commitHash!=undefined){
+                                    var childList = commithashList[commitHash].child;
+                                    if(childList && childList.length>0){
+                                        if(childList.length>1){//从上到下合并
+                                            var childPos = isTabUse.indexOf(childList[0]);
+                                            for(var j=1;j<childList.length;j++){
+                                                childPos = Math.min(childPos,isTabUse.indexOf(childList[j]));
+                                            }
+                                            isTabUse[childPos] = commitHash;
+                                            for(var j=0;j<childList.length;j++){
+                                                var temp = isTabUse.indexOf(childList[j]);
+                                                if(temp!=-1 && temp!=childPos){
+                                                    isTabUse[temp] = null;
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            if(commithashList[childList[0]].parent.length>1){//从上到下分叉
+                                                if(commithashList[childList[0]].parent.indexOf(commitHash)==0){
+                                                    var childPos = isTabUse.indexOf(childList[0]);
+                                                }else{
+                                                    for(var j=0;j<=isTabUse.length;j++){
+                                                        if(isTabUse[j]==undefined || isTabUse[j]==null){
+                                                            var childPos = j;break;
+                                                        }
+                                                    }
+                                                    isTabUseColor[childPos] = getRandomColor();
+                                                }
+                                            }else{//从上到下直线
+                                                var childPos = isTabUse.indexOf(childList[0]);
+                                            }
+                                            isTabUse[childPos] = commitHash;
+                                        }
+                                    }else{
+                                        isTabUse[0] = commitHash;
+                                        isTabUseColor[0] = getRandomColor();
+                                    }
+                                    if(isTabUse.length>isTabMaxUse){
+                                        isTabMaxUse = isTabUse.length;
+                                        (function(){
+                                            var tepData = cxt.getImageData(0,0,cxt.canvas.width,cxt.canvas.height);
+                                            $('#commitlog').parent().find('.dropdown-menu>canvas').attr('width',isTabMaxUse*10+4);
+                                            cxt.putImageData(tepData,0,0);
+                                        })();
+                                    }
+                                    //展示这一行
+                                    var show = 0;
+                                    for(var j=0;j<isTabUse.indexOf(commitHash);j++){
+                                        show ++;
+                                    }
+                                    commithashList[commitHash].tab = show;
+                                    commithashList[commitHash].line = $('#commitlog').parent().find('ul li').length;
+                                    (function(){
+                                        var centerX = show*10+8;
+                                        var centerY = $('#commitlog').parent().find('ul li').length*26+13;
+                                        cxt.lineWidth=2;
+                                        cxt.strokeStyle="#000000";
+                                        cxt.fillStyle=isTabUseColor[show];//"#42768b";
+                                        for(var j=0;j<childList.length;j++){
+                                            var centerX2 = commithashList[childList[j]].tab*10+8;
+                                            var centerY2 = commithashList[childList[j]].line*26+13;
+
+                                            if(commithashList[childList[j]].tab==show){
+                                                cxt.moveTo(centerX,centerY-4);
+                                                cxt.lineTo(centerX,centerY2+13);
+                                                cxt.lineTo(centerX2,centerY2+4);
+                                            } else if(centerX2>centerX){
+                                                cxt.moveTo(centerX+3,centerY);
+                                                cxt.lineTo(centerX2,centerY-13);
+                                                cxt.lineTo(centerX2,centerY2+4);
+                                            }else{
+                                                cxt.moveTo(centerX,centerY);
+                                                cxt.lineTo(centerX,centerY2+13);
+                                                cxt.lineTo(centerX2+3,centerY2);
+                                            }
+                                            cxt.stroke();
+                                        }
+                                        cxt.beginPath();
+                                        cxt.arc(centerX,centerY,4,0,Math.PI*2,true);
+                                        cxt.closePath();
+                                        cxt.stroke();
+                                        cxt.fill();
+                                    })();
+                                    $('#commitlog').parent().find('ul').append('<li><a value="'+commitHash+'">'+commitHash+' '+commithashList[commitHash].title+'</a></li>');
+                                }
+                            }
+                            $('#commitlog').parent().find('ul').css('paddingLeft',isTabMaxUse*10);
+                            var tepData = cxt.getImageData(0,0,cxt.canvas.width,cxt.canvas.height);
+                            $('#commitlog').parent().find('.dropdown-menu>canvas').attr('height', $('#commitlog').parent().find('ul li').length*26  );
+                            $('#commitlog').parent().find('.dropdown-menu>canvas').attr('width',isTabMaxUse*10+4);
+                            cxt.putImageData(tepData,0,0);
+                            stopProgress();
+                        });
+                    });
+                    {/literal}
                     $('#githubClean').click(function(){
                         beginProgress(2);
                         $.post('httpAdminMetaAction.php',{
