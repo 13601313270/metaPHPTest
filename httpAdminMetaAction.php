@@ -62,11 +62,16 @@ if($_POST['action']=='rename'){
 }elseif($_POST['action']=='checkout'){
     $gitAction->branchClean();
     $branchName = $_POST['sName'];
-    $allExistBranch = $gitAction->createBranch('-a',false);
-    if(in_array('  '.$branchName,$allExistBranch)){
-        $branchName = str_replace('remotes/origin/','',$branchName);
+    if(preg_match('/^\S{7}$/',$branchName)){
         $result = $gitAction->checkout($branchName);
         echo json_encode($result);
+    }else{
+        $allExistBranch = $gitAction->createBranch('-a',false);
+        if(in_array('  '.$branchName,$allExistBranch)){
+            $branchName = str_replace('remotes/origin/','',$branchName);
+            $result = $gitAction->checkout($branchName);
+            echo json_encode($result);
+        }
     }
 }elseif($_POST['action']=='updateBranch'){
     $gitAction->pull(true);
