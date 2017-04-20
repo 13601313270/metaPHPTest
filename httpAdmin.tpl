@@ -106,7 +106,7 @@
                             </button>
                             <div class="dropdown-menu" style="height:400px;overflow-y: scroll;width: 400px;">
                                 <canvas style="position:absolute;left:0;"></canvas>
-                                <ul id="floatDom"></ul>
+                                <ul id="checkoutCommit"></ul>
                             </div>
                         </div>
                         <button id="githubClean" type="button" class="btn btn-default">重置</button>
@@ -141,7 +141,7 @@
                             $('#floatDom').append('<li><a href="#" active="pull">分支找不到?需要点击同步一下远程</a></li>');
                         });
                     });
-                    $('#floatDom').on('click','>li',function(){
+                    function checkout(){
                         var selectBranch = $(this).find('>a').attr('value');
                         console.log(selectBranch);
                         beginProgress(2);
@@ -167,7 +167,9 @@
                             });
                         }
                         console.log(selectBranch);
-                    });
+                    }
+                    $('#floatDom').on('click','>li',checkout);
+                    $('#checkoutCommit').on('click','>li',checkout);
                     $('#githubPull').click(function(){
                         beginProgress(4);
                         $.post('httpAdminMetaAction.php',{

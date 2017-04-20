@@ -62,7 +62,6 @@ if($_POST['action']=='rename'){
 }elseif($_POST['action']=='checkout'){
     $gitAction->branchClean();
     $branchName = $_POST['sName'];
-    var_dump($branchName);exit;
     $allExistBranch = $gitAction->createBranch('-a',false);
     if(in_array('  '.$branchName,$allExistBranch)){
         $branchName = str_replace('remotes/origin/','',$branchName);
