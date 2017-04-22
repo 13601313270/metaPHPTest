@@ -75,7 +75,7 @@ if($_POST['action']=='rename'){
     }
 }elseif($_POST['action']=='updateBranch'){
     $gitAction->pull(true);
-    $result = $gitAction->exec('cd ' . $gitAction->webRootDir . ';git remote prune origin');
+    $result = $gitAction->exec('git remote prune origin');
     echo json_encode($result);
 }elseif($_POST['action']=='pull'){
     echo json_encode($gitAction->pull(true));
@@ -83,6 +83,6 @@ if($_POST['action']=='rename'){
     $result = $gitAction->branchClean();
     echo json_encode($result);
 }elseif($_POST['action'] == 'commitlog'){
-    $result = $gitAction->exec('cd ' . $gitAction->webRootDir . ';git log --graph --pretty=format:"%h (%p) (%s) %an %ai"');
+    $result = $gitAction->exec('git log --graph --pretty=format:"%h (%p) (%s) %an %ai"');
     echo json_encode($result);
 }

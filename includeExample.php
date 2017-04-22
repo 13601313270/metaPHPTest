@@ -22,6 +22,13 @@ define('KOD_MYSQL_USER','root');
 define('KOD_MYSQL_PASSWORD','1082322$%&whr309568486');
 define('KOD_COMMENT_MYSQLDB','dbName');
 
+/*
+ * 设置memcache
+ * */
+//define('KOD_MEMCACHE_OPEN',true);
+//define('KOD_MEMCACHE_HOST','***');//默认值是localhost
+//define('KOD_MEMCACHE_PORT',***);//默认值是11211
+
 define("KOD_SMARTY_CSS_DIR",dirname(__FILE__)."/cssCreate/");
 define('KOD_SMARTY_CSS_HOST','http://118.190.95.234/metaPHPTest/cssCreate/');
 
