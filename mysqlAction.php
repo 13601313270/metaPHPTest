@@ -234,6 +234,7 @@ if($_POST['action']=='tables'){
             $metaSearchApi = new metaSearch($allIncludeApi);
             $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
         }
+        $thisTableAdminInfo[0]['option'] = $option;
         echo json_encode($thisTableAdminInfo[0]);exit;
     }
 }
