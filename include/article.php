@@ -5,7 +5,7 @@
 *
 * User: metaPHP
 * Date: 2017/04/23
-* Time: 17:09
+* Time: 17:10
 */
 
 class article extends kod_db_mysqlSingle{
