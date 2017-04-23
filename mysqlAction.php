@@ -140,6 +140,11 @@ if($_POST['action']=='tables'){
             //如果不存在创建一个
             $adminClassName = $className.'Admin';
             $newClass = classAction::createClass($adminClassName,'kod_web_mysqlAdmin');
+            array_splice($newClass->phpInterpreter->codeMeta['child'],1,0,array(array(
+                'type'=>'functionCall',
+                'name'=>'include_once',
+                'property'=>array(array('type'=>'string','data'=>'../include.php')),
+            )));
             $temp = $newClass->phpInterpreter->search('.comments')->toArray();
             $temp[0]['value'] = '*
 * 表'.$className.'操作后台
@@ -160,7 +165,7 @@ if($_POST['action']=='tables'){
                     ),
                 ),
             );
-            $newClass->setProperty('smartyTpl', array('type'=>'string','borderStr'=>"'",'data'=>$className.'.tpl'), 'protected');
+            $newClass->setProperty('smartyTpl', array('type'=>'string','borderStr'=>"'",'data'=>$adminClassName.'.tpl'), 'protected');
 
             $dbColumn = array('type'=>'array','child'=>array());
             foreach($option as $k=>$v){
@@ -179,6 +184,30 @@ if($_POST['action']=='tables'){
                 $dbColumn['child'][] = $insert;
             }
             $newClass->setProperty('dbColumn',$dbColumn, 'protected');
+
+            $class[0]['child'][] = array(
+                'type'=>'function', 'public'=>true, 'name'=>'main',
+                'child'=>array(
+                    array(
+                        'type'=>'=',
+                        'object1'=>array('type'=>'variable','name'=>'$adminHtml'),
+                        'object2'=>array(
+                            'type'=>'objectFunction', 'object'=>'$this', 'name'=>'getAdminHtml',
+                            'property'=>array(
+                                array('type'=>'objectParams', 'object'=>array('name'=>'$this'), 'name'=>'dbColumn',)
+                            ),
+                        ),
+                    ),
+                    array(
+                        'type'=>'objectFunction','object'=>'$this','name'=>'assign',
+                        'property'=>array(
+                            array('type'=>'string','data'=>'adminHtml','borderStr'=>"'"),
+                            array('type'=>'variable','name'=>'$adminHtml'),
+                        ),
+                    ),
+                ),
+            );
+
             $newClass->phpInterpreter->codeMeta['child'][] = array(
                 'type'=>'=',
                 'object1'=>array('type'=>'variable', 'name'=>'$adminObj'),
@@ -191,6 +220,10 @@ if($_POST['action']=='tables'){
             //写入文件系统
             $gitAction->pull();
             file_put_contents('./admin/'.$adminClassName.'.php',$newClass->phpInterpreter->getCode());
+            file_put_contents('./admin/'.$adminClassName.'.tpl','{include file="../adminBase.tpl"}
+{block name="content"}
+{$adminHtml}
+{/block}');
             $gitAction->add('--all');
             $gitAction->commit('增加了表'.$className.'的后台');
             $gitAction->push();
