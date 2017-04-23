@@ -134,8 +134,9 @@ if($_POST['action']=='tables'){
         $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
         //找到这个表对应的后台
         $metaSearchApi = new metaSearch($allIncludeApi);
-        $thisTableApiInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
-        if(empty($thisTableApiInfo)){
+        $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
+
+        if(empty($thisTableAdminInfo)){
             //如果不存在创建一个
             $adminClassName = $className.'Admin';
             $newClass = classAction::createClass($adminClassName,'kod_web_mysqlAdmin');
@@ -199,8 +200,8 @@ if($_POST['action']=='tables'){
             $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
             //找到这个表对应的后台
             $metaSearchApi = new metaSearch($allIncludeApi);
-            $thisTableApiInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
+            $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
         }
-        echo json_encode($thisTableApiInfo[0]);exit;
+        echo json_encode($thisTableAdminInfo[0]);exit;
     }
 }
