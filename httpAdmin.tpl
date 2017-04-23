@@ -59,7 +59,8 @@
     </div>
     <ul id="myTab" class="nav nav-tabs">
         <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
-        <li><a href="#ios" data-toggle="tab">运行环境git状态</a></li>
+        <li><a href="#gitAdmin" data-toggle="tab">运行环境git状态</a></li>
+        <li><a id="dataAdminTab" href="#dataAdmin" data-toggle="tab">数据</a></li>
         <li class="dropdown">
             <a href="#" id="myTabDrop1" class="dropdown-toggle"
                data-toggle="dropdown">Java
@@ -89,7 +90,7 @@
                 </table>
             </section>
         </div>
-        <div class="tab-pane fade" id="ios" style="padding-top: 10px;">
+        <div class="tab-pane fade" id="gitAdmin" style="padding-top: 10px;">
             <section id="github" class="container">
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -143,7 +144,6 @@
                     });
                     function checkout(){
                         var selectBranch = $(this).find('>a').attr('value');
-                        console.log(selectBranch);
                         beginProgress(2);
                         if(selectBranch==undefined){
                             $.post('httpAdminMetaAction.php',{
@@ -151,7 +151,6 @@
                                 sName:selectBranch
                             },function(data){
                                 data = JSON.parse(data);
-                                console.log(data);
                                 initGitState();
                                 stopProgress();
                             });
@@ -162,13 +161,11 @@
                             },function(data){
                                 if(data!=''){
                                     data = JSON.parse(data);
-                                    console.log(data);
                                 }
                                 initGitState();
                                 stopProgress();
                             });
                         }
-                        console.log(selectBranch);
                     }
                     $('#floatDom').on('click','>li',checkout);
                     $('#checkoutCommit').on('click','>li',checkout);
@@ -178,7 +175,6 @@
                             action:'pull'
                         },function(data){
                             data = JSON.parse(data);
-                            console.log(data);
                             initGitState();
                             stopProgress();
                         });
@@ -330,7 +326,6 @@
                             action:'githubClean'
                         },function(data){
                             data = JSON.parse(data);
-                            console.log(data);
                             initGitState();
                             stopProgress();
                         });
@@ -352,8 +347,68 @@
                 </script>
             </section>
         </div>
-        <div class="tab-pane fade" id="jmeter">
-            <p>jMeter 是一款开源的测试软件。它是 100% 纯 Java 应用程序，用于负载和性能测试。</p>
+        <style>
+            {literal}
+            #dataAdmin{margin: 10px auto;}
+            #dataAdmin>.panel{float: left;margin: 0 5px 20px 5px;height: 200px;}
+            @media screen and (min-width: 1200px) {
+                #dataAdmin{width:1040px;}
+                #dataAdmin>.panel{width: 250px;}
+            }
+            @media screen and (min-width: 900px) and (max-width: 1199px){
+                #dataAdmin{width:840px;}
+                #dataAdmin>.panel{width: 200px;}
+            }
+            @media screen and (min-width: 700px) and (max-width: 899px){
+                #dataAdmin{width:640px;}
+                #dataAdmin>.panel{width: 200px;}
+            }
+            @media screen and (max-width: 699px){
+                #dataAdmin{width:90%;}
+                #dataAdmin>.panel{width: 100%;}
+            }
+            {/literal}
+        </style>
+        <div class="tab-pane fade" id="dataAdmin">
+            <script>
+                var allTableApiClass = {json_encode($tableApiClass)};
+                $('#dataAdminTab').click(function(){
+                    $.post('mysqlAction.php',{
+                        action:'tables',
+                        databases:'{$useDataBases[0]}'
+                    },function(data){
+                        $('#dataAdmin').html('');
+                        data = JSON.parse(data);
+                        for(var i=0;i<data.length;i++){
+                            $('#dataAdmin').append('<div class="panel panel-default" data-database="'+data[i].database+'" data-name="'+data[i].Name+'">'+
+                                '<div class="panel-heading">'+data[i].Name+'</div>'+
+                                '<div class="panel-body">'+
+                                    '<p>创建于'+data[i].Create_time+'</p>'+
+                                    '<p>使用引擎'+data[i].Engine+'</p>'+
+                                    '<p>数据量'+data[i].Rows+'</p>'+
+                                    '<p>'+data[i].Comment+'</p>'+
+                                '</div>'+
+//                                '<div class="panel-footer">Panel footer</div>'+
+                            '</div>');
+                        }
+                    });
+                });
+                $('#dataAdmin').on('click','>.panel',function(){
+                    var database = $(this).data('database');
+                    var tableName = $(this).data('name');
+                    $('#dataAdmin>.panel').fadeOut(300);
+                    $.post('mysqlAction.php',{
+                        action:'showTableColumn',
+                        database:database,
+                        name:tableName,
+                        tableApi:allTableApiClass[]
+                    },function(data){
+                        data = JSON.parse(data);
+                        console.log(data);
+                        $('#dataAdmin>.panel').fadeIn(300);
+                    });
+                });
+            </script>
         </div>
         <div class="tab-pane fade" id="ejb">
             <p>Enterprise Java Beans（EJB）是一个创建高度可扩展性和强大企业级应用程序的开发架构，部署在兼容应用程序服务器（比如 JBOSS、Web Logic 等）的 J2EE 上。
