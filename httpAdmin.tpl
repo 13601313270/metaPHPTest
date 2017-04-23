@@ -371,7 +371,7 @@
         </style>
         <div class="tab-pane fade" id="dataAdmin">
             <script>
-                var allTableApiClass = {json_encode($tableApiClass)};
+                {*var allTableApiClass = {json_encode($tableApiClass)};*}
                 $('#dataAdminTab').click(function(){
                     $.post('mysqlAction.php',{
                         action:'tables',
@@ -401,7 +401,7 @@
                         action:'showTableColumn',
                         database:database,
                         name:tableName,
-                        tableApi:allTableApiClass[]
+//                        tableApi:allTableApiClass
                     },function(data){
                         data = JSON.parse(data);
                         console.log(data);
