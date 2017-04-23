@@ -45,6 +45,8 @@ spl_autoload_register(function($model){
     );
     if(isset($classAutoLoad[$model])){
         include_once $classAutoLoad[$model];
+    }elseif(strpos($model,'kod_')===false && strpos($model,'Smarty_')===false){
+        include_once 'include/'.$model.'.php';
     }
 });
 
