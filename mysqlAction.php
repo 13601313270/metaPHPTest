@@ -187,7 +187,6 @@ if($_POST['action']=='tables'){
             $newClass->phpInterpreter->codeMeta['child'][] = array(
                 'type'=>'objectFunction', 'object'=>'$adminObj', 'name'=>'run',
             );
-            echo $newClass->phpInterpreter->getCode();
 
             //写入文件系统
             $gitAction->pull();
