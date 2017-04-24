@@ -26,7 +26,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'title'
+            'title' => '标题'
         ),
         'img' => array(
             'dataType' => 'varchar',
