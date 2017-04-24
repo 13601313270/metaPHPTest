@@ -58,7 +58,7 @@ if($_POST['action']=='tables'){
     $metaSearchApi = new metaSearch($allIncludeApi);
     $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$className.'])')->toArray();
     //如果没有则创建一个
-    if(true || empty($thisTableApiInfo)){
+    if(empty($thisTableApiInfo)){
         $tableInfo = current(kod_db_mysqlDB::create()->runsql('show create table '.$className));
         if(preg_match('/CREATE TABLE ".+?"\s*\(([\S|\s]*)\)$/',$tableInfo['Create Table'],$match)){
             $tableInfo = explode(',',$match[1]);
