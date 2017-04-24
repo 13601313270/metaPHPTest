@@ -425,21 +425,63 @@
 
                             function getDataTypes(nowType){
                                 var html = '<select class="form-control">';
-                                '<option value="bigint">bigint</option>' +
-                                '<option>2</option>' +
-                                '<option>3</option>' +
-                                '<option>4</option>' +
-                                '<option>5</option>';
-                                html+='</select>';
+                                var allType = [
+                                    ['bit','bit'],
+                                    ['tinyint','tinyint'],
+                                    ['smallint','smallint'],
+                                    ['mediumint','mediumint'],
+                                    ['int','int'],
+                                    ['integer','integer'],
+                                    ['bigint','bigint'],
+
+                                    ['real','real'],
+                                    ['double','double'],
+                                    ['float','float'],
+                                    ['decimal','decimal'],
+                                    ['numeric','numeric'],
+
+                                    ['varchar','varchar'],
+                                    ['char','char'],
+
+                                    ['binary','binary'],
+                                    ['varbinary','varbinary'],
+                                    ['date','date'],
+                                    ['time','time'],
+                                    ['datetime','datetime'],
+                                    ['timestamp','timestamp'],
+                                    ['year','year'],
+                                    ['tinyblob','tinyblob'],
+                                    ['blob','blob'],
+                                    ['mediumblob','mediumblob'],
+                                    ['longblob','longblob'],
+                                    ['tinytext','tinytext'],
+                                    ['text','text'],
+                                    ['mediumtext','mediumtext'],
+                                    ['longtext','longtext'],
+                                    ['enum','enum'],
+                                    ['set','set'],
+                                ];
+                                for(var i=0;i<allType.length;i++){
+                                    if(allType[i][0]==nowType){
+                                        html+= '<option selected value="'+allType[i][0]+'">'+allType[i][1]+'</option>';
+                                    }else{
+                                        html+= '<option value="'+allType[i][0]+'">'+allType[i][1]+'</option>';
+                                    }
+                                }
+                                html+= '</select>';
+
                                 return html;
                             }
                             for(var i in data.option){
                                 table.append($('<tr>' +
                                         '<td><label>'+i+'</label></td>' +
                                         '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
-                                        '<td>'+data.option[i].dataType+'</td>' +
-                                        '<td>'+data.option[i].maxLength+'</td>' +
-                                        '<td>'+data.option[i].notNull+'</td>' +
+                                        '<td>'+getDataTypes(data.option[i].dataType)+'</td>' +
+                                        '<td>'+
+                                            (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
+                                                '<input class="form-control" style="max-width: 60px" value="'+data.option[i].maxLength+'">'
+                                            ):'')+'</td>' +
+                                        '<td><input type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
                                         '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
