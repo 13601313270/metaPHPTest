@@ -406,6 +406,13 @@
                     },function(data){
                         data = JSON.parse(data);
                         console.log(data);
+                        $.post('mysqlAction.php',{
+                            action:'showTableAdmin',
+                            class:data.className
+                        },function(data){
+                            console.log(data);
+                        });
+
                     });
                     /*
                     $.post('mysqlAction.php',{
