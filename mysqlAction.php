@@ -50,6 +50,68 @@ if($_POST['action']=='tables'){
         $data[$k]['database'] = KOD_COMMENT_MYSQLDB;
     }
     echo json_encode($data);
+}elseif($_POST['action']=='getDataApi'){
+    $className = $_POST['name'];
+    //获得include文件夹全部接口类梗概信息
+    $allIncludeApi = getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
+    //找到这个表对应的接口类
+    $metaSearchApi = new metaSearch($allIncludeApi);
+    $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$className.'])')->toArray();
+    //如果没有则创建一个
+    if(true || empty($thisTableApiInfo)){
+        $tableInfo = current(kod_db_mysqlDB::create()->runsql('show create table '.$className));
+        if(preg_match('/CREATE TABLE ".+?"\s*\(([\S|\s]*)\)$/',$tableInfo['Create Table'],$match)){
+            $tableInfo = explode(',',$match[1]);
+            $primaryKey = array();//主键
+            $dataType = array();
+            //查找主键
+            foreach($tableInfo as $k=>$v){
+                if(preg_match("/[`|\"](\S+)[`|\"] (int|smallint|varchar|tinyint|char|bigint)\((\d+)\)( NOT NULL| DEFAULT NULL)?( DEFAULT '(\S+)'| AUTO_INCREMENT)?( COMMENT '(\S+)')?/",$v,$match)){
+                    $dataType[$match[1]] = $match[2];
+                    if(!empty($match[5]) && $match[5]==" AUTO_INCREMENT"){
+                        $primaryKey = array('name'=>$match[1], 'dataType'=>$match[2],);
+                    }
+                    break;
+                }elseif(preg_match("/[`|\"](\S+)[`|\"] (text|date)( NOT NULL| DEFAULT NULL)?( DEFAULT '(\S+)'| AUTO_INCREMENT)?( COMMENT '(\S+)')?/",$v,$match)){
+                    $dataType[$match[1]] = $match[2];
+                }elseif(  preg_match("/[`|\"](\S+)[`|\"] timestamp( NOT NULL| DEFAULT NULL)( DEFAULT CURRENT_TIMESTAMP)?( ON UPDATE CURRENT_TIMESTAMP)?( COMMENT '(\S+)')?/",$v,$match)  ){
+                    $dataType[$match[1]] = 'date';
+                }elseif( preg_match("/PRIMARY KEY \(\"(\S+)\"\)/",$v,$match) ){
+                    $primaryKey = array(
+                        'name'=>$match[1], 'dataType' => $option[$match[1]]['dataType']
+                    );
+                }
+            }
+            if(!empty($primaryKey)){
+                //创建表对应的接口类
+                $newClass = classAction::createClass($className,'kod_db_mysqlSingle');
+                $temp = $newClass->phpInterpreter->search('.comments')->toArray();
+                $temp[0]['value'] = '*
+* 表'.$className.'操作接口
+*
+* User: metaPHP
+* Date: '.date('Y/m/d').'
+* Time: '.date('H:i').'
+';
+                $newClass->setProperty('tableName', array('type'=>'string','borderStr'=>"'",'data'=>$className), 'protected');
+                $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['name']), 'protected');
+                $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['dataType']), 'protected');
+                //提交git
+                $gitAction->pull();
+                file_put_contents('./include/'.$className.'.php',$newClass->phpInterpreter->getCode());
+                $gitAction->add('--all');
+                $gitAction->commit('增加了表'.$className.'的操作接口类');
+                $gitAction->push();
+                $gitAction->branchClean();
+
+                //刷新一下接口列表
+                $allIncludeApi = getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
+                $metaSearchApi = new metaSearch($allIncludeApi);
+                $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$className.'])')->toArray();
+            }
+        }
+    }
+    echo json_encode($thisTableApiInfo[0]);
 }elseif($_POST['action']=='showTableColumn'){
     $allTable = kod_db_mysqlDB::create()->runsql('show tables');
     $allTable = kod_tool_array::getNewArrOfArrColumn($allTable,'Tables_in_phoneGap');
@@ -61,7 +123,7 @@ if($_POST['action']=='tables'){
     $tableInfo = current(kod_db_mysqlDB::create()->runsql('show create table '.$className));
     if(preg_match('/CREATE TABLE ".+?"\s*\(([\S|\s]*)\)$/',$tableInfo['Create Table'],$match)){
         $tableInfo = explode(',',$match[1]);
-        $primaryKey = '';//主键
+        $primaryKey = array();//主键
         $option = array();
         foreach($tableInfo as $k=>$v){
             if(preg_match("/[`|\"](\S+)[`|\"] (int|smallint|varchar|tinyint|char|bigint)\((\d+)\)( NOT NULL| DEFAULT NULL)?( DEFAULT '(\S+)'| AUTO_INCREMENT)?( COMMENT '(\S+)')?/",$v,$match)){
@@ -72,7 +134,10 @@ if($_POST['action']=='tables'){
                     "title"=>empty($match[8])?$match[1]:$match[8],
                 );
                 if(!empty($match[5]) && $match[5]==" AUTO_INCREMENT"){
-                    $primaryKey = $match[1];
+                    $primaryKey = array(
+                        'name'=>$match[1],
+                        'dataType'=>$match[2],
+                    );
                     $option[$match[1]]["AUTO_INCREMENT"] = true;
                 }
             }elseif(preg_match("/[`|\"](\S+)[`|\"] (text|date)( NOT NULL| DEFAULT NULL)?( DEFAULT '(\S+)'| AUTO_INCREMENT)?( COMMENT '(\S+)')?/",$v,$match)){
@@ -88,7 +153,10 @@ if($_POST['action']=='tables'){
                     "title"=>"",
                 );
             }elseif( preg_match("/PRIMARY KEY \(\"(\S+)\"\)/",$v,$match) ){
-                $primaryKey = $match[1];
+                $primaryKey = array(
+                    'name'=>$match[1],
+                    'dataType' => $option[$match[1]]['dataType']
+                );
             }
         }
         $gitAction = new githubClass();
@@ -113,8 +181,9 @@ if($_POST['action']=='tables'){
 * Time: '.date('H:i').'
 ';
             $newClass->setProperty('tableName', array('type'=>'string','borderStr'=>"'",'data'=>$className), 'protected');
-            $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey), 'protected');
-            $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>$option[$primaryKey]['dataType']), 'protected');
+            $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['name']), 'protected');
+            $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['dataType']), 'protected');
+            var_dump($newClass->phpInterpreter->getCode());exit;
 
             $gitAction->pull();
             file_put_contents('./include/'.$className.'.php',$newClass->phpInterpreter->getCode());

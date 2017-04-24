@@ -404,7 +404,8 @@
                         name:tableName,
 //                        tableApi:allTableApiClass
                     },function(data){
-
+                        data = JSON.parse(data);
+                        console.log(data);
                     });
                     /*
                     $.post('mysqlAction.php',{
