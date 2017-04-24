@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -398,15 +399,55 @@
                     var tableName = $(this).data('name');
                     $('#dataAdmin>.panel').fadeOut(300);
                     $.post('mysqlAction.php',{
+                        action:'getDataApi',
+                        database:database,
+                        name:tableName,
+//                        tableApi:allTableApiClass
+                    },function(data){
+
+                    });
+                    /*
+                    $.post('mysqlAction.php',{
                         action:'showTableColumn',
                         database:database,
                         name:tableName,
 //                        tableApi:allTableApiClass
                     },function(data){
                         data = JSON.parse(data);
-                        console.log(data);
+                        $('#showTableColumn').show();
+                        $('#showTableColumn>.panel>.panel-body').html('');
+                        var table = $('<table class="table"><thead><tr>' +
+                                '<th>字段</th>' +
+                                '<th>名称</th>' +
+                                '<th>类型</th>' +
+                                '<th>最大长度</th>' +
+                                '<th>是否必填</th>' +
+                            '</tr></thead><tbody></tbody></table>');
+                        //table.find('>tbody')
+
+                        function getDataTypes(nowType){
+                            var html = '<select class="form-control">';
+                                    '<option value="bigint">bigint</option>' +
+                                    '<option>2</option>' +
+                                    '<option>3</option>' +
+                                    '<option>4</option>' +
+                                    '<option>5</option>';
+                            html+='</select>';
+                            return html;
+                        }
+                        for(var i in data.option){
+                            table.append($('<tr>' +
+                                '<td><label>'+i+'</label></td>' +
+                                '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
+                                '<td>'+data.option[i].dataType+'</td>' +
+                                '<td>'+data.option[i].maxLength+'</td>' +
+                                '<td>'+data.option[i].notNull+'</td>' +
+                            '</tr>'));
+                        }
+                        $('#showTableColumn>.panel>.panel-body').append(table);
                         $('#dataAdmin>.panel').fadeIn(300);
                     });
+                    */
                 });
             </script>
         </div>
@@ -467,6 +508,51 @@
         });
         {/literal}
     </script>
+    <style>
+        {literal}
+        #showTableColumn{
+            position: fixed;background-color: rgba(141, 141, 141, 0.48);left:0;top:0;width:100%;height:100%;
+        }
+        #showTableColumn>.panel{  position:absolute;  }
+        @media screen and (min-width: 700px){
+            #showTableColumn>.panel{ left:calc(50% - 336px);width:672px;}
+        }
+        @media screen and (max-width: 699px){
+            #showTableColumn>.panel{ left: 2%;width:96%;}
+        }
+        @media screen and (min-height: 700px){
+            #showTableColumn>.panel{ top: calc(50% - 330px);height:616px;}
+        }
+        @media screen and (max-height: 699px){
+            #showTableColumn>.panel{ top: 2%;height:88%;}
+        }
+        {/literal}
+    </style>
+    <section id="showTableColumn" style="display: none;">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                表后台
+                <div class="btn-group btn-group-xs" role="group" aria-label="..." style="float: right;">
+                    <button type="button" class="btn btn-default">后台</button>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            放到tab
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">移除</a></li>
+                            <li><a href="#">Dropdown link</a></li>
+                            <li><a href="#">最后</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body" style="position: absolute;top:41px;bottom: 56px;width: 100%;overflow-y: scroll"></div>
+            <div class="panel-footer" style="position: absolute;bottom: 0;width: 100%;">
+                <button id="githubClean" type="button" class="btn btn-default">保存</button>
+            </div>
+        </div>
+    </section>
     <section id="console"  class="panel panel-default">
         <div class="panel-heading" data-toggle="collapse" href="#collapseOne">操作日志</div>
         <div class="panel-body">
