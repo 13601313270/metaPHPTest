@@ -410,52 +410,43 @@
                             action:'showTableAdmin',
                             class:data.className
                         },function(data){
+                            data = JSON.parse(data);
                             console.log(data);
+
+                            $('#showTableColumn').show();
+                            $('#showTableColumn>.panel>.panel-body').html('');
+                            var table = $('<table class="table"><thead><tr>' +
+                                    '<th>字段</th>' +
+                                    '<th>名称</th>' +
+                                    '<th>类型</th>' +
+                                    '<th>最大长度</th>' +
+                                    '<th>是否必填</th>' +
+                                    '</tr></thead><tbody></tbody></table>');
+
+                            function getDataTypes(nowType){
+                                var html = '<select class="form-control">';
+                                '<option value="bigint">bigint</option>' +
+                                '<option>2</option>' +
+                                '<option>3</option>' +
+                                '<option>4</option>' +
+                                '<option>5</option>';
+                                html+='</select>';
+                                return html;
+                            }
+                            for(var i in data.option){
+                                table.append($('<tr>' +
+                                        '<td><label>'+i+'</label></td>' +
+                                        '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
+                                        '<td>'+data.option[i].dataType+'</td>' +
+                                        '<td>'+data.option[i].maxLength+'</td>' +
+                                        '<td>'+data.option[i].notNull+'</td>' +
+                                        '</tr>'));
+                            }
+                            $('#showTableColumn>.panel>.panel-body').append(table);
+                            $('#dataAdmin>.panel').fadeIn(300);
                         });
 
                     });
-                    /*
-                    $.post('mysqlAction.php',{
-                        action:'showTableColumn',
-                        database:database,
-                        name:tableName,
-//                        tableApi:allTableApiClass
-                    },function(data){
-                        data = JSON.parse(data);
-                        $('#showTableColumn').show();
-                        $('#showTableColumn>.panel>.panel-body').html('');
-                        var table = $('<table class="table"><thead><tr>' +
-                                '<th>字段</th>' +
-                                '<th>名称</th>' +
-                                '<th>类型</th>' +
-                                '<th>最大长度</th>' +
-                                '<th>是否必填</th>' +
-                            '</tr></thead><tbody></tbody></table>');
-                        //table.find('>tbody')
-
-                        function getDataTypes(nowType){
-                            var html = '<select class="form-control">';
-                                    '<option value="bigint">bigint</option>' +
-                                    '<option>2</option>' +
-                                    '<option>3</option>' +
-                                    '<option>4</option>' +
-                                    '<option>5</option>';
-                            html+='</select>';
-                            return html;
-                        }
-                        for(var i in data.option){
-                            table.append($('<tr>' +
-                                '<td><label>'+i+'</label></td>' +
-                                '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
-                                '<td>'+data.option[i].dataType+'</td>' +
-                                '<td>'+data.option[i].maxLength+'</td>' +
-                                '<td>'+data.option[i].notNull+'</td>' +
-                            '</tr>'));
-                        }
-                        $('#showTableColumn>.panel>.panel-body').append(table);
-                        $('#dataAdmin>.panel').fadeIn(300);
-                    });
-                    */
                 });
             </script>
         </div>

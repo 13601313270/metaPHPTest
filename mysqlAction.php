@@ -229,8 +229,28 @@ if($_POST['action']=='tables'){
         $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
         //找到这个表对应的后台
         $metaSearchApi = new metaSearch($allIncludeApi);
-        $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$thisTableApiInfo['className'].'])')->toArray();
     }
-    $thisTableAdminInfo[0]['option'] = $option;
-    echo json_encode($thisTableAdminInfo[0]);exit;
+    $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$thisTableApiInfo['className'].'])')->toArray();
+    $adminFileName = $thisTableAdminInfo[0]['fileName'];
+
+    $phpInterpreter = new phpInterpreter(file_get_contents('./admin/'.$adminFileName));
+    $option = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) .property:filter(#$dbColumn) value child')->toArray();
+    $optionLast = array();
+    foreach($option[0] as $item){
+        $insert = array();
+        foreach($item['value']['child'] as $vv){
+            if($vv['value']['type']=='int'){
+                $insert[$vv['key']['data']] = intval($vv['value']['data']);
+            }elseif($vv['value']['type']=='bool'){
+                $insert[$vv['key']['data']] = $vv['value']['data']=='true'?true:false;
+            }else{
+                $insert[$vv['key']['data']] = $vv['value']['data'];
+            }
+        }
+        $optionLast[$item['key']['data']] = $insert;
+
+    }
+    echo json_encode(array(
+        'option'=>$optionLast
+    ));exit;
 }
