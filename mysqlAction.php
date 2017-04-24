@@ -97,6 +97,7 @@ if($_POST['action']=='tables'){
                 $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['name']), 'protected');
                 $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['dataType']), 'protected');
                 //提交git
+                $gitAction = new githubClass();
                 $gitAction->pull();
                 file_put_contents('./include/'.$className.'.php',$newClass->phpInterpreter->getCode());
                 $gitAction->add('--all');
