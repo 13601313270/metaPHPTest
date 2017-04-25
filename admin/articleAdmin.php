@@ -29,7 +29,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'title' => '标题'
         ),
         'img' => array(
-            'dataType' => 'varchar',
+            'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
             'title' => 'img'
