@@ -366,7 +366,7 @@
             }
             @media screen and (max-width: 699px){
                 #dataAdmin{width:90%;}
-                #dataAdmin>.panel{width: 100%;}
+                #dataAdmin>.panel{width: 100%;margin: 0 0 20px;}
             }
             {/literal}
         </style>
@@ -422,64 +422,26 @@
                                     '<th>最大长度</th>' +
                                     '<th>是否必填</th>' +
                                     '</tr></thead><tbody></tbody></table>');
-
-                            function getDataTypes(nowType){
+                            function getDataTypes(nowType,allType){
                                 var html = '<select class="form-control">';
-                                var allType = [
-                                    ['bit','bit'],
-                                    ['tinyint','tinyint'],
-                                    ['smallint','smallint'],
-                                    ['mediumint','mediumint'],
-                                    ['int','int'],
-                                    ['integer','integer'],
-                                    ['bigint','bigint'],
-
-                                    ['real','real'],
-                                    ['double','double'],
-                                    ['float','float'],
-                                    ['decimal','decimal'],
-                                    ['numeric','numeric'],
-
-                                    ['varchar','varchar'],
-                                    ['char','char'],
-
-                                    ['binary','binary'],
-                                    ['varbinary','varbinary'],
-                                    ['date','date'],
-                                    ['time','time'],
-                                    ['datetime','datetime'],
-                                    ['timestamp','timestamp'],
-                                    ['year','year'],
-                                    ['tinyblob','tinyblob'],
-                                    ['blob','blob'],
-                                    ['mediumblob','mediumblob'],
-                                    ['longblob','longblob'],
-                                    ['tinytext','tinytext'],
-                                    ['text','text'],
-                                    ['mediumtext','mediumtext'],
-                                    ['longtext','longtext'],
-                                    ['enum','enum'],
-                                    ['set','set'],
-                                ];
                                 for(var i=0;i<allType.length;i++){
-                                    if(allType[i][0]==nowType){
-                                        html+= '<option selected value="'+allType[i][0]+'">'+allType[i][1]+'</option>';
+                                    if(allType[i].type==nowType){
+                                        html+= '<option selected value="'+allType[i].type+'">'+allType[i].name+'</option>';
                                     }else{
-                                        html+= '<option value="'+allType[i][0]+'">'+allType[i][1]+'</option>';
+                                        html+= '<option value="'+allType[i].type+'">'+allType[i].name+'</option>';
                                     }
                                 }
                                 html+= '</select>';
-
                                 return html;
                             }
                             for(var i in data.option){
                                 table.append($('<tr>' +
                                         '<td><label>'+i+'</label></td>' +
                                         '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
-                                        '<td>'+getDataTypes(data.option[i].dataType)+'</td>' +
+                                        '<td>'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
                                         '<td>'+
                                             (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
-                                                '<input class="form-control" style="max-width: 60px" value="'+data.option[i].maxLength+'">'
+                                                '<input class="form-control" style="max-width: 60px;min-width:37px;padding:6px;text-align: center;" value="'+data.option[i].maxLength+'">'
                                             ):'')+'</td>' +
                                         '<td><input type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
                                         '</tr>'));
@@ -591,6 +553,7 @@
             <div class="panel-body" style="position: absolute;top:41px;bottom: 56px;width: 100%;overflow-y: scroll"></div>
             <div class="panel-footer" style="position: absolute;bottom: 0;width: 100%;">
                 <button id="githubClean" type="button" class="btn btn-default">保存</button>
+                <button id="githubClean" type="button" onclick="$('#showTableColumn').hide()" class="btn btn-default">取消</button>
             </div>
         </div>
     </section>

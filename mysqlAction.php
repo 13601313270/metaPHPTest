@@ -250,7 +250,46 @@ if($_POST['action']=='tables'){
         $optionLast[$item['key']['data']] = $insert;
 
     }
-    echo json_encode(array(
-        'option'=>$optionLast
-    ));exit;
+    $allMysqlColType = array(
+        'boolean'=>array('name'=>'布尔值', 'saveType'=>'tinyint'),
+        'tinyint'=>array('name'=>'tinyint', 'saveType'=>'tinyint'),
+        'int'=>array('name'=>'数字', 'saveType'=>'int'),
+        'bigint'=>array('name'=>'超大数字', 'saveType'=>'bigint'),
+//        'real'=>array('name'=>'real', 'saveType'=>'real'),
+        'double'=>array('name'=>'双精度小数', 'saveType'=>'double'),
+//        'float'=>array('name'=>'小数', 'saveType'=>'float'),
+        'image'=>array('name'=>'图片', 'saveType'=>'varchar'),
+        'imageQiniu'=>array('name'=>'七牛图片', 'saveType'=>'imageQiniu'),
+//        'decimal'=>array('name'=>'decimal', 'saveType'=>'decimal'),
+//        'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
+        'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
+        'varchar'=>array('name'=>'字符串', 'saveType'=>'varchar'),
+        'char'=>array('name'=>'固定长度字符串', 'saveType'=>'char'),
+//        'binary'=>array('name'=>'binary', 'saveType'=>'binary'),
+//        'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
+        'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
+        'date'=>array('name'=>'日期', 'saveType'=>'date'),
+        'time'=>array('name'=>'时间', 'saveType'=>'time'),
+        'datetime'=>array('name'=>'日期+时间', 'saveType'=>'datetime'),
+        'timestamp'=>array('name'=>'时间戳', 'saveType'=>'timestamp'),
+        'year'=>array('name'=>'年份', 'saveType'=>'year'),
+//        'tinyblob'=>array('name'=>'tiny二进制', 'saveType'=>'tinyblob'),
+//        'blob'=>array('name'=>'二进制', 'saveType'=>'blob'),
+//        'mediumblob'=>array('name'=>'medium二进制', 'saveType'=>'mediumblob'),
+//        'longblob'=>array('name'=>'long二进制', 'saveType'=>'longblob'),
+        'text'=>array('name'=>'长文本', 'saveType'=>'text'),
+//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
+//        'longtext'=>array('name'=>'长文本', 'saveType'=>'longtext'),
+//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
+//        'enum'=>array('name'=>'enum', 'saveType'=>'enum'),
+        'set'=>array('name'=>'set', 'saveType'=>'set'),
+    );
+    $return = array(
+        'option'=>$optionLast,
+        'allMysqlColType'=>array()
+    );
+    foreach($allMysqlColType as $k=>$v){
+        $return['allMysqlColType'][] = array_merge(array('type'=>$k),$v);
+    }
+    echo json_encode($return);exit;
 }
