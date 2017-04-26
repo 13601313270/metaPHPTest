@@ -20,53 +20,62 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'maxLength' => 20,
             'notNull' => true,
             'title' => 'id',
-            'AUTO_INCREMENT' => true
+            'AUTO_INCREMENT' => true,
+            'default' => ''
         ),
         'title' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => '标题'
+            'title' => '标题',
+            'default' => '标题'
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'img'
+            'title' => 'img',
+            'default' => ''
         ),
         'ctime' => array(
             'dataType' => 'date',
             'notNull' => true,
-            'title' => 'ctime'
+            'title' => 'ctime',
+            'default' => ''
         ),
         'content' => array(
             'dataType' => 'text',
             'notNull' => true,
-            'title' => 'content'
+            'title' => 'content',
+            'default' => ''
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'type'
+            'title' => 'type',
+            'default' => ''
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'project'
+            'title' => 'project',
+            'default' => ''
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'good'
+            'title' => 'good',
+            'default' => ''
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'bad'
+            'title' => 'bad',
+            'default' => ''
         )
     );
     public function main(){
