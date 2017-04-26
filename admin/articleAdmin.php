@@ -75,7 +75,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'maxLength' => 11,
             'notNull' => true,
             'title' => 'bad',
-            'default' => ''
+            'default' => '0'
         )
     );
     public function main(){
