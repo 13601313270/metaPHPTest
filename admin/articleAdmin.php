@@ -36,7 +36,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
         ),
         'ctime' => array(
             'dataType' => 'date',
-            'notNull' => false,
+            'notNull' => true,
             'title' => 'ctime'
         ),
         'content' => array(
@@ -59,13 +59,13 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => false,
+            'notNull' => true,
             'title' => 'good'
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => false,
+            'notNull' => true,
             'title' => 'bad'
         )
     );
