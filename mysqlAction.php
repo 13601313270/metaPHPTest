@@ -317,6 +317,10 @@ if($_POST['action']=='tables'){
             }
             if($vv!=$v[$kk] && $kk!=='title'){
                 $isChange = true;
+                var_dump('==========');
+                var_dump($kk);
+                var_dump($v[$kk]);
+                var_dump($vv);
                 $optionSave[$kk] = $vv;
             }
         }
@@ -352,7 +356,7 @@ if($_POST['action']=='tables'){
                 $canshuMeta[0][] = array(
                     'type'=>'arrayValue',
                     'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
-                    'value'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshuVal),
+                    'value'=>array('type'=>in_array($optionSave['dataType'],array('int'))?'int':'string','borderStr'=>'\'','data'=>$canshuVal),
                 );
             }else{
                 $tempData2[0]['value']['data'] = $canshuVal;
