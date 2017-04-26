@@ -328,6 +328,8 @@ if($_POST['action']=='tables'){
                 ' '.($optionSave['notNull']?'NOT NULL':'').
                 ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
             $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+            echo $sql."\n";
+            var_dump($data);
         }
     }
     //所有后台
