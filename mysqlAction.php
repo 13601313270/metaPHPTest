@@ -327,11 +327,12 @@ if($_POST['action']=='tables'){
                 ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
                 ' '.($optionSave['notNull']?'NOT NULL':'').
                 ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
-            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+//            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
             echo $sql."\n";
-            var_dump($data);
+//            var_dump($data);
         }
     }
+//    exit;
     //所有后台
     $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
     //找到这个表对应的后台
@@ -339,14 +340,24 @@ if($_POST['action']=='tables'){
     $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
     if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
     $phpInterpreter = new phpInterpreter(file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']));
-    $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
-    foreach($className[0] as $k=>$column){
-        $columnName = $column['key']['data'];
-        foreach($className[0][$k]['value']['child'] as $kk=>$vv){
-            $className[0][$k]['value']['child'][$kk]['value']['data'] = $option[$columnName][$vv['key']['data']];
+    $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
+    foreach($option as $columnName=>$canshuList){
+        $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
+        foreach($canshuList as $canshu=>$canshuVal){
+            $tempData = $thisColumnInfo->toArray();
+//            var_dump($canshu."|".$canshuVal);
+            $tempApi = new metaSearch($tempData);
+            $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
+            if(empty($tempData2)){
+//                print_r($tempData);exit;
+            }else{
+                $tempData2[0]['value']['data'] = $canshuVal;
+            }
         }
+//        print_r($thisColumnInfo->toArray());
     }
     //提交git
+//    echo $phpInterpreter->getCode();exit;
     $gitAction = new githubClass();
     $gitAction->pull();
     file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
