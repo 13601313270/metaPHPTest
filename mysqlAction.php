@@ -356,9 +356,14 @@ if($_POST['action']=='tables'){
                 $canshuMeta[0][] = array(
                     'type'=>'arrayValue',
                     'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
-                    'value'=>array('type'=>in_array($optionSave['dataType'],array('int'))?'int':'string','borderStr'=>'\'','data'=>$canshuVal),
+                    'value'=>array('type'=>in_array($option['dataType'],array('int'))?'int':'string','borderStr'=>'\'','data'=>$canshuVal),
                 );
             }else{
+                if(in_array($option['dataType'],array('int'))){
+                    $tempData2[0]['value']['type'] = 'int';
+                }else{
+                    $tempData2[0]['value']['type'] = 'string';
+                }
                 $tempData2[0]['value']['data'] = $canshuVal;
             }
         }
