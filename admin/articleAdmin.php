@@ -18,62 +18,62 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'id' => array(
             'dataType' => 'bigint',
             'maxLength' => 20,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'id',
             'AUTO_INCREMENT' => true,
             'default' => ''
         ),
         'title' => array(
             'dataType' => 'varchar',
-            'maxLength' => 255,
-            'notNull' => true,
+            'maxLength' => "255",
+            'notNull' => "true",
             'title' => '标题',
             'default' => '标题'
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
             'maxLength' => 255,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'img',
             'default' => ''
         ),
         'ctime' => array(
             'dataType' => 'datetime',
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'ctime',
             'default' => ''
         ),
         'content' => array(
             'dataType' => 'text',
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'content',
             'default' => ''
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'type',
             'default' => ''
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'project',
             'default' => ''
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'good',
             'default' => '10'
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'bad',
             'default' => '0'
         )
