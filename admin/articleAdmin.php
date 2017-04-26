@@ -17,10 +17,10 @@ class articleAdmin extends kod_web_mysqlAdmin{
     protected $dbColumn = array(
         'id' => array(
             'dataType' => 'bigint',
-            'maxLength' => ,
+            'maxLength' => 20,
             'notNull' => true,
             'title' => 'id',
-            'AUTO_INCREMENT' => false
+            'AUTO_INCREMENT' => true
         ),
         'title' => array(
             'dataType' => 'varchar',
@@ -30,13 +30,13 @@ class articleAdmin extends kod_web_mysqlAdmin{
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
-            'maxLength' => ,
+            'maxLength' => 255,
             'notNull' => true,
             'title' => 'img'
         ),
         'ctime' => array(
-            'dataType' => 'datetime',
-            'notNull' => true,
+            'dataType' => 'date',
+            'notNull' => false,
             'title' => 'ctime'
         ),
         'content' => array(
@@ -46,26 +46,26 @@ class articleAdmin extends kod_web_mysqlAdmin{
         ),
         'type' => array(
             'dataType' => 'int',
-            'maxLength' => ,
+            'maxLength' => 11,
             'notNull' => true,
             'title' => 'type'
         ),
         'project' => array(
             'dataType' => 'int',
-            'maxLength' => ,
+            'maxLength' => 11,
             'notNull' => true,
             'title' => 'project'
         ),
         'good' => array(
             'dataType' => 'int',
-            'maxLength' => ,
-            'notNull' => true,
+            'maxLength' => 11,
+            'notNull' => false,
             'title' => 'good'
         ),
         'bad' => array(
             'dataType' => 'int',
-            'maxLength' => ,
-            'notNull' => true,
+            'maxLength' => 11,
+            'notNull' => false,
             'title' => 'bad'
         )
     );
