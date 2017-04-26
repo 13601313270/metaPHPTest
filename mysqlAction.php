@@ -12,6 +12,40 @@ class githubClass extends githubAction{
     public $webRootDir = '/var/www/html/metaPHPTest';
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 }
+$allMysqlColType = array(
+    'boolean'=>array('name'=>'布尔值', 'saveType'=>'tinyint'),
+    'tinyint'=>array('name'=>'tinyint', 'saveType'=>'tinyint'),
+    'int'=>array('name'=>'数字', 'saveType'=>'int'),
+    'bigint'=>array('name'=>'超大数字', 'saveType'=>'bigint'),
+//        'real'=>array('name'=>'real', 'saveType'=>'real'),
+    'double'=>array('name'=>'双精度小数', 'saveType'=>'double'),
+//        'float'=>array('name'=>'小数', 'saveType'=>'float'),
+    'image'=>array('name'=>'图片', 'saveType'=>'varchar'),
+    'imageQiniu'=>array('name'=>'七牛图片', 'saveType'=>'varchar'),
+//        'decimal'=>array('name'=>'decimal', 'saveType'=>'decimal'),
+//        'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
+    'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
+    'varchar'=>array('name'=>'字符串', 'saveType'=>'varchar'),
+    'char'=>array('name'=>'固定长度字符串', 'saveType'=>'char'),
+//        'binary'=>array('name'=>'binary', 'saveType'=>'binary'),
+//        'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
+    'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
+    'date'=>array('name'=>'日期', 'saveType'=>'date'),
+    'time'=>array('name'=>'时间', 'saveType'=>'time'),
+    'datetime'=>array('name'=>'日期+时间', 'saveType'=>'datetime'),
+    'timestamp'=>array('name'=>'时间戳', 'saveType'=>'timestamp'),
+    'year'=>array('name'=>'年份', 'saveType'=>'year'),
+//        'tinyblob'=>array('name'=>'tiny二进制', 'saveType'=>'tinyblob'),
+//        'blob'=>array('name'=>'二进制', 'saveType'=>'blob'),
+//        'mediumblob'=>array('name'=>'medium二进制', 'saveType'=>'mediumblob'),
+//        'longblob'=>array('name'=>'long二进制', 'saveType'=>'longblob'),
+    'text'=>array('name'=>'长文本', 'saveType'=>'text'),
+//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
+//        'longtext'=>array('name'=>'长文本', 'saveType'=>'longtext'),
+//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
+//        'enum'=>array('name'=>'enum', 'saveType'=>'enum'),
+    'set'=>array('name'=>'set', 'saveType'=>'set'),
+);
 function getAllIncludeApi($folder,$classType,$classSplitColumn){
     $gitAction = new githubClass();
     $headCommit = $gitAction->exec('git rev-parse HEAD');
@@ -250,40 +284,7 @@ if($_POST['action']=='tables'){
         $optionLast[$item['key']['data']] = $insert;
 
     }
-    $allMysqlColType = array(
-        'boolean'=>array('name'=>'布尔值', 'saveType'=>'tinyint'),
-        'tinyint'=>array('name'=>'tinyint', 'saveType'=>'tinyint'),
-        'int'=>array('name'=>'数字', 'saveType'=>'int'),
-        'bigint'=>array('name'=>'超大数字', 'saveType'=>'bigint'),
-//        'real'=>array('name'=>'real', 'saveType'=>'real'),
-        'double'=>array('name'=>'双精度小数', 'saveType'=>'double'),
-//        'float'=>array('name'=>'小数', 'saveType'=>'float'),
-        'image'=>array('name'=>'图片', 'saveType'=>'varchar'),
-        'imageQiniu'=>array('name'=>'七牛图片', 'saveType'=>'imageQiniu'),
-//        'decimal'=>array('name'=>'decimal', 'saveType'=>'decimal'),
-//        'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
-        'numeric'=>array('name'=>'numeric', 'saveType'=>'numeric'),
-        'varchar'=>array('name'=>'字符串', 'saveType'=>'varchar'),
-        'char'=>array('name'=>'固定长度字符串', 'saveType'=>'char'),
-//        'binary'=>array('name'=>'binary', 'saveType'=>'binary'),
-//        'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
-        'varbinary'=>array('name'=>'varbinary', 'saveType'=>'varbinary'),
-        'date'=>array('name'=>'日期', 'saveType'=>'date'),
-        'time'=>array('name'=>'时间', 'saveType'=>'time'),
-        'datetime'=>array('name'=>'日期+时间', 'saveType'=>'datetime'),
-        'timestamp'=>array('name'=>'时间戳', 'saveType'=>'timestamp'),
-        'year'=>array('name'=>'年份', 'saveType'=>'year'),
-//        'tinyblob'=>array('name'=>'tiny二进制', 'saveType'=>'tinyblob'),
-//        'blob'=>array('name'=>'二进制', 'saveType'=>'blob'),
-//        'mediumblob'=>array('name'=>'medium二进制', 'saveType'=>'mediumblob'),
-//        'longblob'=>array('name'=>'long二进制', 'saveType'=>'longblob'),
-        'text'=>array('name'=>'长文本', 'saveType'=>'text'),
-//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
-//        'longtext'=>array('name'=>'长文本', 'saveType'=>'longtext'),
-//        'mediumtext'=>array('name'=>'长文本', 'saveType'=>'mediumtext'),
-//        'enum'=>array('name'=>'enum', 'saveType'=>'enum'),
-        'set'=>array('name'=>'set', 'saveType'=>'set'),
-    );
+
     $return = array(
         'option'=>$optionLast,
         'allMysqlColType'=>array()
@@ -292,4 +293,63 @@ if($_POST['action']=='tables'){
         $return['allMysqlColType'][] = array_merge(array('type'=>$k),$v);
     }
     echo json_encode($return);exit;
+}elseif($_POST['action']=='updateTableAdmin'){
+    $table = $_POST['table'];
+    $option = $_POST['option'];
+    //获得include文件夹全部接口类梗概信息
+    $allIncludeApi = getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
+    //找到这个表对应的接口类
+    $metaSearchApi = new metaSearch($allIncludeApi);
+    $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$table.'])')->toArray();
+    if(empty($thisTableApiInfo)){
+        echo '接口不存在';exit;
+    }
+    $className = $thisTableApiInfo[0]['className'];
+    $classApi = new $className();
+    foreach($classApi->showCreateTable() as $columnName=>$v){
+        $isChange = false;
+        $optionSave = $option[$columnName];
+        foreach($option[$columnName] as $kk=>$vv){
+            if($kk=='notNull'){
+                $vv = $vv=='true';
+            }elseif($kk=='dataType'){
+                $vv = $allMysqlColType[$vv]['saveType'];
+            }
+            if($vv!=$v[$kk] && $kk!=='title'){
+                $isChange = true;
+                $optionSave[$kk] = $vv;
+            }
+        }
+        if($isChange){
+            $default = $optionSave['default']?$optionSave['default']:$v['default'];
+            $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' MODIFY `'.$columnName.'` '.
+                $optionSave['dataType'].
+                ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
+                ' '.($optionSave['notNull']?'NOT NULL':'').
+                ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
+            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+        }
+    }
+    //所有后台
+    $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
+    //找到这个表对应的后台
+    $metaSearchApi = new metaSearch($allIncludeApi);
+    $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
+    if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
+    $phpInterpreter = new phpInterpreter(file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']));
+    $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
+    foreach($className[0] as $k=>$column){
+        $columnName = $column['key']['data'];
+        foreach($className[0][$k]['value']['child'] as $kk=>$vv){
+            $className[0][$k]['value']['child'][$kk]['value']['data'] = $option[$columnName][$vv['key']['data']];
+        }
+    }
+    //提交git
+    $gitAction = new githubClass();
+    $gitAction->pull();
+    file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
+    $gitAction->add('--all');
+    $gitAction->commit('修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
+    $gitAction->push();
+    $gitAction->branchClean();
 }

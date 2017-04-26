@@ -405,15 +405,14 @@
 //                        tableApi:allTableApiClass
                     },function(data){
                         data = JSON.parse(data);
-                        console.log(data);
+                        var className = data.className;
                         $.post('mysqlAction.php',{
                             action:'showTableAdmin',
-                            class:data.className
+                            class:className
                         },function(data){
                             data = JSON.parse(data);
-                            console.log(data);
-
                             $('#showTableColumn').show();
+                            $('#showTableColumn').attr('data-id',className);
                             $('#showTableColumn>.panel>.panel-body').html('');
                             var table = $('<table class="table"><thead><tr>' +
                                     '<th>字段</th>' +
@@ -421,6 +420,7 @@
                                     '<th>类型</th>' +
                                     '<th>最大长度</th>' +
                                     '<th>是否必填</th>' +
+                                    '<th>默认值</th>' +
                                     '</tr></thead><tbody></tbody></table>');
                             function getDataTypes(nowType,allType){
                                 var html = '<select class="form-control">';
@@ -435,15 +435,16 @@
                                 return html;
                             }
                             for(var i in data.option){
-                                table.append($('<tr>' +
+                                table.append($('<tr data-id="'+i+'">' +
                                         '<td><label>'+i+'</label></td>' +
-                                        '<td><input class="form-control" value="'+data.option[i].title+'"/></td>' +
-                                        '<td>'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
-                                        '<td>'+
+                                        '<td data-id="title"><input class="form-control" value="'+data.option[i].title+'"/></td>' +
+                                        '<td data-id="dataType">'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
+                                        '<td data-id="maxLength">'+
                                             (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
-                                                '<input class="form-control" style="max-width: 60px;min-width:37px;padding:6px;text-align: center;" value="'+data.option[i].maxLength+'">'
+                                                '<input type="number" class="form-control" style="max-width: 60px;min-width:37px;padding:6px;text-align: center;" value="'+data.option[i].maxLength+'">'
                                             ):'')+'</td>' +
-                                        '<td><input type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
+                                        '<td data-id="notNull"><input class="form-control" type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
+                                        '<td data-id="default"><input class="form-control" value="'+(data.option[i].default?data.option[i].default:'')+'">'+'</td>' +
                                         '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
@@ -455,8 +456,7 @@
             </script>
         </div>
         <div class="tab-pane fade" id="ejb">
-            <p>Enterprise Java Beans（EJB）是一个创建高度可扩展性和强大企业级应用程序的开发架构，部署在兼容应用程序服务器（比如 JBOSS、Web Logic 等）的 J2EE 上。
-            </p>
+            <p>Enterprise Java Beans（EJB）是一个创建高度可扩展性和强大企业级应用程序的开发架构，部署在兼容应用程序服务器（比如 JBOSS、Web Logic 等）的 J2EE 上。</p>
         </div>
     </div>
     <script>
@@ -552,8 +552,39 @@
             </div>
             <div class="panel-body" style="position: absolute;top:41px;bottom: 56px;width: 100%;overflow-y: scroll"></div>
             <div class="panel-footer" style="position: absolute;bottom: 0;width: 100%;">
-                <button id="githubClean" type="button" class="btn btn-default">保存</button>
-                <button id="githubClean" type="button" onclick="$('#showTableColumn').hide()" class="btn btn-default">取消</button>
+                <button id="saveColumn" type="button" class="btn btn-default">保存</button>
+                <button type="button" onclick="$('#showTableColumn').hide()" class="btn btn-default">取消</button>
+                <script>
+                    $('#saveColumn').click(function(){
+                        var allColumnTr = $(this).parents('.panel').find('>.panel-body>table>tbody>tr');
+                        var nowSate = {
+                        };
+                        allColumnTr.each(function(){
+                            var columnName = $(this).data('id');
+                            nowSate[columnName] = {
+                            };
+                            $(this).find('>[data-id]').each(function(){
+                                var shuxingName = $(this).data('id');
+                                if($(this).find('>.form-control').attr('type') == 'checkbox'){
+                                    var shuxingValue = $(this).find('>.form-control').is(':checked');
+                                }else if($(this).find('>.form-control').attr('type') == 'number'){
+                                    var shuxingValue = parseInt($(this).find('>.form-control').val());
+                                }else{
+                                    var shuxingValue = $(this).find('>.form-control').val();
+                                }
+                                nowSate[columnName][shuxingName] = shuxingValue;
+                            });
+                        });
+                        $.post('mysqlAction.php',{
+                            action:'updateTableAdmin',
+                            databases:'{$useDataBases[0]}',
+                            table:$('#showTableColumn').data('id'),
+                            option:nowSate,
+                        },function(data){
+                            console.log(data);
+                        });
+                    });
+                </script>
             </div>
         </div>
     </section>
