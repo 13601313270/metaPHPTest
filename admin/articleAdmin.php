@@ -35,7 +35,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'title' => 'img'
         ),
         'ctime' => array(
-            'dataType' => 'date',
+            'dataType' => 'datetime',
             'notNull' => true,
             'title' => 'ctime'
         ),
