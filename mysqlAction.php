@@ -321,7 +321,7 @@ if($_POST['action']=='tables'){
             }
         }
         if($isChange){
-            $default = $optionSave['default']?$optionSave['default']:$v['default'];
+            $default = isset($optionSave['default'])?$optionSave['default']:$v['default'];
             $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' MODIFY `'.$columnName.'` '.
                 $optionSave['dataType'].
                 ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
@@ -332,7 +332,6 @@ if($_POST['action']=='tables'){
             var_dump($data);
         }
     }
-//    exit;
     //所有后台
     $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
     //找到这个表对应的后台
