@@ -327,9 +327,9 @@ if($_POST['action']=='tables'){
                 ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
                 ' '.($optionSave['notNull']?'NOT NULL':'').
                 ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
-//            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
             echo $sql."\n";
-//            var_dump($data);
+            var_dump($data);
         }
     }
 //    exit;
@@ -349,15 +349,19 @@ if($_POST['action']=='tables'){
             $tempApi = new metaSearch($tempData);
             $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
             if(empty($tempData2)){
-//                print_r($tempData);exit;
+                $canshuMeta = $tempApi->search('value child')->toArray();
+                $canshuMeta[0][] = array(
+                    'type'=>'arrayValue',
+                    'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
+                    'value'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshuVal),
+                );
             }else{
                 $tempData2[0]['value']['data'] = $canshuVal;
             }
         }
-//        print_r($thisColumnInfo->toArray());
     }
     //提交git
-//    echo $phpInterpreter->getCode();exit;
+    echo $phpInterpreter->getCode();
     $gitAction = new githubClass();
     $gitAction->pull();
     file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
