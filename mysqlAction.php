@@ -354,14 +354,41 @@ if($_POST['action']=='tables'){
             $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
             if(empty($tempData2)){
                 $canshuMeta = $tempApi->search('value child')->toArray();
+                if($canshu=='notNull'){
+                    $valueType = 'bool';
+                }elseif($canshu=='maxLength'){
+                    $valueType = 'int';
+                }elseif($canshu=='default'){
+                    if($canshuList['dataType']=='int'){
+                        $valueType = 'int';
+                    }elseif($canshuList['dataType']=='bool'){
+                        $valueType = 'bool';
+                    }else{
+                        $valueType = 'int';
+                    }
+                }else{
+                    $valueType = 'string';
+                }
                 $canshuMeta[0][] = array(
                     'type'=>'arrayValue',
                     'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
-                    'value'=>array('type'=>in_array($option['dataType'],array('int'))?'int':'string','borderStr'=>'\'','data'=>$canshuVal),
+                    'value'=>array(
+                        'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
+                    ),
                 );
             }else{
-                if(in_array($option['dataType'],array('int'))){
+                if($tempData2[0]['key']['data']=='notNull'){
+                    $tempData2[0]['value']['type'] = 'bool';
+                }elseif($tempData2[0]['key']['data']=='maxLength'){
                     $tempData2[0]['value']['type'] = 'int';
+                }elseif($tempData2[0]['key']['data']=='default'){
+                    if($canshuList['dataType']=='int'){
+                        $tempData2[0]['value']['type'] = 'int';
+                    }elseif($canshuList['dataType']=='bool'){
+                        $tempData2[0]['value']['type'] = 'bool';
+                    }else{
+                        $tempData2[0]['value']['type'] = 'int';
+                    }
                 }else{
                     $tempData2[0]['value']['type'] = 'string';
                 }
@@ -371,6 +398,7 @@ if($_POST['action']=='tables'){
     }
     //提交git
     if($oldCode!==$phpInterpreter->getCode()){
+        echo $phpInterpreter->getCode();
         $gitAction = new githubClass();
         $gitAction->pull();
         file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
