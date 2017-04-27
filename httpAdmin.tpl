@@ -415,12 +415,12 @@
                             $('#showTableColumn').attr('data-id',className);
                             $('#showTableColumn>.panel>.panel-body').html('');
                             var table = $('<table class="table"><thead><tr>' +
-                                    '<th>字段</th>' +
-                                    '<th>名称</th>' +
-                                    '<th>类型</th>' +
-                                    '<th>最大长度</th>' +
-                                    '<th>是否必填</th>' +
-                                    '<th>默认值</th>' +
+                                    '<th style="min-width: 100px">字段</th>' +
+                                    '<th style="min-width: 100px">名称</th>' +
+                                    '<th style="min-width: 100px">类型</th>' +
+                                    '<th style="min-width: 100px">最大长度</th>' +
+                                    '<th style="min-width: 100px">是否必填</th>' +
+                                    '<th style="min-width: 100px">默认值</th>' +
                                     '</tr></thead><tbody></tbody></table>');
                             function getDataTypes(nowType,allType){
                                 var html = '<select class="form-control">';
