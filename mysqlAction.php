@@ -342,7 +342,8 @@ if($_POST['action']=='tables'){
     $metaSearchApi = new metaSearch($allIncludeApi);
     $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
     if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
-    $phpInterpreter = new phpInterpreter(file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']));
+    $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
+    $phpInterpreter = new phpInterpreter($oldCode);
     $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
@@ -369,12 +370,13 @@ if($_POST['action']=='tables'){
         }
     }
     //提交git
-    echo $phpInterpreter->getCode();
-    $gitAction = new githubClass();
-    $gitAction->pull();
-    file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
-    $gitAction->add('--all');
-    $gitAction->commit('修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
-    $gitAction->push();
-    $gitAction->branchClean();
+    if($oldCode!==$phpInterpreter->getCode()){
+        $gitAction = new githubClass();
+        $gitAction->pull();
+        file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
+        $gitAction->add('--all');
+        $gitAction->commit('修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
+        $gitAction->push();
+        $gitAction->branchClean();
+    }
 }
