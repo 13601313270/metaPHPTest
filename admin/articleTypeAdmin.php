@@ -17,39 +17,45 @@ class articleTypeAdmin extends kod_web_mysqlAdmin{
         'id' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
+            'notNull' => "true",
             'title' => 'id',
-            'AUTO_INCREMENT' => true
+            'AUTO_INCREMENT' => true,
+            'default' => ''
         ),
         'title' => array(
             'dataType' => 'varchar',
-            'maxLength' => 255,
-            'notNull' => true,
-            'title' => 'title'
+            'maxLength' => "255",
+            'notNull' => "true",
+            'title' => 'title',
+            'default' => ''
         ),
         'orderNum' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
-            'title' => 'orderNum'
+            'notNull' => "true",
+            'title' => 'orderNum',
+            'default' => ''
         ),
         'projectId' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => true,
-            'title' => 'projectId'
+            'notNull' => "true",
+            'title' => 'projectId',
+            'default' => ''
         ),
         'icon' => array(
             'dataType' => 'varchar',
-            'maxLength' => 255,
-            'notNull' => true,
-            'title' => 'icon'
+            'maxLength' => "255",
+            'notNull' => "true",
+            'title' => 'icon',
+            'default' => ''
         ),
         'keyWord' => array(
             'dataType' => 'varchar',
-            'maxLength' => 255,
-            'notNull' => true,
-            'title' => 'keyWord'
+            'maxLength' => "255",
+            'notNull' => "true",
+            'title' => 'keyWord',
+            'default' => ''
         )
     );
 }
