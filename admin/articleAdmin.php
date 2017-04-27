@@ -34,47 +34,47 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => "true",
-            'title' => 'img',
+            'title' => '列表图',
             'default' => ''
         ),
         'ctime' => array(
             'dataType' => 'datetime',
             'notNull' => "true",
-            'title' => 'ctime',
+            'title' => '创建时间',
             'default' => ''
         ),
         'content' => array(
             'dataType' => 'text',
             'notNull' => "true",
-            'title' => 'content',
+            'title' => '正文',
             'default' => ''
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => "true",
-            'title' => 'type',
+            'title' => '分类',
             'default' => ''
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => "true",
-            'title' => 'project',
+            'title' => '项目',
             'default' => ''
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => "true",
-            'title' => 'good',
-            'default' => '10'
+            'title' => '点赞',
+            'default' => '0'
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => "true",
-            'title' => 'bad',
+            'title' => '差评',
             'default' => '0'
         )
     );
