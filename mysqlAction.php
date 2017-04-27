@@ -367,7 +367,7 @@ if($_POST['action']=='tables'){
                     }elseif($canshuList['dataType']=='bool'){
                         $valueType = 'bool';
                     }else{
-                        $valueType = 'int';
+                        $valueType = 'string';
                     }
                 }else{
                     $valueType = 'string';
@@ -391,7 +391,7 @@ if($_POST['action']=='tables'){
                     }elseif($canshuList['dataType']=='bool'){
                         $tempData2[0]['value']['type'] = 'bool';
                     }else{
-                        $tempData2[0]['value']['type'] = 'int';
+                        $tempData2[0]['value']['type'] = 'string';
                     }
                 }else{
                     $tempData2[0]['value']['type'] = 'string';
