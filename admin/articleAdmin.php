@@ -67,7 +67,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '差评'
+            'title' => '差评',
+            'default' => 0
         )
     );
     public function main(){
