@@ -403,9 +403,8 @@ if($_POST['action']=='tables'){
         }
     }
     //提交git
-    echo $phpInterpreter->getCode();
     if($oldCode!==$phpInterpreter->getCode()){
-
+        echo $phpInterpreter->getCode();
         $gitAction = new githubClass();
         $gitAction->pull();
         file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
