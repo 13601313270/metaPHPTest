@@ -16,7 +16,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
     protected $smartyTpl = 'articleAdmin.tpl';
     protected $dbColumn = array(
         'id' => array(
-            'dataType' => 'int',
+            'dataType' => 'bigint',
             'maxLength' => 20,
             'notNull' => "true",
             'title' => 'id',
