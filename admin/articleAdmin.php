@@ -27,7 +27,6 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'maxLength' => 255,
             'notNull' => true,
             'title' => '标题',
-            'default' => 新闻
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
