@@ -18,59 +18,64 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'id' => array(
             'dataType' => 'bigint',
             'maxLength' => 20,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => 'id',
             'AUTO_INCREMENT' => true,
+            'default' => 
         ),
         'title' => array(
             'dataType' => 'varchar',
-            'maxLength' => "255",
-            'notNull' => "true",
+            'maxLength' => 255,
+            'notNull' => true,
             'title' => '标题',
-            'default' => ''
+            'default' => 
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
             'maxLength' => 255,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '列表图',
-            'default' => ''
+            'default' => 
         ),
         'ctime' => array(
             'dataType' => 'datetime',
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '创建时间',
-            'default' => ''
+            'default' => 
         ),
         'content' => array(
             'dataType' => 'text',
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '正文',
-            'default' => ''
+            'default' => 
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '分类',
+            'default' => 
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '项目',
+            'default' => 
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '点赞',
+            'default' => 
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '差评',
+            'default' => 
         )
     );
     public function main(){
