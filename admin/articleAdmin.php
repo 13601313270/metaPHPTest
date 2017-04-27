@@ -60,7 +60,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '点赞'
+            'title' => '点赞',
+            'default' => 0
         ),
         'bad' => array(
             'dataType' => 'int',
