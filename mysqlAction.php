@@ -348,14 +348,12 @@ if($_POST['action']=='tables'){
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
         foreach($canshuList as $canshu=>$canshuVal){
-            if($canshu=='default' && $canshuVal===''){
-                continue;
-            }
             $tempData = $thisColumnInfo->toArray();
 //            var_dump($canshu."|".$canshuVal);
             $tempApi = new metaSearch($tempData);
             $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
             if(empty($tempData2)){
+                if($canshuVal==''){continue;}
                 $canshuMeta = $tempApi->search('value child')->toArray();
                 if($canshu=='notNull'){
                     $valueType = 'bool';
@@ -381,28 +379,33 @@ if($_POST['action']=='tables'){
                 );
             }
             else{
-                if($tempData2[0]['key']['data']=='notNull'){
-                    $tempData2[0]['value']['type'] = 'bool';
-                }elseif($tempData2[0]['key']['data']=='maxLength'){
-                    $tempData2[0]['value']['type'] = 'int';
-                }elseif($tempData2[0]['key']['data']=='default'){
-                    if($canshuList['dataType']=='int'){
-                        $tempData2[0]['value']['type'] = 'int';
-                    }elseif($canshuList['dataType']=='bool'){
+                if($canshuVal==''){
+                    $tempData2[0] = null;
+                }else{
+                    if($tempData2[0]['key']['data']=='notNull'){
                         $tempData2[0]['value']['type'] = 'bool';
+                    }elseif($tempData2[0]['key']['data']=='maxLength'){
+                        $tempData2[0]['value']['type'] = 'int';
+                    }elseif($tempData2[0]['key']['data']=='default'){
+                        if($canshuList['dataType']=='int'){
+                            $tempData2[0]['value']['type'] = 'int';
+                        }elseif($canshuList['dataType']=='bool'){
+                            $tempData2[0]['value']['type'] = 'bool';
+                        }else{
+                            $tempData2[0]['value']['type'] = 'string';
+                        }
                     }else{
                         $tempData2[0]['value']['type'] = 'string';
                     }
-                }else{
-                    $tempData2[0]['value']['type'] = 'string';
+                    $tempData2[0]['value']['data'] = $canshuVal;
                 }
-                $tempData2[0]['value']['data'] = $canshuVal;
             }
         }
     }
     //提交git
+    echo $phpInterpreter->getCode();
     if($oldCode!==$phpInterpreter->getCode()){
-        echo $phpInterpreter->getCode();
+
         $gitAction = new githubClass();
         $gitAction->pull();
         file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
