@@ -444,7 +444,7 @@
                                                 '<input type="number" class="form-control" style="max-width: 60px;min-width:37px;padding:6px;text-align: center;" value="'+data.option[i].maxLength+'">'
                                             ):'')+'</td>' +
                                         '<td data-id="notNull"><input class="form-control" type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
-                                        '<td data-id="default"><input class="form-control" value="'+(data.option[i].default?data.option[i].default:'')+'">'+'</td>' +
+                                        '<td data-id="default"><input class="form-control" value="'+(data.option[i].default!==undefined?data.option[i].default:'')+'">'+'</td>' +
                                         '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
