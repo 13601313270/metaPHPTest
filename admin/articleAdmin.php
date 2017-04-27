@@ -20,53 +20,53 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'maxLength' => 20,
             'notNull' => true,
             'title' => 'id',
-            'AUTO_INCREMENT' => true,
+            'AUTO_INCREMENT' => true
         ),
         'title' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => '标题',
+            'title' => '标题'
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => '列表图',
+            'title' => '列表图'
         ),
         'ctime' => array(
             'dataType' => 'datetime',
             'notNull' => true,
-            'title' => '创建时间',
+            'title' => '创建时间'
         ),
         'content' => array(
             'dataType' => 'text',
             'notNull' => true,
-            'title' => '正文',
+            'title' => '正文'
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '分类',
+            'title' => '分类'
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '项目',
+            'title' => '项目'
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '点赞',
+            'title' => '点赞'
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '差评',
+            'title' => '差评'
         )
     );
     public function main(){
