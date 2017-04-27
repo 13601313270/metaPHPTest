@@ -16,7 +16,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
     protected $smartyTpl = 'articleAdmin.tpl';
     protected $dbColumn = array(
         'id' => array(
-            'dataType' => 'bigint',
+            'dataType' => 'int',
             'maxLength' => 20,
             'notNull' => "true",
             'title' => 'id',
@@ -28,7 +28,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'maxLength' => "255",
             'notNull' => "true",
             'title' => '标题',
-            'default' => '标题'
+            'default' => ''
         ),
         'img' => array(
             'dataType' => 'imageQiniu',
