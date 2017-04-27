@@ -348,6 +348,9 @@ if($_POST['action']=='tables'){
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
         foreach($canshuList as $canshu=>$canshuVal){
+            if($canshu=='default' && $canshuVal===''){
+                continue;
+            }
             $tempData = $thisColumnInfo->toArray();
 //            var_dump($canshu."|".$canshuVal);
             $tempApi = new metaSearch($tempData);
@@ -376,7 +379,8 @@ if($_POST['action']=='tables'){
                         'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
                     ),
                 );
-            }else{
+            }
+            else{
                 if($tempData2[0]['key']['data']=='notNull'){
                     $tempData2[0]['value']['type'] = 'bool';
                 }elseif($tempData2[0]['key']['data']=='maxLength'){
