@@ -368,10 +368,29 @@
                 #dataAdmin{width:90%;}
                 #dataAdmin>.panel{width: 100%;margin: 0 0 20px;}
             }
+            #showTableColumn table [data-id=maxLength] input{
+                max-width: 60px;min-width:37px;padding:6px;text-align: center;
+            }
             {/literal}
         </style>
         <div class="tab-pane fade" id="dataAdmin">
             <script>
+                var allDataType = null;
+                function getDataTypes(nowType,allType){
+                    if(allType!==undefined){
+                        allDataType = allType;
+                    }
+                    var html = '<select class="form-control">';
+                    for(var i=0;i<allDataType.length;i++){
+                        if(allDataType[i].type==nowType){
+                            html+= '<option selected value="'+allDataType[i].type+'">'+allDataType[i].name+'</option>';
+                        }else{
+                            html+= '<option value="'+allDataType[i].type+'">'+allDataType[i].name+'</option>';
+                        }
+                    }
+                    html+= '</select>';
+                    return html;
+                }
                 {*var allTableApiClass = {json_encode($tableApiClass)};*}
                 $('#dataAdminTab').click(function(){
                     $.post('mysqlAction.php',{
@@ -394,10 +413,8 @@
                         }
                     });
                 });
-                $('#dataAdmin').on('click','>.panel',function(){
-                    var database = $(this).data('database');
-                    var tableName = $(this).data('name');
-                    $('#dataAdmin>.panel').fadeOut(300);
+                //初始化表后台信息
+                function initTableInfo(database,tableName){
                     $.post('mysqlAction.php',{
                         action:'getDataApi',
                         database:database,
@@ -422,36 +439,28 @@
                                     '<th style="min-width: 100px">是否必填</th>' +
                                     '<th style="min-width: 100px">默认值</th>' +
                                     '</tr></thead><tbody></tbody></table>');
-                            function getDataTypes(nowType,allType){
-                                var html = '<select class="form-control">';
-                                for(var i=0;i<allType.length;i++){
-                                    if(allType[i].type==nowType){
-                                        html+= '<option selected value="'+allType[i].type+'">'+allType[i].name+'</option>';
-                                    }else{
-                                        html+= '<option value="'+allType[i].type+'">'+allType[i].name+'</option>';
-                                    }
-                                }
-                                html+= '</select>';
-                                return html;
-                            }
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
                                         '<td><label>'+i+'</label></td>' +
                                         '<td data-id="title"><input class="form-control" value="'+data.option[i].title+'"/></td>' +
                                         '<td data-id="dataType">'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
-                                        '<td data-id="maxLength">'+
-                                            (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
-                                                '<input type="number" class="form-control" style="max-width: 60px;min-width:37px;padding:6px;text-align: center;" value="'+data.option[i].maxLength+'">'
-                                            ):'')+'</td>' +
+                                        '<td data-id="maxLength" data-value="'+data.option[i].maxLength+'">'+
+                                        (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
+                                                '<input type="number" class="form-control" value="'+data.option[i].maxLength+'">'
+                                        ):'')+'</td>' +
                                         '<td data-id="notNull"><input class="form-control" type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
                                         '<td data-id="default"><input class="form-control" value="'+(data.option[i].default!==undefined?data.option[i].default:'')+'">'+'</td>' +
                                         '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
-                            $('#dataAdmin>.panel').fadeIn(300);
                         });
 
                     });
+                }
+                $('#dataAdmin').on('click','>.panel',function(){
+                    var database = $(this).data('database');
+                    var tableName = $(this).data('name');
+                    initTableInfo(database,tableName);
                 });
             </script>
         </div>
@@ -536,6 +545,7 @@
             <div class="panel-heading">
                 表后台
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="float: right;">
+                    <button type="button" class="btn btn-default" onclick="addColumn()">插入新字段</button>
                     <button type="button" class="btn btn-default">后台</button>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -549,6 +559,18 @@
                         </ul>
                     </div>
                 </div>
+                <script>
+                    function addColumn(){
+                        $('#showTableColumn .panel-body>table>tbody').append($('<tr>' +
+                            '<td data-id="name"><input class="form-control"/></td>' +
+                            '<td data-id="title"><input class="form-control" value=""/></td>' +
+                            '<td data-id="dataType">'+getDataTypes('int')+'</td>' +
+                            '<td data-id="maxLength"></td>' +
+                            '<td data-id="notNull"><input class="form-control" type="checkbox">'+'</td>' +
+                            '<td data-id="default"><input class="form-control"></td>' +
+                        '</tr>'));
+                    }
+                </script>
             </div>
             <div class="panel-body" style="position: absolute;top:41px;bottom: 56px;width: 100%;overflow-y: scroll"></div>
             <div class="panel-footer" style="position: absolute;bottom: 0;width: 100%;">
@@ -561,6 +583,9 @@
                         };
                         allColumnTr.each(function(){
                             var columnName = $(this).data('id');
+                            if(columnName==undefined){
+                                columnName = $(this).find('>[data-id=name] input').val();
+                            }
                             nowSate[columnName] = {
                             };
                             $(this).find('>[data-id]').each(function(){
@@ -588,6 +613,20 @@
             </div>
         </div>
     </section>
+    <script>
+        //切换分类
+        $('#showTableColumn').on('change','table [data-id=dataType]',function(){
+            var selectType = $(this).find('select').val();
+            var maxLengthTd = $(this).parents('tr').find('[data-id=maxLength]');
+            console.log(   $(this).parents('tr').find('[data-id=maxLength]')   );
+            if(['varchar','char'].indexOf(selectType)>-1){
+                maxLengthTd.html('<input type="number" class="form-control" value="'+maxLengthTd.data('value')+'">');
+            }else{
+                maxLengthTd.html('');
+            }
+            console.log(selectType);
+        });
+    </script>
     <section id="console"  class="panel panel-default">
         <div class="panel-heading" data-toggle="collapse" href="#collapseOne">操作日志</div>
         <div class="panel-body">

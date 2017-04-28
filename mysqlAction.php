@@ -306,7 +306,8 @@ if($_POST['action']=='tables'){
     }
     $className = $thisTableApiInfo[0]['className'];
     $classApi = new $className();
-    foreach($classApi->showCreateTable() as $columnName=>$v){
+    $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
+    foreach($showCreateTable as $columnName=>$v){
         $isChange = false;
         $optionSave = $option[$columnName];
         foreach($option[$columnName] as $kk=>$vv){
@@ -317,10 +318,6 @@ if($_POST['action']=='tables'){
             }
             if($vv!=$v[$kk] && $kk!=='title'){
                 $isChange = true;
-                var_dump('==========');
-                var_dump($kk);
-                var_dump($v[$kk]);
-                var_dump($vv);
                 $optionSave[$kk] = $vv;
             }
         }
@@ -331,10 +328,32 @@ if($_POST['action']=='tables'){
                 ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
                 ' '.($optionSave['notNull']?'NOT NULL':'').
                 ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
-            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+//            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
             echo $sql."\n";
-            var_dump($data);
+//            var_dump($data);
         }
+    }
+
+//    print_r(array_keys($showCreateTable));
+//    print_r(array_keys($option));
+
+    //处理新增字段
+    $insertColumn = array_diff(array_keys($option),array_keys($showCreateTable));
+    foreach($insertColumn as $insertItem){
+        $option[$insertItem]['notNull'] = $option[$insertItem]['notNull'] =='true';
+        $default = $option[$insertItem]['default'];
+        $option[$insertItem]['dataType'] = $allMysqlColType[$option[$insertItem]['dataType']]['saveType'];
+        $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' add `'.$option[$insertItem]['name'].'` '.
+            $option[$insertItem]['dataType'].
+            ($option[$insertItem]['maxLength']?('('.$option[$insertItem]['maxLength'].')'):'').
+            ' '.($option[$insertItem]['notNull']?'NOT NULL':'');
+        if($option[$insertItem]['dataType']=='int'){
+            if($default!==''){$sql .= ' DEFAULT '.$default;}
+        }else{
+            $sql .= ' DEFAULT \''.$default.'\'';
+        }
+        $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+        echo $sql."\n";var_dump($data);
     }
     //所有后台
     $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
@@ -347,64 +366,95 @@ if($_POST['action']=='tables'){
     $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
-        foreach($canshuList as $canshu=>$canshuVal){
-            $tempData = $thisColumnInfo->toArray();
-//            var_dump($canshu."|".$canshuVal);
+        $tempData = $thisColumnInfo->toArray();
+        if(empty($tempData)){
+            $dbColumnMetaBase = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
+            $insert = array(
+                'type'=>'arrayValue',
+                'key'=>array('type'=>'string','data'=>$columnName,'borderStr'=>"'"),
+                'value'=>array(
+                    'type'=>'array',
+                    'child'=>array(),
+                ),
+            );
+            foreach(array('dataType','notNull','title','maxLength','default') as $canshuName){
+                if($canshuList[$canshuName]!==''){
+                    if($canshuName=='notNull'){
+                        $canshuList[$canshuName] = $canshuList[$canshuName]=='true';
+                    }elseif($canshuName=='maxLength'){
+                        $canshuList[$canshuName] = intval($canshuList[$canshuName]);
+                    }elseif($canshuName=='default'){
+                        if($canshuList['dataType']=='int'){
+                            $canshuList[$canshuName] = intval($canshuList[$canshuName]);
+                        }elseif($canshuList['dataType']=='bool'){
+                            $canshuList[$canshuName] = $canshuList[$canshuName]=='true'?true:false;
+                        }
+                    }
+                    $insert['value']['child'][] = array(
+                        'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>$canshuName,'borderStr'=>"'"),
+                        'value'=>array('type'=>gettype($canshuList[$canshuName]),'data'=>$canshuList[$canshuName],'borderStr'=>"'"),
+                    );
+
+                }
+            }
+            $dbColumnMetaBase[0][] = $insert;
+        }else{
             $tempApi = new metaSearch($tempData);
-            $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
-            if(empty($tempData2)){
-                if($canshuVal==''){continue;}
-                $canshuMeta = $tempApi->search('value child')->toArray();
-                if($canshu=='notNull'){
-                    $valueType = 'bool';
-                }elseif($canshu=='maxLength'){
-                    $valueType = 'int';
-                }elseif($canshu=='default'){
-                    if($canshuList['dataType']=='int'){
-                        $valueType = 'int';
-                    }elseif($canshuList['dataType']=='bool'){
+            foreach($canshuList as $canshu=>$canshuVal){
+                $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
+                if(empty($tempData2)){
+                    if($canshuVal==''){continue;}
+                    $canshuMeta = $tempApi->search('value child')->toArray();
+                    if($canshu=='notNull'){
                         $valueType = 'bool';
+                    }elseif($canshu=='maxLength'){
+                        $valueType = 'int';
+                    }elseif($canshu=='default'){
+                        if($canshuList['dataType']=='int'){
+                            $valueType = 'int';
+                        }elseif($canshuList['dataType']=='bool'){
+                            $valueType = 'bool';
+                        }else{
+                            $valueType = 'string';
+                        }
                     }else{
                         $valueType = 'string';
                     }
-                }else{
-                    $valueType = 'string';
+                    $canshuMeta[0][] = array(
+                        'type'=>'arrayValue',
+                        'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
+                        'value'=>array(
+                            'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
+                        ),
+                    );
                 }
-                $canshuMeta[0][] = array(
-                    'type'=>'arrayValue',
-                    'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
-                    'value'=>array(
-                        'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
-                    ),
-                );
-            }
-            else{
-                if($canshuVal==''){
-                    $tempData2[0] = null;
-                }else{
-                    if($tempData2[0]['key']['data']=='notNull'){
-                        $tempData2[0]['value']['type'] = 'bool';
-                    }elseif($tempData2[0]['key']['data']=='maxLength'){
-                        $tempData2[0]['value']['type'] = 'int';
-                    }elseif($tempData2[0]['key']['data']=='default'){
-                        if($canshuList['dataType']=='int'){
-                            $tempData2[0]['value']['type'] = 'int';
-                        }elseif($canshuList['dataType']=='bool'){
+                else{
+                    if($canshuVal==''){
+                        $tempData2[0] = null;
+                    }else{
+                        if($tempData2[0]['key']['data']=='notNull'){
                             $tempData2[0]['value']['type'] = 'bool';
+                        }elseif($tempData2[0]['key']['data']=='maxLength'){
+                            $tempData2[0]['value']['type'] = 'int';
+                        }elseif($tempData2[0]['key']['data']=='default'){
+                            if($canshuList['dataType']=='int'){
+                                $tempData2[0]['value']['type'] = 'int';
+                            }elseif($canshuList['dataType']=='bool'){
+                                $tempData2[0]['value']['type'] = 'bool';
+                            }else{
+                                $tempData2[0]['value']['type'] = 'string';
+                            }
                         }else{
                             $tempData2[0]['value']['type'] = 'string';
                         }
-                    }else{
-                        $tempData2[0]['value']['type'] = 'string';
+                        $tempData2[0]['value']['data'] = $canshuVal;
                     }
-                    $tempData2[0]['value']['data'] = $canshuVal;
                 }
             }
         }
     }
     //提交git
     if($oldCode!==$phpInterpreter->getCode()){
-        echo $phpInterpreter->getCode();
         $gitAction = new githubClass();
         $gitAction->pull();
         file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode());
