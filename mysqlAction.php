@@ -129,7 +129,7 @@ if($_POST['action']=='tables'){
 ';
                 $newClass->setProperty('tableName', array('type'=>'string','borderStr'=>"'",'data'=>$className), 'protected');
                 $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['name']), 'protected');
-                $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['dataType']), 'protected');
+                $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>in_array($primaryKey['dataType'],array('int','bigint'))?'int':'varchar'), 'protected');
                 //提交git
                 $gitAction = new githubClass();
                 $gitAction->pull();
