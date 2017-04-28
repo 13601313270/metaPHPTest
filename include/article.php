@@ -11,6 +11,6 @@
 class article extends kod_db_mysqlSingle{
     protected $tableName = 'article';
     protected $key = 'id';
-    protected $keyDataType = 'bigint';
+    protected $keyDataType = 'int';
 }
 
