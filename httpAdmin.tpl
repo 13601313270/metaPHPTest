@@ -371,6 +371,18 @@
             #showTableColumn table [data-id=maxLength] input{
                 max-width: 60px;min-width:37px;padding:6px;text-align: center;
             }
+            #showTableColumn table tbody tr td:first-child label{
+                line-height: 34px;
+            }
+            #showTableColumn table tbody tr td:first-child span{
+                border:solid 1px #a96449;
+                border-radius: 4px;
+                color: #a96449;
+                display: none;
+            }
+            #showTableColumn table tbody tr:hover td:first-child span{
+                display:inline-block;
+            }
             {/literal}
         </style>
         <div class="tab-pane fade" id="dataAdmin">
@@ -441,7 +453,7 @@
                                     '</tr></thead><tbody></tbody></table>');
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
-                                        '<td><label>'+i+'</label></td>' +
+                                        '<td><label>'+i+'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></label></td>' +
                                         '<td data-id="title"><input class="form-control" value="'+data.option[i].title+'"/></td>' +
                                         '<td data-id="dataType">'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
                                         '<td data-id="maxLength" data-value="'+data.option[i].maxLength+'">'+
