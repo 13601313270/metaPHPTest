@@ -25,7 +25,7 @@ class testAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'name'
+            'title' => '名字'
         )
     );
     public function main(){
