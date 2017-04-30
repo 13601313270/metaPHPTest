@@ -56,8 +56,7 @@ class projectAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '项目名',
-            'default' => 0
+            'title' => '项目名'
         ),
         'typeInChuiZhiWeb' => array(
             'dataType' => 'varchar',
