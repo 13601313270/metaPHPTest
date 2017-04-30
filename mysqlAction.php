@@ -104,15 +104,15 @@ if($_POST['action']=='tables'){
                     $dataType[$match[1]] = $match[2];
                     if(!empty($match[5]) && $match[5]==" AUTO_INCREMENT"){
                         $primaryKey = array('name'=>$match[1], 'dataType'=>$match[2],);
+                        break;
                     }
-                    break;
                 }elseif(preg_match("/[`|\"](\S+)[`|\"] (text|date)( NOT NULL| DEFAULT NULL)?( DEFAULT '(\S+)'| AUTO_INCREMENT)?( COMMENT '(\S+)')?/",$v,$match)){
                     $dataType[$match[1]] = $match[2];
                 }elseif(  preg_match("/[`|\"](\S+)[`|\"] timestamp( NOT NULL| DEFAULT NULL)( DEFAULT CURRENT_TIMESTAMP)?( ON UPDATE CURRENT_TIMESTAMP)?( COMMENT '(\S+)')?/",$v,$match)  ){
                     $dataType[$match[1]] = 'date';
                 }elseif( preg_match("/PRIMARY KEY \(\"(\S+)\"\)/",$v,$match) ){
                     $primaryKey = array(
-                        'name'=>$match[1], 'dataType' => $option[$match[1]]['dataType']
+                        'name'=>$match[1], 'dataType' => $dataType[$match[1]]
                     );
                 }
             }

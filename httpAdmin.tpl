@@ -364,7 +364,11 @@
                 #dataAdmin{width:640px;}
                 #dataAdmin>.panel{width: 200px;}
             }
-            @media screen and (max-width: 699px){
+            @media screen and (min-width: 550px) and (max-width: 699px){
+                #dataAdmin{width:480px;}
+                #dataAdmin>.panel{width: 230px;}
+            }
+            @media screen and (max-width: 549px){
                 #dataAdmin{width:90%;}
                 #dataAdmin>.panel{width: 100%;margin: 0 0 20px;}
             }
@@ -424,6 +428,11 @@
 //                                '<div class="panel-footer">Panel footer</div>'+
                             '</div>');
                         }
+                        $('#dataAdmin').append('<div class="panel panel-default" data-database="'+data[0].database+'">'+
+                                '<div class="panel-body" style="text-align: center">'+
+                                    '<span class="glyphicon glyphicon-plus" aria-hidden="true" style="line-height: 168px;font-size: 50px;color: #adadad;"></span>'+
+                                '</div>'+
+                            '</div>');
                     });
                 });
                 //初始化表后台信息
