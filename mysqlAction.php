@@ -307,36 +307,40 @@ if($_POST['action']=='tables'){
     }
     $className = $thisTableApiInfo[0]['className'];
     $classApi = new $className();
+    $allDeleteColumn = array();
     $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
     foreach($showCreateTable as $columnName=>$v){
         $isChange = false;
-        $optionSave = $option[$columnName];
-        foreach($option[$columnName] as $kk=>$vv){
-            if($kk=='notNull'){
-                $vv = $vv=='true';
-            }elseif($kk=='dataType'){
-                $vv = $allMysqlColType[$vv]['saveType'];
+        if(isset($option[$columnName])){
+            $optionSave = $option[$columnName];
+            foreach($option[$columnName] as $kk=>$vv){
+                if($kk=='notNull'){
+                    $vv = $vv=='true';
+                }elseif($kk=='dataType'){
+                    $vv = $allMysqlColType[$vv]['saveType'];
+                }
+                if($vv!=$v[$kk] && $kk!=='title'){
+                    $isChange = true;
+                    $optionSave[$kk] = $vv;
+                }
             }
-            if($vv!=$v[$kk] && $kk!=='title'){
-                $isChange = true;
-                $optionSave[$kk] = $vv;
+            if($isChange){
+                $default = isset($optionSave['default'])?$optionSave['default']:$v['default'];
+                $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY `'.$columnName.'` '.
+                    $optionSave['dataType'].
+                    ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
+                    ' '.($optionSave['notNull']?'NOT NULL':'').
+                    ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
+                echo $sql."\n";
+                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
             }
-        }
-        if($isChange){
-            $default = isset($optionSave['default'])?$optionSave['default']:$v['default'];
-            $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' MODIFY `'.$columnName.'` '.
-                $optionSave['dataType'].
-                ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
-                ' '.($optionSave['notNull']?'NOT NULL':'').
-                ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
-            $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+        }else{
+            $allDeleteColumn[] = $columnName;
+            $sql = 'alter table `'.$thisTableApiInfo[0]['tableName'].'` drop column `'.$columnName.'`';
             echo $sql."\n";
-            var_dump($data);
+            var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
         }
     }
-
-//    print_r(array_keys($showCreateTable));
-//    print_r(array_keys($option));
 
     //处理新增字段
     $insertColumn = array_diff(array_keys($option),array_keys($showCreateTable));
@@ -353,8 +357,7 @@ if($_POST['action']=='tables'){
         }else{
             $sql .= ' DEFAULT \''.$default.'\'';
         }
-        $data = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
-        echo $sql."\n";var_dump($data);
+        echo $sql."\n";var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
     }
     //所有后台
     $allIncludeApi = getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
@@ -364,6 +367,11 @@ if($_POST['action']=='tables'){
     if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
     $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
     $phpInterpreter = new phpInterpreter($oldCode);
+    //删除所有不存在的字段
+    foreach($allDeleteColumn as $delete){
+        $temp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$delete.'])')->parent()->toArray();
+        $temp[0] = null;
+    }
     $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();

@@ -378,6 +378,7 @@
                 border:solid 1px #a96449;
                 border-radius: 4px;
                 color: #a96449;
+                cursor: pointer;
                 display: none;
             }
             #showTableColumn table tbody tr:hover td:first-child span{
@@ -621,6 +622,9 @@
                         },function(data){
                             console.log(data);
                         });
+                    });
+                    $('#showTableColumn').on('click','table tbody tr td .glyphicon',function(){
+                        $(this).parents('tr').remove();
                     });
                 </script>
             </div>
