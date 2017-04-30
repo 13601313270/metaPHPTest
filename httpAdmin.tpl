@@ -453,6 +453,7 @@
                                         '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
+                            $('[data-id=adminFileName]').attr('href',data.adminFileName);
                         });
 
                     });
@@ -546,7 +547,7 @@
                 表后台
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="float: right;">
                     <button type="button" class="btn btn-default" onclick="addColumn()">插入新字段</button>
-                    <button type="button" class="btn btn-default">后台</button>
+                    <a class="btn btn-default" data-id="adminFileName" target="_blank">后台</a>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             放到tab

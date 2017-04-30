@@ -286,6 +286,7 @@ if($_POST['action']=='tables'){
     }
 
     $return = array(
+        'adminFileName'=>'admin/'.$adminFileName,
         'option'=>$optionLast,
         'allMysqlColType'=>array()
     );
