@@ -72,7 +72,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
         ),
         'test1' => array(
             'dataType' => 'int',
-            'notNull' => false,
+            'notNull' => true,
             'title' => '测试1',
             'maxLength' => 0
         )
