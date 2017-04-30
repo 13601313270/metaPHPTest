@@ -26,43 +26,43 @@ class projectAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'projectName'
+            'title' => '项目名'
         ),
         'packName' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'packName'
+            'title' => '包'
         ),
         'AppName' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'AppName'
+            'title' => 'app名'
         ),
         'logo' => array(
-            'dataType' => 'varchar',
+            'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'logo'
+            'title' => '图标'
         ),
         'tag' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'tag'
+            'title' => '标签'
         ),
         'projectType' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'projectType'
+            'title' => '项目名'
         ),
         'typeInChuiZhiWeb' => array(
             'dataType' => 'varchar',
             'maxLength' => 255,
             'notNull' => true,
-            'title' => 'typeInChuiZhiWeb'
+            'title' => '所属垂直分类'
         )
     );
     public function main(){
