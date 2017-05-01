@@ -470,7 +470,9 @@
                                 table.append($('<tr data-id="'+i+'">' +
                                         '<td><label>'+i+'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></label></td>' +
                                         '<td data-id="title"><input class="form-control" value="'+data.option[i].title+'"/></td>' +
-                                        '<td data-id="dataType">'+getDataTypes(data.option[i].dataType,data.allMysqlColType)+'</td>' +
+                                        '<td data-id="dataType">'+
+                                            getDataTypes((data.option[i].AUTO_INCREMENT?'AUTO_INCREMENT':data.option[i].dataType),data.allMysqlColType)+
+                                        '</td>' +
                                         '<td data-id="maxLength" data-value="'+data.option[i].maxLength+'">'+
                                         (['varchar','char'].indexOf(data.option[i].dataType)>-1?(
                                                 '<input type="number" class="form-control" value="'+data.option[i].maxLength+'">'

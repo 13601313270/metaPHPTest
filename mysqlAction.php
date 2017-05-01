@@ -311,9 +311,19 @@ if($_POST['action']=='tables'){
     $allDeleteColumn = array();
     $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
     foreach($showCreateTable as $columnName=>$v){
-        $isChange = false;
         if(isset($option[$columnName])){
+            $isChange = false;
             $optionSave = $option[$columnName];
+            $auto_increment = false;
+            if($option[$columnName]['dataType']=='auto_increment'){
+                $option[$columnName]['dataType'] = 'int';
+                $option[$columnName]['AUTO_INCREMENT'] = true;
+                $auto_increment = true;
+            }
+            $deleteCanshu = array_values(array_diff(array_keys($v),array_keys($option[$columnName])));
+            if(in_array('AUTO_INCREMENT',$deleteCanshu)){
+                $isChange = true;
+            }
             foreach($option[$columnName] as $kk=>$vv){
                 if($kk=='notNull'){
                     $vv = $vv=='true';
@@ -327,11 +337,6 @@ if($_POST['action']=='tables'){
             }
             if($isChange){
                 $default = isset($optionSave['default'])?$optionSave['default']:$v['default'];
-                $auto_increment = false;
-                if($optionSave['dataType']=='auto_increment'){
-                    $optionSave['dataType'] = 'int';
-                    $auto_increment = true;
-                }
                 //ALTER TABLE `phoneGap`.`test` CHANGE COLUMN `mddid` `mddid` int(11) NOT NULL AUTO_INCREMENT;
                 $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY `'.$columnName.'` '.
                     $optionSave['dataType'].
@@ -383,7 +388,7 @@ if($_POST['action']=='tables'){
     foreach($option as $columnName=>$canshuList){
         $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
         $tempData = $thisColumnInfo->toArray();
-        if(empty($tempData)){
+        if(empty($tempData)){//新增字段
             $dbColumnMetaBase = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
             $insert = array(
                 'type'=>'arrayValue',
@@ -420,11 +425,11 @@ if($_POST['action']=='tables'){
                 }
             }
             $dbColumnMetaBase[0][] = $insert;
-        }else{
+        }else{//修改字段
             $tempApi = new metaSearch($tempData);
             foreach($canshuList as $canshu=>$canshuVal){
                 $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
-                if(empty($tempData2)){
+                if(empty($tempData2)){//新增属性
                     if($canshuVal==''){continue;}
                     $canshuMeta = $tempApi->search('value child')->toArray();
                     if($canshu=='notNull'){
@@ -455,7 +460,7 @@ if($_POST['action']=='tables'){
                         $tempData2[0] = null;
                     }else{
                         if($tempData2[0]['key']['data']=='dataType'){
-                            if($canshuVal=='auto_increment'){
+                            if($canshuList['auto_increment']==true){
                                 $canshuVal = 'int';
                                 $canshuMeta = $tempApi->search('value child')->toArray();
                                 $canshuMeta[0][] = array(
@@ -465,6 +470,11 @@ if($_POST['action']=='tables'){
                                         'type'=>'bool','data'=>true
                                     ),
                                 );
+                            }else{
+                                $temp3 = $tempApi->search('value child key:filter([data=AUTO_INCREMENT])')->parent()->toArray();
+                                if(count($temp3)>0){
+                                    $temp3[0] = null;
+                                }
                             }
                         }elseif($tempData2[0]['key']['data']=='notNull'){
                             $tempData2[0]['value']['type'] = 'bool';
