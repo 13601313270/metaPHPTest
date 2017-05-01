@@ -6,7 +6,7 @@ include_once("../include.php");
 *
 * User: metaPHP
 * Date: 2017/05/01
-* Time: 21:35
+* Time: 21:37
 */
 
 class test2Admin extends kod_web_mysqlAdmin{
