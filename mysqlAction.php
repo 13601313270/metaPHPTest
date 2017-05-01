@@ -13,6 +13,7 @@ class githubClass extends githubAction{
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 }
 $allMysqlColType = array(
+    'auto_increment'=>array('name'=>'自增数字', 'saveType'=>'auto_increment'),
     'boolean'=>array('name'=>'布尔值', 'saveType'=>'tinyint'),
     'tinyint'=>array('name'=>'tinyint', 'saveType'=>'tinyint'),
     'int'=>array('name'=>'数字', 'saveType'=>'int'),
@@ -326,11 +327,18 @@ if($_POST['action']=='tables'){
             }
             if($isChange){
                 $default = isset($optionSave['default'])?$optionSave['default']:$v['default'];
+                $auto_increment = false;
+                if($optionSave['dataType']=='auto_increment'){
+                    $optionSave['dataType'] = 'int';
+                    $auto_increment = true;
+                }
+                //ALTER TABLE `phoneGap`.`test` CHANGE COLUMN `mddid` `mddid` int(11) NOT NULL AUTO_INCREMENT;
                 $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY `'.$columnName.'` '.
                     $optionSave['dataType'].
                     ($optionSave['maxLength']?('('.$optionSave['maxLength'].')'):'').
                     ' '.($optionSave['notNull']?'NOT NULL':'').
-                    ' DEFAULT '.(in_array($optionSave['dataType'],array('int'))?$default:"'".$default."'");
+                    (in_array($optionSave['dataType'],array('int'))?($default!==""?' DEFAULT '.$default:''):(" DEFAULT '".$default."'")).
+                    ($auto_increment?' AUTO_INCREMENT':'');
                 echo $sql."\n";
                 var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
             }
@@ -341,7 +349,6 @@ if($_POST['action']=='tables'){
             var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
         }
     }
-
     //处理新增字段
     $insertColumn = array_diff(array_keys($option),array_keys($showCreateTable));
     foreach($insertColumn as $insertItem){
@@ -388,7 +395,13 @@ if($_POST['action']=='tables'){
             );
             foreach(array('dataType','notNull','title','maxLength','default') as $canshuName){
                 if($canshuList[$canshuName]!==''){
-                    if($canshuName=='notNull'){
+                    if($canshuName=='dataType'){
+                        $canshuList[$canshuName] = 'int';
+                        $insert['value']['child'][] = array(
+                            'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>'AUTO_INCREMENT','borderStr'=>"'"),
+                            'value'=>array('type'=>gettype(true),'data'=>true,'borderStr'=>"'"),
+                        );
+                    }elseif($canshuName=='notNull'){
                         $canshuList[$canshuName] = $canshuList[$canshuName]=='true';
                     }elseif($canshuName=='maxLength'){
                         $canshuList[$canshuName] = intval($canshuList[$canshuName]);
@@ -441,7 +454,19 @@ if($_POST['action']=='tables'){
                     if($canshuVal==''){
                         $tempData2[0] = null;
                     }else{
-                        if($tempData2[0]['key']['data']=='notNull'){
+                        if($tempData2[0]['key']['data']=='dataType'){
+                            if($canshuVal=='auto_increment'){
+                                $canshuVal = 'int';
+                                $canshuMeta = $tempApi->search('value child')->toArray();
+                                $canshuMeta[0][] = array(
+                                    'type'=>'arrayValue',
+                                    'key'=>array('type'=>'string','borderStr'=>'\'','data'=>'AUTO_INCREMENT'),
+                                    'value'=>array(
+                                        'type'=>'bool','data'=>true
+                                    ),
+                                );
+                            }
+                        }elseif($tempData2[0]['key']['data']=='notNull'){
                             $tempData2[0]['value']['type'] = 'bool';
                         }elseif($tempData2[0]['key']['data']=='maxLength'){
                             $tempData2[0]['value']['type'] = 'int';

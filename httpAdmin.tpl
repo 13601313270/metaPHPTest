@@ -73,6 +73,11 @@
             </ul>
         </li>
     </ul>
+    <style>
+        #myTabContent:after{
+            content:' ';width:100%;height:40px;float: left;clear: both;
+        }
+    </style>
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade in active" id="home">
             <section id="fileList">
@@ -472,10 +477,11 @@
                                         ):'')+'</td>' +
                                         '<td data-id="notNull"><input class="form-control" type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
                                         '<td data-id="default"><input class="form-control" value="'+(data.option[i].default!==undefined?data.option[i].default:'')+'">'+'</td>' +
-                                        '</tr>'));
+                                    '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
                             $('[data-id=adminFileName]').attr('href',data.adminFileName);
+                            $('[data-id=adminFileName]').removeAttr('disabled');
                         });
 
                     });
@@ -483,7 +489,24 @@
                 $('#dataAdmin').on('click','>.panel',function(){
                     var database = $(this).data('database');
                     var tableName = $(this).data('name');
-                    initTableInfo(database,tableName);
+                    if(tableName==undefined){
+                        $('#showTableColumn').show();
+                        $('#showTableColumn').attr('data-id','');
+                        $('#showTableColumn>.panel>.panel-body').html('');
+                        var table = $('<table class="table"><thead><tr>' +
+                                '<th style="min-width: 100px">字段</th>' +
+                                '<th style="min-width: 100px">名称</th>' +
+                                '<th style="min-width: 100px">类型</th>' +
+                                '<th style="min-width: 100px">最大长度</th>' +
+                                '<th style="min-width: 100px">是否必填</th>' +
+                                '<th style="min-width: 100px">默认值</th>' +
+                                '</tr></thead><tbody></tbody></table>');
+                        $('#showTableColumn>.panel>.panel-body').append(table);
+                        $('[data-id=adminFileName]').removeAttr('href');
+                        $('[data-id=adminFileName]').attr('disabled','disabled');
+                    }else{
+                        initTableInfo(database,tableName);
+                    }
                 });
             </script>
         </div>
