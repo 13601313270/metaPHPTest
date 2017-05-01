@@ -317,6 +317,7 @@ if($_POST['action']=='tables'){
             $auto_increment = false;
             if($option[$columnName]['dataType']=='auto_increment'){
                 $option[$columnName]['dataType'] = 'int';
+                $optionSave['dataType'] = 'int';
                 $option[$columnName]['AUTO_INCREMENT'] = true;
                 $auto_increment = true;
             }
@@ -404,7 +405,7 @@ if($_POST['action']=='tables'){
                         $canshuList[$canshuName] = 'int';
                         $insert['value']['child'][] = array(
                             'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>'AUTO_INCREMENT','borderStr'=>"'"),
-                            'value'=>array('type'=>gettype(true),'data'=>true,'borderStr'=>"'"),
+                            'value'=>array('type'=>'bool','data'=>'true','borderStr'=>"'"),
                         );
                     }elseif($canshuName=='notNull'){
                         $canshuList[$canshuName] = $canshuList[$canshuName]=='true';
@@ -432,7 +433,7 @@ if($_POST['action']=='tables'){
                 if(empty($tempData2)){//新增属性
                     if($canshuVal==''){continue;}
                     $canshuMeta = $tempApi->search('value child')->toArray();
-                    if($canshu=='notNull'){
+                    if(in_array($canshu,array('notNull','AUTO_INCREMENT'))){
                         $valueType = 'bool';
                     }elseif($canshu=='maxLength'){
                         $valueType = 'int';
