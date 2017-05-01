@@ -393,6 +393,21 @@
             #showTableColumn table tbody tr:hover td:first-child span{
                 display:inline-block;
             }
+            #addTable>.panel-body{
+                text-align: center;padding: 0
+            }
+            #addTable>.panel-body>div:first-child{
+                height: 33%;line-height: 66px;padding: 15px;
+            }
+            #addTable>.panel-body>div:first-child>input{
+                display: none;
+            }
+            #addTable:hover>.panel-body>div:first-child>input{
+                display: block;
+            }
+            .has-error .form-control::-moz-placeholder { color: #993423; }
+            .has-error .form-control::-webkit-input-placeholder { color:#993423; }
+            .has-error .form-control:-ms-input-placeholder { color:#993423; }
             {/literal}
         </style>
         <div class="tab-pane fade" id="dataAdmin">
@@ -433,9 +448,10 @@
 //                                '<div class="panel-footer">Panel footer</div>'+
                             '</div>');
                         }
-                        $('#dataAdmin').append('<div class="panel panel-default" data-database="'+data[0].database+'">'+
-                                '<div class="panel-body" style="text-align: center">'+
-                                    '<span class="glyphicon glyphicon-plus" aria-hidden="true" style="line-height: 168px;font-size: 50px;color: #adadad;"></span>'+
+                        $('#dataAdmin').append('<div id="addTable" class="panel panel-default" data-database="'+data[0].database+'">'+
+                                '<div class="panel-body">'+
+                                    '<div class="form-group"><input class="form-control" placeholder="请输入新表名字"></div>'+
+                                    '<div><span class="glyphicon glyphicon-plus" aria-hidden="true" style="font-size: 50px;color: #adadad;"></span></div>'+
                                 '</div>'+
                             '</div>');
                     });
@@ -456,7 +472,8 @@
                         },function(data){
                             data = JSON.parse(data);
                             $('#showTableColumn').show();
-                            $('#showTableColumn').attr('data-id',className);
+                            $('#showTableColumn').data('id',className);
+                            $('#showTableColumn').data('type','update');
                             $('#showTableColumn>.panel>.panel-body').html('');
                             var table = $('<table class="table"><thead><tr>' +
                                     '<th style="min-width: 100px">字段</th>' +
@@ -468,7 +485,7 @@
                                     '</tr></thead><tbody></tbody></table>');
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
-                                        '<td><label>'+i+'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></label></td>' +
+                                        '<td><p class="form-control-static">'+i+'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span></p></td>' +
                                         '<td data-id="title"><input class="form-control" value="'+data.option[i].title+'"/></td>' +
                                         '<td data-id="dataType">'+
                                             getDataTypes((data.option[i].AUTO_INCREMENT?'AUTO_INCREMENT':data.option[i].dataType),data.allMysqlColType)+
@@ -492,20 +509,35 @@
                     var database = $(this).data('database');
                     var tableName = $(this).data('name');
                     if(tableName==undefined){
-                        $('#showTableColumn').show();
-                        $('#showTableColumn').attr('data-id','');
-                        $('#showTableColumn>.panel>.panel-body').html('');
-                        var table = $('<table class="table"><thead><tr>' +
-                                '<th style="min-width: 100px">字段</th>' +
-                                '<th style="min-width: 100px">名称</th>' +
-                                '<th style="min-width: 100px">类型</th>' +
-                                '<th style="min-width: 100px">最大长度</th>' +
-                                '<th style="min-width: 100px">是否必填</th>' +
-                                '<th style="min-width: 100px">默认值</th>' +
-                                '</tr></thead><tbody></tbody></table>');
-                        $('#showTableColumn>.panel>.panel-body').append(table);
-                        $('[data-id=adminFileName]').removeAttr('href');
-                        $('[data-id=adminFileName]').attr('disabled','disabled');
+                        var newClassName = $('#addTable>.panel-body>div:eq(0)>input').val();
+                        if(newClassName===''){
+                            $('#addTable>.panel-body>div:eq(0)').addClass('has-error');
+                        }else{
+                            $('#addTable>.panel-body>div:eq(0)').removeClass('has-error');
+                            $.post('mysqlAction.php',{
+                                action:'getIsExistTable',
+                                database:database,
+                                name:newClassName,
+                            },function(data){
+                                data = JSON.parse(data);
+                                allDataType = data;
+                                $('#showTableColumn').show();
+                                $('#showTableColumn').data('id',newClassName);
+                                $('#showTableColumn').data('type','insert');
+                                $('#showTableColumn>.panel>.panel-body').html('');
+                                var table = $('<table class="table"><thead><tr>' +
+                                        '<th style="min-width: 100px">字段</th>' +
+                                        '<th style="min-width: 100px">名称</th>' +
+                                        '<th style="min-width: 100px">类型</th>' +
+                                        '<th style="min-width: 100px">最大长度</th>' +
+                                        '<th style="min-width: 100px">是否必填</th>' +
+                                        '<th style="min-width: 100px">默认值</th>' +
+                                        '</tr></thead><tbody></tbody></table>');
+                                $('#showTableColumn>.panel>.panel-body').append(table);
+                                $('[data-id=adminFileName]').removeAttr('href');
+                                $('[data-id=adminFileName]').attr('disabled','disabled');
+                            });
+                        }
                     }else{
                         initTableInfo(database,tableName);
                     }
@@ -648,8 +680,9 @@
                                 nowSate[columnName][shuxingName] = shuxingValue;
                             });
                         });
+                        console.log($('#showTableColumn').data('type'));
                         $.post('mysqlAction.php',{
-                            action:'updateTableAdmin',
+                            action:($('#showTableColumn').data('type')=='insert'?'insertTable':'updateTableAdmin'),
                             databases:'{$useDataBases[0]}',
                             table:$('#showTableColumn').data('id'),
                             option:nowSate,
