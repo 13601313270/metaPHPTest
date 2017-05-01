@@ -482,6 +482,8 @@
                                     '<th style="min-width: 100px">最大长度</th>' +
                                     '<th style="min-width: 100px">是否必填</th>' +
                                     '<th style="min-width: 100px">默认值</th>' +
+                                    '<th style="min-width: 100px">主键</th>' +
+                                    '<th style="min-width: 100px">表内唯一</th>' +
                                     '</tr></thead><tbody></tbody></table>');
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
@@ -509,16 +511,24 @@
                     var database = $(this).data('database');
                     var tableName = $(this).data('name');
                     if(tableName==undefined){
-                        var newClassName = $('#addTable>.panel-body>div:eq(0)>input').val();
-                        if(newClassName===''){
-                            $('#addTable>.panel-body>div:eq(0)').addClass('has-error');
-                        }else{
-                            $('#addTable>.panel-body>div:eq(0)').removeClass('has-error');
-                            $.post('mysqlAction.php',{
-                                action:'getIsExistTable',
-                                database:database,
-                                name:newClassName,
-                            },function(data){
+                    }else{
+                        initTableInfo(database,tableName);
+                    }
+                });
+                $('#dataAdmin').on('click','#addTable .glyphicon',function(){
+                    var newClassName = $('#addTable>.panel-body>div:eq(0)>input').val();
+                    if(newClassName===''){
+                        $('#addTable>.panel-body>div:eq(0)').addClass('has-error');
+                    }else{
+                        $('#addTable>.panel-body>div:eq(0)').removeClass('has-error');
+                        $.post('mysqlAction.php',{
+                            action:'getIsExistTable',
+                            database:$(this).parents('.panel').data('database'),
+                            name:newClassName,
+                        },function(data){
+                            if(data=='wrong'){
+                                alert('表已存在');
+                            }else{
                                 data = JSON.parse(data);
                                 allDataType = data;
                                 $('#showTableColumn').show();
@@ -532,14 +542,14 @@
                                         '<th style="min-width: 100px">最大长度</th>' +
                                         '<th style="min-width: 100px">是否必填</th>' +
                                         '<th style="min-width: 100px">默认值</th>' +
+                                        '<th style="min-width: 100px">主键</th>' +
+                                        '<th style="min-width: 100px">表内唯一</th>' +
                                         '</tr></thead><tbody></tbody></table>');
                                 $('#showTableColumn>.panel>.panel-body').append(table);
                                 $('[data-id=adminFileName]').removeAttr('href');
                                 $('[data-id=adminFileName]').attr('disabled','disabled');
-                            });
-                        }
-                    }else{
-                        initTableInfo(database,tableName);
+                            }
+                        });
                     }
                 });
             </script>
@@ -648,6 +658,8 @@
                             '<td data-id="maxLength"></td>' +
                             '<td data-id="notNull"><input class="form-control" type="checkbox">'+'</td>' +
                             '<td data-id="default"><input class="form-control"></td>' +
+                            '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey"></td>' +
+                            '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"></td>' +
                         '</tr>'));
                     }
                 </script>
@@ -672,6 +684,8 @@
                                 var shuxingName = $(this).data('id');
                                 if($(this).find('>.form-control').attr('type') == 'checkbox'){
                                     var shuxingValue = $(this).find('>.form-control').is(':checked');
+                                }else if($(this).find('>.form-control').attr('type') == 'radio'){
+                                    var shuxingValue = $(this).find('>.form-control').is(':checked');
                                 }else if($(this).find('>.form-control').attr('type') == 'number'){
                                     var shuxingValue = parseInt($(this).find('>.form-control').val());
                                 }else{
@@ -680,14 +694,19 @@
                                 nowSate[columnName][shuxingName] = shuxingValue;
                             });
                         });
-                        console.log($('#showTableColumn').data('type'));
                         $.post('mysqlAction.php',{
                             action:($('#showTableColumn').data('type')=='insert'?'insertTable':'updateTableAdmin'),
                             databases:'{$useDataBases[0]}',
                             table:$('#showTableColumn').data('id'),
                             option:nowSate,
                         },function(data){
-                            console.log(data);
+                            if($('#showTableColumn').data('type')=='insert'){
+                                if(data=='0'){
+                                    var database = '{$useDataBases[0]}';
+                                    var tableName = $('#showTableColumn').data('id');
+                                    initTableInfo(database,tableName);
+                                }
+                            }
                         });
                     });
                     $('#showTableColumn').on('click','table tbody tr td .glyphicon',function(){
@@ -702,11 +721,16 @@
         $('#showTableColumn').on('change','table [data-id=dataType]',function(){
             var selectType = $(this).find('select').val();
             var maxLengthTd = $(this).parents('tr').find('[data-id=maxLength]');
-            console.log(   $(this).parents('tr').find('[data-id=maxLength]')   );
             if(['varchar','char'].indexOf(selectType)>-1){
                 maxLengthTd.html('<input type="number" class="form-control" value="'+maxLengthTd.data('value')+'">');
             }else{
                 maxLengthTd.html('');
+            }
+            if(selectType=='auto_increment'){
+                $(this).parents('tr').find('[data-id=primarykey]>input').click();
+                $('#showTableColumn [data-id=primarykey]>input').attr('disabled','disabled');
+            }else{
+                $('#showTableColumn [data-id=primarykey]>input').removeAttr('disabled');
             }
             console.log(selectType);
         });

@@ -317,12 +317,15 @@ class control{
                 $return[] = array_merge(array('type'=>$k),$v);
             }
             echo json_encode($return);exit;
+        }else{
+            echo 'wrong';exit;
         }
     }
     private function getStrByColumnArr($columnName,&$arr){
         if($arr['dataType']=='auto_increment'){
             $arr['dataType'] = 'int';
-            $arr['AUTO_INCREMENT'] = true;
+            $arr['auto_increment'] = true;
+            unset($arr['primarykey']);
         }
         if($arr['default']===''){
             unset($arr['default']);
@@ -335,10 +338,17 @@ class control{
                 $arr['maxLength'] = 255;
             }
         }
+        if(isset($arr['unique']) && $arr['unique']=='false'){
+            unset($arr['unique']);
+        }
+        $arr['primarykey'] = ($arr['primarykey']=='true'||$arr['primarykey']==true);
+        if(isset($arr['primarykey']) && $arr['primarykey']===false){
+            unset($arr['primarykey']);
+        }
         $arr['notNull'] = ($arr['notNull']=='true' || $arr['notNull']==true);
         $dataType = $this->allMysqlColType[$arr['dataType']]['saveType'];
-        $temp = $columnName." ".
-            '`'.$dataType.'`'.
+        $temp = '`'.$columnName."` ".
+            $dataType.
             (isset($arr['maxLength'])?('('.$arr['maxLength'].')'):'').
             ($arr['notNull']?' NOT NULL':'').
             ($arr['default']===null?'': (' DEFAULT '.
@@ -348,13 +358,23 @@ class control{
         return $temp;
     }
     public function insertTable(){
-        $sql = "CREATE TABLE ".$_POST['table']."( ";
+        $sql = "CREATE TABLE ".$_POST['table']."(\n";
+        $primary = '';
+        $temp = array();
         foreach($_POST['option'] as $key=>$val){
-            $temp = $this->getStrByColumnArr($key,$val);
-            $sql .= $temp;
+            $insert = $this->getStrByColumnArr($key,$val);
+            $temp[] = $insert;
+            if(isset($val['primarykey'])){
+                $primary = $key;
+            }
         }
-        $sql .= "PRIMARY KEY ( runoob_id ))ENGINE=InnoDB DEFAULT CHARSET=".KOD_COMMENT_MYSQLDB_CHARSET."; ";
-        var_dump($sql);exit;
+        $sql.=implode(",\n",$temp);
+        if($primary!==''){
+            $sql .= ",\nPRIMARY KEY (".$primary.")";
+        }
+        $sql .= "\n)ENGINE=InnoDB DEFAULT CHARSET=".KOD_COMMENT_MYSQLDB_CHARSET."; ";
+        $result = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+        echo $result;exit;
     }
     public function updateTableAdmin(){
         $table = $_POST['table'];
