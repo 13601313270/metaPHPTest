@@ -438,12 +438,18 @@ class control{
                             echo $dropIndexSql."\n";
                             var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                         }
+                    }elseif($kk=='unique'){
+                        if($vv!=$dbCanshu[$kk]){
+                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD UNIQUE(`'.$columnName.'`)';
+                            echo $dropIndexSql."\n";
+                            var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                        }
                     }else if($vv!=$dbCanshu[$kk] && $kk!=='title'){
                         $isChange = true;
                     }
                 }
                 if($isChange){
-                    $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY `'.$sql;
+                    $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY '.$sql;
                     echo $sql."\n";
                     var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
                 }
