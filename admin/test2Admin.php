@@ -38,9 +38,9 @@ class test2Admin extends kod_web_mysqlAdmin{
         ),
         'ddd' => array(
             'dataType' => 'int',
-            'notNull' => false,
             'title' => '飞飞飞',
-            'unique' => true
+            'unique' => true,
+            'name' => 'ddd'
         )
     );
     public function main(){
