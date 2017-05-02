@@ -572,7 +572,7 @@ class control{
                                         $temp3[0] = null;
                                     }
                                 }
-                            }elseif(in_array($tempData2[0]['key']['data'],array('notNull','unique'))){
+                            }elseif(in_array($tempData2[0]['key']['data'],array('notNull','unique','primarykey'))){
                                 $tempData2[0]['value']['type'] = 'bool';
                             }elseif($tempData2[0]['key']['data']=='maxLength'){
                                 $tempData2[0]['value']['type'] = 'int';
