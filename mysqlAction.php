@@ -142,6 +142,7 @@ class control{
                         $newClass->setProperty('key',array('type'=>'string','borderStr'=>"'",'data'=>$primaryKey['name']), 'protected');
                         $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>in_array($primaryKey['dataType'],array('int','bigint'))?'int':'varchar'), 'protected');
                         //提交git
+//                        var_dump(  $newClass->phpInterpreter->getCode()  );exit;
                         $gitAction = new githubClass();
                         $gitAction->pull();
                         file_put_contents('./include/'.$className.'.php',$newClass->phpInterpreter->getCode());
@@ -338,7 +339,8 @@ class control{
                 $arr['maxLength'] = 255;
             }
         }
-        if(isset($arr['unique']) && $arr['unique']=='false'){
+        $arr['unique'] = ($arr['unique']==='true'||$arr['unique']===true);
+        if(isset($arr['unique']) && $arr['unique']===false){
             unset($arr['unique']);
         }
         $arr['primarykey'] = ($arr['primarykey']==='true'||$arr['primarykey']===true);
@@ -360,6 +362,7 @@ class control{
     public function insertTable(){
         $sql = "CREATE TABLE ".$_POST['table']."(\n";
         $primary = '';
+        $unique = array();
         $temp = array();
         foreach($_POST['option'] as $key=>$val){
             $insert = $this->getStrByColumnArr($key,$val);
@@ -367,8 +370,16 @@ class control{
             if(isset($val['primarykey'])){
                 $primary = $key;
             }
+            if(isset($val['unique']) && $val['unique']===true){
+                $unique[] = $key;
+            }
         }
         $sql.=implode(",\n",$temp);
+        if(count($unique)>0){
+            foreach($unique as $v){
+                $sql.=",\nUNIQUE KEY `".$v."` (`".$v."`)";
+            }
+        }
         if($primary!==''){
             $sql .= ",\nPRIMARY KEY (".$primary.")";
         }
