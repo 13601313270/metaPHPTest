@@ -35,7 +35,7 @@ class test2Admin extends kod_web_mysqlAdmin{
             'title' => 'title',
             'unique' => true
         ),
-        'ddd' => array(,
+        'ddd' => array(
             'dataType' => 'int',
             'title' => '巴拉',
             'primarykey' => true,
