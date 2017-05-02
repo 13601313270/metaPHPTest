@@ -35,6 +35,12 @@ class test2Admin extends kod_web_mysqlAdmin{
             'notNull' => true,
             'title' => 'title',
             'unique' => true
+        ),
+        'ddd' => array(
+            'dataType' => 'int',
+            'notNull' => false,
+            'title' => '飞飞飞',
+            'unique' => true
         )
     );
     public function main(){
