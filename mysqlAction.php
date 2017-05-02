@@ -470,7 +470,7 @@ class control{
         foreach($insertColumn as $insertItem){
             $sql = $this->getStrByColumnArr($insertItem,$option[$insertItem]);
             $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' add '.$sql;
-            echo $sql."\n";//var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
+            echo $sql."\n";var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
             if(isset($option[$insertItem]['primarykey'])){
                 $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY `'.$insertItem.'`';
                 echo $dropIndexSql."\n";
