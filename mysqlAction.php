@@ -344,10 +344,14 @@ class control{
             unset($arr['unique']);
         }
         $arr['primarykey'] = ($arr['primarykey']==='true'||$arr['primarykey']===true);
-        if(isset($arr['primarykey']) && $arr['primarykey']===false){
-            unset($arr['primarykey']);
+        if(isset($arr['primarykey'])){
+            if($arr['primarykey']===false){
+                unset($arr['primarykey']);
+            }else{
+                unset($arr['unique']);
+            }
         }
-        $arr['notNull'] = ($arr['notNull']=='true' || $arr['notNull']==true);
+        $arr['notNull'] = ($arr['notNull']==='true' || $arr['notNull']===true);
         $dataType = $this->allMysqlColType[$arr['dataType']]['saveType'];
         $temp = '`'.$columnName."` ".
             $dataType.
@@ -466,7 +470,16 @@ class control{
         foreach($insertColumn as $insertItem){
             $sql = $this->getStrByColumnArr($insertItem,$option[$insertItem]);
             $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' add '.$sql;
-            echo $sql."\n";var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
+            echo $sql."\n";//var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
+            if(isset($option[$insertItem]['primarykey'])){
+                $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY `'.$insertItem.'`';
+                echo $dropIndexSql."\n";
+                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+            } elseif(isset($option[$insertItem]['unique'])){
+                $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD UNIQUE(`'.$insertItem.'`)';
+                echo $dropIndexSql."\n";
+                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+            }
         }
         //所有后台
         $allIncludeApi = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
@@ -495,8 +508,8 @@ class control{
                         'child'=>array(),
                     ),
                 );
-                foreach(array('dataType','notNull','title','maxLength','default') as $canshuName){
-                    if($canshuList[$canshuName]!==''){
+                foreach(array('dataType','notNull','title','maxLength','default','primarykey','unique') as $canshuName){
+                    if(isset($canshuList[$canshuName]) && $canshuList[$canshuName]!==''){
                         if($canshuName=='dataType'){
                             $canshuList[$canshuName] = 'int';
                             $insert['value']['child'][] = array(
@@ -525,9 +538,11 @@ class control{
             }else{//修改字段
                 $tempApi = new metaSearch($tempData);
                 //如果没有unique,则删除unique属性
-                if(!isset($canshuList['unique'])){
-                    $tempData2 = $tempApi->search('value child key:filter([data=unique])')->parent()->toArray();
-                    $tempData2[0] = null;
+                foreach(array('unique','primarykey') as $delete){
+                    if(!isset($canshuList[$delete])){
+                        $tempData2 = $tempApi->search('value child key:filter([data='.$delete.'])')->parent()->toArray();
+                        $tempData2[0] = null;
+                    }
                 }
                 foreach($canshuList as $canshu=>$canshuVal){
                     $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
