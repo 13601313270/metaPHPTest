@@ -508,25 +508,8 @@ class control{
                         'child'=>array(),
                     ),
                 );
-                foreach(array('dataType','notNull','title','maxLength','default','primarykey','unique') as $canshuName){
+                foreach(array('dataType','notNull','title','auto_increment','maxLength','default','primarykey','unique') as $canshuName){
                     if(isset($canshuList[$canshuName]) && $canshuList[$canshuName]!==''){
-                        if($canshuName=='dataType'){
-                            $canshuList[$canshuName] = 'int';
-                            $insert['value']['child'][] = array(
-                                'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>'AUTO_INCREMENT','borderStr'=>"'"),
-                                'value'=>array('type'=>'bool','data'=>'true','borderStr'=>"'"),
-                            );
-                        }elseif($canshuName=='notNull'){
-                            $canshuList[$canshuName] = $canshuList[$canshuName]=='true';
-                        }elseif($canshuName=='maxLength'){
-                            $canshuList[$canshuName] = intval($canshuList[$canshuName]);
-                        }elseif($canshuName=='default'){
-                            if($canshuList['dataType']=='int'){
-                                $canshuList[$canshuName] = intval($canshuList[$canshuName]);
-                            }elseif($canshuList['dataType']=='bool'){
-                                $canshuList[$canshuName] = $canshuList[$canshuName]=='true'?true:false;
-                            }
-                        }
                         $insert['value']['child'][] = array(
                             'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>$canshuName,'borderStr'=>"'"),
                             'value'=>array('type'=>gettype($canshuList[$canshuName]),'data'=>$canshuList[$canshuName],'borderStr'=>"'"),
