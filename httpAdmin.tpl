@@ -498,6 +498,8 @@
                                         ):'')+'</td>' +
                                         '<td data-id="notNull"><input class="form-control" type="checkbox" '+(data.option[i].notNull?'checked':'')+'>'+'</td>' +
                                         '<td data-id="default"><input class="form-control" value="'+(data.option[i].default!==undefined?data.option[i].default:'')+'">'+'</td>' +
+                                        '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey"'+(data.option[i].primarykey===true?' checked="check"':'')+'></td>' +
+                                        '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"'+(data.option[i].unique===true?' checked="check"':'')+'></td>' +
                                     '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
