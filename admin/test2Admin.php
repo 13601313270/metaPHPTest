@@ -19,7 +19,8 @@ class test2Admin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'mddid'
+            'title' => 'mddid',
+            'primarykey' => '1'
         ),
         'name' => array(
             'dataType' => 'varchar',
