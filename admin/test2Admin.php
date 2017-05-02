@@ -20,7 +20,7 @@ class test2Admin extends kod_web_mysqlAdmin{
             'maxLength' => 11,
             'notNull' => true,
             'title' => 'mddid',
-            'primarykey' => '1'
+            'primarykey' => true
         ),
         'name' => array(
             'dataType' => 'varchar',
@@ -36,7 +36,7 @@ class test2Admin extends kod_web_mysqlAdmin{
             'title' => 'title',
             'unique' => true
         ),
-        'ddd' => array(,
+        'ddd' => array(
             'dataType' => 'int',
             'title' => '巴拉'
         )
