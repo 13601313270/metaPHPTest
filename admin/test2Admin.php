@@ -19,8 +19,7 @@ class test2Admin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'mddid',
-            'primarykey' => '1'
+            'title' => 'mddid'
         ),
         'name' => array(
             'dataType' => 'varchar',
@@ -36,12 +35,11 @@ class test2Admin extends kod_web_mysqlAdmin{
             'title' => 'title',
             'unique' => true
         ),
-        'ddd' => array(
-            'AUTO_INCREMENT' => true,
+        'ddd' => array(,
             'dataType' => 'int',
-            'notNull' => true,
             'title' => '巴拉',
-            'primarykey' => true
+            'primarykey' => true,
+            'name' => 'ddd'
         )
     );
     public function main(){
