@@ -407,6 +407,18 @@ class control{
             if(isset($option[$columnName])){
                 $isChange = false;
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
+                //查看主键和唯一键是否消失
+                foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
+                    if($item=='primarykey'){
+                        $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` DROP primary key';
+                        echo $dropIndexSql."\n";
+                        var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                    }elseif($item=='unique'){
+                        $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` DROP INDEX '.$columnName;
+                        echo $dropIndexSql."\n";
+                        var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                    }
+                }
                 foreach($option[$columnName] as $kk=>$vv){
                     if($kk=='dataType' && in_array($vv,array('int','bigint'))){
                         if($option[$columnName]['AUTO_INCREMENT']==true && $dbCanshu['AUTO_INCREMENT']==true  ){
@@ -419,6 +431,12 @@ class control{
                             $isChange = true;
                         }elseif($vv!=$dbCanshu[$kk]){
                             $isChange = true;
+                        }
+                    }elseif($kk=='primarykey'){
+                        if($vv!=$dbCanshu[$kk]){
+                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY `'.$columnName.'`';
+                            echo $dropIndexSql."\n";
+                            var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                         }
                     }else if($vv!=$dbCanshu[$kk] && $kk!=='title'){
                         $isChange = true;
@@ -500,12 +518,17 @@ class control{
                 $dbColumnMetaBase[0][] = $insert;
             }else{//修改字段
                 $tempApi = new metaSearch($tempData);
+                //如果没有unique,则删除unique属性
+                if(!isset($canshuList['unique'])){
+                    $tempData2 = $tempApi->search('value child key:filter([data=unique])')->parent()->toArray();
+                    $tempData2[0] = null;
+                }
                 foreach($canshuList as $canshu=>$canshuVal){
                     $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
                     if(empty($tempData2)){//新增属性
                         if($canshuVal==''){continue;}
                         $canshuMeta = $tempApi->search('value child')->toArray();
-                        if(in_array($canshu,array('notNull','AUTO_INCREMENT'))){
+                        if(in_array($canshu,array('notNull','AUTO_INCREMENT','unique'))){
                             $valueType = 'bool';
                         }elseif($canshu=='maxLength'){
                             $valueType = 'int';
@@ -549,7 +572,7 @@ class control{
                                         $temp3[0] = null;
                                     }
                                 }
-                            }elseif($tempData2[0]['key']['data']=='notNull'){
+                            }elseif(in_array($tempData2[0]['key']['data'],array('notNull','unique'))){
                                 $tempData2[0]['value']['type'] = 'bool';
                             }elseif($tempData2[0]['key']['data']=='maxLength'){
                                 $tempData2[0]['value']['type'] = 'int';
