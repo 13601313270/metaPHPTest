@@ -341,7 +341,7 @@ class control{
         if(isset($arr['unique']) && $arr['unique']=='false'){
             unset($arr['unique']);
         }
-        $arr['primarykey'] = ($arr['primarykey']=='true'||$arr['primarykey']==true);
+        $arr['primarykey'] = ($arr['primarykey']==='true'||$arr['primarykey']===true);
         if(isset($arr['primarykey']) && $arr['primarykey']===false){
             unset($arr['primarykey']);
         }
