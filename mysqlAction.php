@@ -438,7 +438,7 @@ class control{
                         }
                     }elseif($kk=='primarykey'){
                         if($vv!=$dbCanshu[$kk]){
-                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY `'.$columnName.'`';
+                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY(`'.$columnName.'`)';
                             echo $dropIndexSql."\n";
                             var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                         }
