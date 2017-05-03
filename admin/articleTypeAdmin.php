@@ -1,4 +1,5 @@
 <?php
+include_once("../include.php");
 
 /**
 * 表articleType操作后台
