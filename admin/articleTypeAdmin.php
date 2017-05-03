@@ -17,43 +17,45 @@ class articleTypeAdmin extends kod_web_mysqlAdmin{
         'id' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => 'id',
             'AUTO_INCREMENT' => true,
-            'default' => ''
+            'default' => '',
+            'AUTO_INCREMENT' => true,
+            'auto_increment' => '1'
         ),
         'title' => array(
             'dataType' => 'varchar',
-            'maxLength' => "255",
-            'notNull' => "true",
+            'maxLength' => 255,
+            'notNull' => true,
             'title' => '标题',
             'default' => ''
         ),
         'orderNum' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '排序',
             'default' => ''
         ),
         'projectId' => array(
             'dataType' => 'int',
             'maxLength' => 11,
-            'notNull' => "true",
+            'notNull' => true,
             'title' => '项目',
             'default' => ''
         ),
         'icon' => array(
             'dataType' => 'varchar',
-            'maxLength' => "255",
-            'notNull' => "true",
+            'maxLength' => 255,
+            'notNull' => true,
             'title' => '图标',
             'default' => ''
         ),
         'keyWord' => array(
             'dataType' => 'varchar',
-            'maxLength' => "255",
-            'notNull' => "true",
+            'maxLength' => 255,
+            'notNull' => true,
             'title' => '关键词',
             'default' => ''
         )
