@@ -21,7 +21,8 @@ class articleTypeAdmin extends kod_web_mysqlAdmin{
             'notNull' => true,
             'title' => 'id',
             'AUTO_INCREMENT' => true,
-            'primarykey' => true
+            'AUTO_INCREMENT' => true,
+            'auto_increment' => '1'
         ),
         'title' => array(
             'dataType' => 'varchar',
@@ -42,7 +43,7 @@ class articleTypeAdmin extends kod_web_mysqlAdmin{
             'title' => 'projectId'
         ),
         'icon' => array(
-            'dataType' => 'varchar',
+            'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
             'title' => 'icon'
