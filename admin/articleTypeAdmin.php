@@ -22,7 +22,8 @@ class articleTypeAdmin extends kod_web_mysqlAdmin{
             'AUTO_INCREMENT' => true,
             'default' => '',
             'AUTO_INCREMENT' => true,
-            'auto_increment' => '1'
+            'auto_increment' => '1',
+            'AUTO_INCREMENT' => true
         ),
         'title' => array(
             'dataType' => 'varchar',
