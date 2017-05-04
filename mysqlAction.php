@@ -524,8 +524,6 @@ class control{
                                         }else{
                                             $tempData2[0]['value']['type'] = 'string';
                                         }
-                                    }else{
-                                        $tempData2[0]['value']['type'] = 'string';
                                     }
                                     $tempData2[0]['value']['data'] = $canshuVal;
                                 }
