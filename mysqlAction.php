@@ -396,7 +396,8 @@ class control{
         $option = $_POST['option'];
 
         //找到这个表对应的接口类
-        $metaSearchApi = new metaSearch($this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data'));
+        $allIncludeApi = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
+        $metaSearchApi = new metaSearch($allIncludeApi);
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$tableName.'])')->toArray();
         if(empty($thisTableApiInfo)){
             echo '接口不存在';exit;
@@ -404,7 +405,8 @@ class control{
         $className = $thisTableApiInfo[0]['className'];
 
         //找到这个表对应的后台
-        $metaSearchApi = new metaSearch($this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className'));
+        $allAdmin = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
+        $metaSearchApi = new metaSearch($allAdmin);
         $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
         if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
         $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
@@ -419,21 +421,18 @@ class control{
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
                 //查看主键和唯一键是否消失
                 foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
-                    if($item=='primarykey'){
-                        $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP primary key';
+                    if(in_array($item,array('primarykey','unique'))){
+                        $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP '.($item=='primarykey'?'primary key':('INDEX '.$columnName) );
                         echo $dropIndexSql."\n";
-                        var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
-                    }elseif($item=='unique'){
-                        $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP INDEX '.$columnName;
-                        echo $dropIndexSql."\n";
-                        var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                        if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
+                            $option[$columnName][$item] = true;
+                        }
                     }
                 }
                 foreach($option[$columnName] as $kk=>$vv){
                     if($kk=='dataType' && in_array($vv,array('int','bigint'))){
                         if($option[$columnName]['AUTO_INCREMENT']==true && $dbCanshu['AUTO_INCREMENT']==true  ){
-                            if(in_array($dbCanshu[$kk],array('int','bigint'))){
-                            }else{
+                            if(!in_array($dbCanshu[$kk],array('int','bigint'))){
                                 echo $kk.";";
                                 $isChange = true;
                             }
@@ -446,13 +445,17 @@ class control{
                         if($vv!=$dbCanshu[$kk]){
                             $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD PRIMARY KEY(`'.$columnName.'`)';
                             echo $dropIndexSql."\n";
-                            var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                            if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
+                                unset($option[$columnName]['primarykey']);
+                            }
                         }
                     }elseif($kk=='unique'){
                         if($vv!=$dbCanshu[$kk]){
                             $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD UNIQUE(`'.$columnName.'`)';
                             echo $dropIndexSql."\n";
-                            var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
+                            if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
+                                unset($option[$columnName]['unique']);
+                            }
                         }
                     }else if($vv!=$dbCanshu[$kk] && $kk!=='title'){
                         $isChange = true;
@@ -461,7 +464,74 @@ class control{
                 if($isChange){
                     $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
                     echo $sql."\n";
-                    var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
+                    if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql)>-1){
+                        $tempData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
+                        $tempApi = new metaSearch($tempData);
+                        foreach($option[$columnName] as $canshu=>$canshuVal){
+                            $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
+                            if(empty($tempData2)){//新增属性
+                                if($canshuVal==''){continue;}
+                                $canshuMeta = $tempApi->search('value child')->toArray();
+                                if(in_array($canshu,array('notNull','AUTO_INCREMENT','unique'))){
+                                    $valueType = 'bool';
+                                }elseif($canshu=='maxLength'){
+                                    $valueType = 'int';
+                                }elseif($canshu=='default'){
+                                    if($option[$columnName]['dataType']=='int'){
+                                        $valueType = 'int';
+                                    }elseif($option[$columnName]['dataType']=='bool'){
+                                        $valueType = 'bool';
+                                    }else{
+                                        $valueType = 'string';
+                                    }
+                                }else{
+                                    $valueType = 'string';
+                                }
+                                $canshuMeta[0][] = array(
+                                    'type'=>'arrayValue',
+                                    'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
+                                    'value'=>array(
+                                        'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
+                                    ),
+                                );
+                            }
+                            else{
+                                if($canshuVal==''){
+                                    $tempData2[0] = null;
+                                }else{
+                                    if($tempData2[0]['key']['data']=='dataType'){
+                                        if($option[$columnName]['auto_increment']==true){
+                                            $canshuVal = 'int';
+                                            $canshuMeta = $tempApi->search('value child')->toArray();
+                                            $canshuMeta[0][] = array(
+                                                'type'=>'arrayValue',
+                                                'key'=>array('type'=>'string','borderStr'=>'\'','data'=>'AUTO_INCREMENT'),
+                                                'value'=>array(
+                                                    'type'=>'bool','data'=>true
+                                                ),
+                                            );
+                                        }else{
+                                            $temp3 = $tempApi->search('value child key:filter([data=AUTO_INCREMENT])')->parent()->toArray();
+                                            if(count($temp3)>0){
+                                                $temp3[0] = null;
+                                            }
+                                        }
+                                    }elseif($tempData2[0]['key']['data']=='default'){
+                                        if($option[$columnName]['dataType']=='int'){
+                                            $tempData2[0]['value']['type'] = 'int';
+                                        }elseif($option[$columnName]['dataType']=='bool'){
+                                            $tempData2[0]['value']['type'] = 'bool';
+                                        }else{
+                                            $tempData2[0]['value']['type'] = 'string';
+                                        }
+                                    }else{
+                                        $tempData2[0]['value']['type'] = 'string';
+                                    }
+                                    $tempData2[0]['value']['data'] = $canshuVal;
+                                }
+                            }
+                        }
+                    }
                 }
             }else{
                 $sql = 'alter table `'.$tableName.'` drop column `'.$columnName.'`';
@@ -469,126 +539,6 @@ class control{
                 if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql)>-1){
                     $temp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
                     $temp[0] = null;
-                }
-            }
-        }
-
-        //处理新增字段
-        $insertColumn = array_diff(array_keys($option),array_keys($showCreateTable));
-        foreach($insertColumn as $insertItem){
-            $sql = $this->getStrByColumnArr($insertItem,$option[$insertItem]);
-            $sql = 'ALTER TABLE '.$tableName.' add '.$sql;
-            echo $sql."\n";var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
-            if(isset($option[$insertItem]['primarykey'])){
-                $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD PRIMARY KEY `'.$insertItem.'`';
-                echo $dropIndexSql."\n";
-                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
-            } elseif(isset($option[$insertItem]['unique'])){
-                $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD UNIQUE(`'.$insertItem.'`)';
-                echo $dropIndexSql."\n";
-                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
-            }
-        }
-        $columnList = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
-        foreach($option as $columnName=>$canshuList){
-            $thisColumnInfo = $columnList->search('key:filter([data='.$columnName.'])')->parent();
-            $tempData = $thisColumnInfo->toArray();
-            if(empty($tempData)){//新增字段
-                $dbColumnMetaBase = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
-                $insert = array(
-                    'type'=>'arrayValue',
-                    'key'=>array('type'=>'string','data'=>$columnName,'borderStr'=>"'"),
-                    'value'=>array(
-                        'type'=>'array',
-                        'child'=>array(),
-                    ),
-                );
-                foreach(array('dataType','notNull','title','auto_increment','maxLength','default','primarykey','unique') as $canshuName){
-                    if(isset($canshuList[$canshuName]) && $canshuList[$canshuName]!==''){
-                        $insert['value']['child'][] = array(
-                            'type'=>'arrayValue', 'key'=>array('type'=>'string','data'=>$canshuName,'borderStr'=>"'"),
-                            'value'=>array('type'=>gettype($canshuList[$canshuName]),'data'=>$canshuList[$canshuName],'borderStr'=>"'"),
-                        );
-
-                    }
-                }
-                $dbColumnMetaBase[0][] = $insert;
-            }else{//修改字段
-                $tempApi = new metaSearch($tempData);
-                //如果没有unique,则删除unique属性
-                foreach(array('unique','primarykey') as $delete){
-                    if(!isset($canshuList[$delete])){
-                        $tempData2 = $tempApi->search('value child key:filter([data='.$delete.'])')->parent()->toArray();
-                        $tempData2[0] = null;
-                    }
-                }
-                foreach($canshuList as $canshu=>$canshuVal){
-                    $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
-                    if(empty($tempData2)){//新增属性
-                        if($canshuVal==''){continue;}
-                        $canshuMeta = $tempApi->search('value child')->toArray();
-                        if(in_array($canshu,array('notNull','AUTO_INCREMENT','unique'))){
-                            $valueType = 'bool';
-                        }elseif($canshu=='maxLength'){
-                            $valueType = 'int';
-                        }elseif($canshu=='default'){
-                            if($canshuList['dataType']=='int'){
-                                $valueType = 'int';
-                            }elseif($canshuList['dataType']=='bool'){
-                                $valueType = 'bool';
-                            }else{
-                                $valueType = 'string';
-                            }
-                        }else{
-                            $valueType = 'string';
-                        }
-                        $canshuMeta[0][] = array(
-                            'type'=>'arrayValue',
-                            'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
-                            'value'=>array(
-                                'type'=>$valueType, 'borderStr'=>'\'', 'data'=>$canshuVal
-                            ),
-                        );
-                    }
-                    else{
-                        if($canshuVal==''){
-                            $tempData2[0] = null;
-                        }else{
-                            if($tempData2[0]['key']['data']=='dataType'){
-                                if($canshuList['auto_increment']==true){
-                                    $canshuVal = 'int';
-                                    $canshuMeta = $tempApi->search('value child')->toArray();
-                                    $canshuMeta[0][] = array(
-                                        'type'=>'arrayValue',
-                                        'key'=>array('type'=>'string','borderStr'=>'\'','data'=>'AUTO_INCREMENT'),
-                                        'value'=>array(
-                                            'type'=>'bool','data'=>true
-                                        ),
-                                    );
-                                }else{
-                                    $temp3 = $tempApi->search('value child key:filter([data=AUTO_INCREMENT])')->parent()->toArray();
-                                    if(count($temp3)>0){
-                                        $temp3[0] = null;
-                                    }
-                                }
-                            }elseif(in_array($tempData2[0]['key']['data'],array('notNull','unique','primarykey'))){
-                                $tempData2[0]['value']['type'] = 'bool';
-                            }elseif($tempData2[0]['key']['data']=='maxLength'){
-                                $tempData2[0]['value']['type'] = 'int';
-                            }elseif($tempData2[0]['key']['data']=='default'){
-                                if($canshuList['dataType']=='int'){
-                                    $tempData2[0]['value']['type'] = 'int';
-                                }elseif($canshuList['dataType']=='bool'){
-                                    $tempData2[0]['value']['type'] = 'bool';
-                                }else{
-                                    $tempData2[0]['value']['type'] = 'string';
-                                }
-                            }else{
-                                $tempData2[0]['value']['type'] = 'string';
-                            }
-                            $tempData2[0]['value']['data'] = $canshuVal;
-                        }
-                    }
                 }
             }
         }
