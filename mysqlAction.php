@@ -223,6 +223,9 @@ class control{
             $classApi = new $thisTableApiInfo['className']();
             $option = $classApi->showCreateTable();
             foreach($option as $k=>$v){
+                if($v['AUTO_INCREMENT']==true){
+                    unset($v['primarykey']);
+                }
                 $insert = array(
                     'type' => 'arrayValue',
                     'key'=>array('type'=>'string','borderStr'=>"'",'data'=>$k),
