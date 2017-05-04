@@ -42,7 +42,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'content' => array(
             'dataType' => 'text',
             'notNull' => true,
-            'title' => '正文'
+            'title' => '正文',
+            'listShowType' => 'hidden'
         ),
         'type' => array(
             'dataType' => 'int',
