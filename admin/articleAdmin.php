@@ -21,7 +21,9 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'notNull' => true,
             'title' => 'id',
             'AUTO_INCREMENT' => true,
-            'primarykey' => true
+            'primarykey' => true,
+            'AUTO_INCREMENT' => true,
+            'auto_increment' => '1'
         ),
         'title' => array(
             'dataType' => 'varchar',
