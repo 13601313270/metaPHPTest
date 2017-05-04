@@ -325,7 +325,7 @@ class control{
     private function getStrByColumnArr($columnName,&$arr){
         if($arr['dataType']=='auto_increment'){
             $arr['dataType'] = 'int';
-            $arr['auto_increment'] = true;
+            $arr['AUTO_INCREMENT'] = true;
             unset($arr['primarykey']);
         }
         if($arr['default']===''){
@@ -505,7 +505,7 @@ class control{
                                     $tempData2[0] = null;
                                 }else{
                                     if($tempData2[0]['key']['data']=='dataType'){
-                                        if($option[$columnName]['auto_increment']==true){
+                                        if($option[$columnName]['AUTO_INCREMENT']==true){
                                             $canshuVal = 'int';
                                             $canshuMeta = $tempApi->search('value child')->toArray();
                                             $canshuMeta[0][] = array(
