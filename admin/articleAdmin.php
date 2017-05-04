@@ -16,11 +16,14 @@ class articleAdmin extends kod_web_mysqlAdmin{
     protected $smartyTpl = 'articleAdmin.tpl';
     protected $dbColumn = array(
         'id' => array(
-            'dataType' => 'bigint',
+            'dataType' => 'int',
             'maxLength' => 20,
             'notNull' => true,
             'title' => 'id',
-            'AUTO_INCREMENT' => true
+            'AUTO_INCREMENT' => true,
+            'AUTO_INCREMENT' => true,
+            'auto_increment' => '1',
+            'primarykey' => '1'
         ),
         'title' => array(
             'dataType' => 'varchar',
@@ -42,7 +45,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'content' => array(
             'dataType' => 'text',
             'notNull' => true,
-            'title' => '正文'
+            'title' => '正文',
+            'listShowType' => 'hidden'
         ),
         'type' => array(
             'dataType' => 'int',
