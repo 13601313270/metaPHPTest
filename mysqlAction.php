@@ -426,7 +426,8 @@ class control{
         foreach($showCreateTable as $columnName=>$dbCanshu){
             if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
-                $isChange = false;
+                $isChangeMql = false;//数据库是否产生变化,必然导致后台产生变化
+                $isChangeAdmin = false;//后台是否产生变化
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
                 //查看主键和唯一键是否消失
                 foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
@@ -439,16 +440,19 @@ class control{
                     }
                 }
                 foreach($option[$columnName] as $kk=>$vv){
+                    if($kk=='dataType'){
+                        $vv = $this->allMysqlColType[$vv]['saveType'];
+                    }
                     if($kk=='dataType' && in_array($vv,array('int','bigint'))){
                         if($option[$columnName]['AUTO_INCREMENT']==true && $dbCanshu['AUTO_INCREMENT']==true  ){
                             if(!in_array($dbCanshu[$kk],array('int','bigint'))){
                                 echo $kk.";";
-                                $isChange = true;
+                                $isChangeMql = true;
                             }
                         }elseif($option[$columnName]['AUTO_INCREMENT']!==$dbCanshu['AUTO_INCREMENT']){
-                            $isChange = true;
+                            $isChangeMql = true;
                         }elseif($vv!=$dbCanshu[$kk]){
-                            $isChange = true;
+                            $isChangeMql = true;
                         }
                     }elseif($kk=='primarykey'){
                         if($vv!=$dbCanshu[$kk]){
@@ -466,14 +470,22 @@ class control{
                                 unset($option[$columnName]['unique']);
                             }
                         }
-                    }else if($vv!=$dbCanshu[$kk] && $kk!=='title'){
-                        $isChange = true;
+                    }else if($vv!=$dbCanshu[$kk]){
+                        if(in_array($kk,array('title','listShowType'))){
+                            $isChangeAdmin = true;
+                        }else{
+                            $isChangeMql = true;
+                        }
+
                     }
                 }
-                if($isChange){
-                    $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
-                    echo $sql."\n";
-                    if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql)>-1){
+                if($isChangeMql||$isChangeAdmin){
+                    if($isChangeMql){
+                        $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
+                        echo $sql."\n";
+                        $mysqlResult = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+                    }
+                    if(($isChangeMql&&$mysqlResult>-1)||$isChangeAdmin){
                         $tempData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
                         $tempApi = new metaSearch($tempData);
                         foreach($option[$columnName] as $canshu=>$canshuVal){
