@@ -392,20 +392,26 @@ class control{
         echo $result;exit;
     }
     public function updateTableAdmin(){
-        $table = $_POST['table'];
+        $tableName = $_POST['table'];
         $option = $_POST['option'];
 
-        //获得include文件夹全部接口类梗概信息
-        $allIncludeApi = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
         //找到这个表对应的接口类
-        $metaSearchApi = new metaSearch($allIncludeApi);
-        $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$table.'])')->toArray();
+        $metaSearchApi = new metaSearch($this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data'));
+        $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$tableName.'])')->toArray();
         if(empty($thisTableApiInfo)){
             echo '接口不存在';exit;
         }
         $className = $thisTableApiInfo[0]['className'];
+
+        //找到这个表对应的后台
+        $metaSearchApi = new metaSearch($this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className'));
+        $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
+        if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
+        $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
+        $phpInterpreter = new phpInterpreter($oldCode);
+
+
         $classApi = new $className();
-        $allDeleteColumn = array();
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
         foreach($showCreateTable as $columnName=>$dbCanshu){
             if(isset($option[$columnName])){
@@ -414,11 +420,11 @@ class control{
                 //查看主键和唯一键是否消失
                 foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
                     if($item=='primarykey'){
-                        $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` DROP primary key';
+                        $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP primary key';
                         echo $dropIndexSql."\n";
                         var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                     }elseif($item=='unique'){
-                        $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` DROP INDEX '.$columnName;
+                        $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP INDEX '.$columnName;
                         echo $dropIndexSql."\n";
                         var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                     }
@@ -438,13 +444,13 @@ class control{
                         }
                     }elseif($kk=='primarykey'){
                         if($vv!=$dbCanshu[$kk]){
-                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY(`'.$columnName.'`)';
+                            $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD PRIMARY KEY(`'.$columnName.'`)';
                             echo $dropIndexSql."\n";
                             var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                         }
                     }elseif($kk=='unique'){
                         if($vv!=$dbCanshu[$kk]){
-                            $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD UNIQUE(`'.$columnName.'`)';
+                            $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD UNIQUE(`'.$columnName.'`)';
                             echo $dropIndexSql."\n";
                             var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
                         }
@@ -453,15 +459,17 @@ class control{
                     }
                 }
                 if($isChange){
-                    $sql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` MODIFY '.$sql;
+                    $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
                     echo $sql."\n";
                     var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
                 }
             }else{
-                $allDeleteColumn[] = $columnName;
-                $sql = 'alter table `'.$thisTableApiInfo[0]['tableName'].'` drop column `'.$columnName.'`';
+                $sql = 'alter table `'.$tableName.'` drop column `'.$columnName.'`';
                 echo $sql."\n";
-                var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
+                if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql)>-1){
+                    $temp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
+                    $temp[0] = null;
+                }
             }
         }
 
@@ -469,34 +477,21 @@ class control{
         $insertColumn = array_diff(array_keys($option),array_keys($showCreateTable));
         foreach($insertColumn as $insertItem){
             $sql = $this->getStrByColumnArr($insertItem,$option[$insertItem]);
-            $sql = 'ALTER TABLE '.$thisTableApiInfo[0]['tableName'].' add '.$sql;
+            $sql = 'ALTER TABLE '.$tableName.' add '.$sql;
             echo $sql."\n";var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql));
             if(isset($option[$insertItem]['primarykey'])){
-                $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD PRIMARY KEY `'.$insertItem.'`';
+                $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD PRIMARY KEY `'.$insertItem.'`';
                 echo $dropIndexSql."\n";
                 var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
             } elseif(isset($option[$insertItem]['unique'])){
-                $dropIndexSql = 'ALTER TABLE `'.$thisTableApiInfo[0]['tableName'].'` ADD UNIQUE(`'.$insertItem.'`)';
+                $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD UNIQUE(`'.$insertItem.'`)';
                 echo $dropIndexSql."\n";
                 var_dump(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql));
             }
         }
-        //所有后台
-        $allIncludeApi = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
-        //找到这个表对应的后台
-        $metaSearchApi = new metaSearch($allIncludeApi);
-        $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
-        if(empty($thisTableAdminInfo)){echo '接口不存在';exit;}
-        $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
-        $phpInterpreter = new phpInterpreter($oldCode);
-        //删除所有不存在的字段
-        foreach($allDeleteColumn as $delete){
-            $temp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$delete.'])')->parent()->toArray();
-            $temp[0] = null;
-        }
-        $className = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
+        $columnList = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child');
         foreach($option as $columnName=>$canshuList){
-            $thisColumnInfo = $className->search('key:filter([data='.$columnName.'])')->parent();
+            $thisColumnInfo = $columnList->search('key:filter([data='.$columnName.'])')->parent();
             $tempData = $thisColumnInfo->toArray();
             if(empty($tempData)){//新增字段
                 $dbColumnMetaBase = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
@@ -598,8 +593,9 @@ class control{
             }
         }
         //提交git
-        if($oldCode!==$phpInterpreter->getCode()){
-            $this->pushGit('./admin/'.$thisTableAdminInfo[0]['fileName'],$phpInterpreter->getCode(),'修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
+        $newCode = $phpInterpreter->getCode();
+        if($oldCode!==$newCode){
+            $this->pushGit('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode,'修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
         }
     }
     //保存文件并提交git
