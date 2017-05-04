@@ -424,6 +424,7 @@ class control{
         $classApi = new $className();
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
         foreach($showCreateTable as $columnName=>$dbCanshu){
+            if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
                 $isChange = false;
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
