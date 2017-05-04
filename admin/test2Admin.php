@@ -24,7 +24,7 @@ class test2Admin extends kod_web_mysqlAdmin{
         ),
         'name' => array(
             'dataType' => 'varchar',
-            'maxLength' => 253,
+            'maxLength' => 255,
             'notNull' => true,
             'title' => 'name',
             'unique' => true
