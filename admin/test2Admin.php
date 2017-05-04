@@ -24,10 +24,10 @@ class test2Admin extends kod_web_mysqlAdmin{
         ),
         'name' => array(
             'dataType' => 'varchar',
-            'maxLength' => 255,
-            'notNull' => true,
+            'maxLength' => "254",
+            'notNull' => "1",
             'title' => 'name',
-            'unique' => true
+            'unique' => "1"
         )
     );
     public function main(){
