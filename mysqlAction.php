@@ -351,6 +351,11 @@ class control{
                 unset($arr['unique']);
             }
         }
+        if($arr['listShowType']==='true'||$arr['listShowType']===true){
+            $arr['listShowType'] = 'hidden';
+        } elseif($arr['listShowType']==='false'||$arr['listShowType']===false){
+            unset($arr['listShowType']);
+        }
         $arr['notNull'] = ($arr['notNull']==='true' || $arr['notNull']===true);
         $dataType = $this->allMysqlColType[$arr['dataType']]['saveType'];
         $temp = '`'.$columnName."` ".

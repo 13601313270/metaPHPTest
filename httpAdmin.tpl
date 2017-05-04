@@ -484,6 +484,7 @@
                                     '<th style="min-width: 100px">默认值</th>' +
                                     '<th style="min-width: 100px">主键</th>' +
                                     '<th style="min-width: 100px">表内唯一</th>' +
+                                    '<th style="min-width: 100px">列表隐藏</th>' +
                                     '</tr></thead><tbody></tbody></table>');
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
@@ -500,6 +501,7 @@
                                         '<td data-id="default"><input class="form-control" value="'+(data.option[i].default!==undefined?data.option[i].default:'')+'">'+'</td>' +
                                         '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey"'+(data.option[i].primarykey===true?' checked="check"':'')+'></td>' +
                                         '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"'+(data.option[i].unique===true?' checked="check"':'')+'></td>' +
+                                        '<td data-id="listShowType"><input type="checkbox" class="form-control" '+(data.option[i].listShowType===true?' checked="check"':'')+'></td>' +
                                     '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
@@ -546,6 +548,7 @@
                                         '<th style="min-width: 100px">默认值</th>' +
                                         '<th style="min-width: 100px">主键</th>' +
                                         '<th style="min-width: 100px">表内唯一</th>' +
+                                        '<th style="min-width: 100px">列表隐藏</th>' +
                                         '</tr></thead><tbody></tbody></table>');
                                 $('#showTableColumn>.panel>.panel-body').append(table);
                                 $('[data-id=adminFileName]').removeAttr('href');
