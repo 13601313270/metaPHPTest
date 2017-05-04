@@ -29,7 +29,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'title' => '标题'
         ),
         'img' => array(
-            'dataType' => 'varchar',
+            'dataType' => 'imageQiniu',
             'maxLength' => 255,
             'notNull' => true,
             'title' => '图片'
@@ -37,38 +37,38 @@ class articleAdmin extends kod_web_mysqlAdmin{
         'ctime' => array(
             'dataType' => 'datetime',
             'notNull' => true,
-            'title' => 'ctime'
+            'title' => '创建时间'
         ),
         'content' => array(
             'dataType' => 'text',
             'notNull' => true,
-            'title' => 'content'
+            'title' => '正文'
         ),
         'type' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'type'
+            'title' => '类型'
         ),
         'project' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'project'
+            'title' => '项目'
         ),
         'good' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'good',
-            'default' => '0'
+            'title' => '好评',
+            'default' => 0
         ),
         'bad' => array(
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'bad',
-            'default' => '0'
+            'title' => '差评',
+            'default' => 0
         )
     );
     public function main(){
