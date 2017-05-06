@@ -30,7 +30,6 @@ class test4Admin extends kod_web_mysqlAdmin{
         ),
         'content' => array(
             'dataType' => 'text',
-            'notNull' => false,
             'title' => '正文',
             'listShowType' => 'hidden'
         )
