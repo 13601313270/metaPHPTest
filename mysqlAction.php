@@ -368,7 +368,7 @@ class control{
             ($arr['default']===null?'': (' DEFAULT '.
                 (   in_array($dataType,array('int','bigint'))? $arr['default'] : ('"'.$arr['default'].'"'))
             )).
-            (isset($arr['auto_increment'])?" AUTO_INCREMENT":"");
+            (isset($arr['AUTO_INCREMENT'])?" AUTO_INCREMENT":"");
         return $temp;
     }
     public function insertTable(){
