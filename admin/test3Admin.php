@@ -30,8 +30,8 @@ class test3Admin extends kod_web_mysqlAdmin{
         ),
         'content' => array(
             'dataType' => 'text',
-            'notNull' => false,
-            'title' => 'content'
+            'title' => 'content',
+            'listShowType' => 'hidden'
         )
     );
     public function main(){
