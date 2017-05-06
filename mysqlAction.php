@@ -379,7 +379,9 @@ class control{
         foreach($_POST['option'] as $key=>$val){
             $insert = $this->getStrByColumnArr($key,$val);
             $temp[] = $insert;
-            if(isset($val['primarykey'])){
+            if(isset($val['AUTO_INCREMENT'])){
+                $primary = $key;
+            }else if(isset($val['primarykey'])){
                 $primary = $key;
             }
             if(isset($val['unique']) && $val['unique']===true){
