@@ -508,6 +508,23 @@
                             $('#showTableColumn>.panel>.panel-body').append(table);
                             $('[data-id=adminFileName]').attr('href',data.adminFileName);
                             $('[data-id=adminFileName]').removeAttr('disabled');
+
+                            var isHasAutoIncrement = false;
+                            $('[data-id=dataType] select').each(function(){
+                                if($(this).val()=='auto_increment'){
+                                    $(this).parents('tr').find('[data-id=primarykey]>input').click();
+                                    $(this).parents('tr').find('[data-id=notNull]>input').attr("checked","true");
+                                    $(this).parents('tr').find('[data-id=notNull]>input').attr("disabled","disabled");
+                                    isHasAutoIncrement = true;
+                                    return false
+                                }
+                            });
+                            if(isHasAutoIncrement){
+                                $('#showTableColumn [data-id=primarykey]>input').attr('disabled','disabled');
+                            }else{
+                                $('#showTableColumn [data-id=primarykey]>input').removeAttr('disabled');
+                                $('#showTableColumn [data-id=notNull]>input').removeAttr('disabled');
+                            }
                         });
 
                     });
@@ -744,6 +761,8 @@
             $('[data-id=dataType] select').each(function(){
                 if($(this).val()=='auto_increment'){
                     $(this).parents('tr').find('[data-id=primarykey]>input').click();
+                    $(this).parents('tr').find('[data-id=primarykey]>input').attr('disabled','disabled');
+                    $(this).parents('tr').find('[data-id=notNull]>input').attr('disabled','disabled');
                     isHasAutoIncrement = true;
                     return false
                 }
@@ -752,6 +771,7 @@
                 $('#showTableColumn [data-id=primarykey]>input').attr('disabled','disabled');
             }else{
                 $('#showTableColumn [data-id=primarykey]>input').removeAttr('disabled');
+                $('#showTableColumn [data-id=notNull]>input').removeAttr('disabled');
             }
             console.log(selectType);
         });
