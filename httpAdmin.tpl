@@ -457,7 +457,7 @@
                     });
                 });
                 //初始化表后台信息
-                function initTableInfo(database,tableName){
+                function initTableInfo(database,tableName,option){
                     $.post('mysqlAction.php',{
                         action:'getDataApi',
                         database:database,
@@ -468,7 +468,8 @@
                         var className = data.className;
                         $.post('mysqlAction.php',{
                             action:'showTableAdmin',
-                            class:className
+                            class:className,
+                            option:option
                         },function(data){
                             data = JSON.parse(data);
                             $('#showTableColumn').show();
@@ -717,7 +718,7 @@
                                 if(data=='0'){
                                     var database = '{$useDataBases[0]}';
                                     var tableName = $('#showTableColumn').data('id');
-                                    initTableInfo(database,tableName);
+                                    initTableInfo(database,tableName,nowSate);
                                 }
                             }
                         });

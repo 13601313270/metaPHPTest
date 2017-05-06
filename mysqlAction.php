@@ -274,6 +274,7 @@ class control{
                 'type'=>'objectFunction', 'object'=>'$adminObj', 'name'=>'run',
             );
             //写入文件系统
+            echo $newClass->phpInterpreter->getCode();exit;
             $gitAction = new githubClass();
             $gitAction->pull();
             file_put_contents('./admin/'.$adminClassName.'.php',$newClass->phpInterpreter->getCode());
