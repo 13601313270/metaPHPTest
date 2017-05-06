@@ -226,6 +226,15 @@ class control{
                 if($v['AUTO_INCREMENT']==true){
                     unset($v['primarykey']);
                 }
+                //填充上只在后台有意义的字段,非mysql字段
+                if(!empty($_POST['option'])){
+                    $this->getStrByColumnArr($k,$_POST['option'][$k]);
+                    foreach(array('title','listShowType') as $vv){
+                        if(isset($_POST['option'][$k][$vv])){
+                            $v[$vv] = $_POST['option'][$k][$vv];
+                        }
+                    }
+                }
                 $insert = array(
                     'type' => 'arrayValue',
                     'key'=>array('type'=>'string','borderStr'=>"'",'data'=>$k),
@@ -274,7 +283,6 @@ class control{
                 'type'=>'objectFunction', 'object'=>'$adminObj', 'name'=>'run',
             );
             //写入文件系统
-            echo $newClass->phpInterpreter->getCode();exit;
             $gitAction = new githubClass();
             $gitAction->pull();
             file_put_contents('./admin/'.$adminClassName.'.php',$newClass->phpInterpreter->getCode());
