@@ -656,6 +656,13 @@
                 </div>
                 <script>
                     function addColumn(){
+                        var isHasAutoIncrement = false;
+                        $('[data-id=dataType] select').each(function(){
+                            if($(this).val()=='auto_increment'){
+                                isHasAutoIncrement = true;
+                                return false
+                            }
+                        });
                         $('#showTableColumn .panel-body>table>tbody').append($('<tr>' +
                             '<td data-id="name"><input class="form-control"/></td>' +
                             '<td data-id="title"><input class="form-control" value=""/></td>' +
@@ -663,8 +670,9 @@
                             '<td data-id="maxLength"></td>' +
                             '<td data-id="notNull"><input class="form-control" type="checkbox">'+'</td>' +
                             '<td data-id="default"><input class="form-control"></td>' +
-                            '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey"></td>' +
+                            '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey" '+(isHasAutoIncrement?'disabled="disabled"':'')+'></td>' +
                             '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"></td>' +
+                            '<td data-id="listShowType"><input type="checkbox" class="form-control"></td>' +
                         '</tr>'));
                     }
                 </script>
@@ -731,8 +739,15 @@
             }else{
                 maxLengthTd.html('');
             }
-            if(selectType=='auto_increment'){
-                $(this).parents('tr').find('[data-id=primarykey]>input').click();
+            var isHasAutoIncrement = false;
+            $('[data-id=dataType] select').each(function(){
+                if($(this).val()=='auto_increment'){
+                    $(this).parents('tr').find('[data-id=primarykey]>input').click();
+                    isHasAutoIncrement = true;
+                    return false
+                }
+            });
+            if(isHasAutoIncrement){
                 $('#showTableColumn [data-id=primarykey]>input').attr('disabled','disabled');
             }else{
                 $('#showTableColumn [data-id=primarykey]>input').removeAttr('disabled');
