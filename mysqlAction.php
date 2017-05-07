@@ -444,7 +444,7 @@ class control{
                 $isChangeAdmin = false;//后台是否产生变化
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
                 //增加外键字段
-                if(isset($option[$columnName]['foreignKey'])){//如果这个字段设有外键
+                if(!empty($option[$columnName]['foreignKey'])){//如果这个字段设有外键
                     $foreignKey = $allIncludeApi->phpInterpreter->search('.class #$foreignKey')->toArray();
                     $foreignKey[0]['value']['child'][] = array(
                         'type'=>'arrayValue',
