@@ -19,12 +19,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'id',
-<<<<<<< Updated upstream
-            'AUTO_INCREMENT' => true
-=======
-            'AUTO_INCREMENT' => true,
->>>>>>> Stashed changes
+            'title' => 'undefined'<<<<<<<true===true>>>>>>>changes
         ),
         'title' => array(
             'dataType' => 'varchar',
