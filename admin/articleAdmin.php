@@ -54,7 +54,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => '项目'
+            'title' => '项目',
+            'foreignKey' => 'project'
         ),
         'good' => array(
             'dataType' => 'int',
