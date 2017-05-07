@@ -368,6 +368,9 @@ class control{
         } elseif($arr['listShowType']==='false'||$arr['listShowType']===false){
             unset($arr['listShowType']);
         }
+        if($arr['foreignKey']==NULL){
+            unset($arr['foreignKey']);
+        }
         $arr['notNull'] = ($arr['notNull']==='true' || $arr['notNull']===true);
         $dataType = $this->allMysqlColType[$arr['dataType']]['saveType'];
         $temp = '`'.$columnName."` ".
@@ -415,8 +418,8 @@ class control{
         $option = $_POST['option'];
 
         //找到这个表对应的接口类
-        $allIncludeApi = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
-        $metaSearchApi = new metaSearch($allIncludeApi);
+        $allIncludeApiList = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
+        $metaSearchApi = new metaSearch($allIncludeApiList);
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$tableName.'])')->toArray();
         if(empty($thisTableApiInfo)){
             echo '接口不存在';exit;
@@ -434,12 +437,27 @@ class control{
 
         $classApi = new $className();
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
+        //include的api的外键字段
+        $allIncludeApi = new classAction($className);
+        $isHasForeighKeys = $allIncludeApi->phpInterpreter->search('.class #$foreignKey')->toArray();
+        if(empty($isHasForeighKeys)){
+            $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
+        }
         foreach($showCreateTable as $columnName=>$dbCanshu){
             if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
                 $isChangeMql = false;//数据库是否产生变化,必然导致后台产生变化
                 $isChangeAdmin = false;//后台是否产生变化
                 $sql = $this->getStrByColumnArr($columnName,$option[$columnName]);
+                //增加外键字段
+                if(isset($option[$columnName]['foreignKey'])){//如果这个字段设有外键
+                    $foreignKey = $allIncludeApi->phpInterpreter->search('.class #$foreignKey')->toArray();
+                    $foreignKey[0]['value']['child'][] = array(
+                        'type'=>'arrayValue',
+                        'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$columnName),
+                        'value'=>array('type'=>'string','borderStr'=>'\'','data'=>$option[$columnName]['foreignKey'] ),
+                    );
+                }
                 //查看主键和唯一键是否消失
                 foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
                     if(in_array($item,array('primarykey','unique'))){
@@ -482,7 +500,7 @@ class control{
                             }
                         }
                     }else if($vv!=$dbCanshu[$kk]){
-                        if(in_array($kk,array('title','listShowType'))){
+                        if(in_array($kk,array('title','listShowType','foreignKey'))){
                             $isChangeAdmin = true;
                         }else{
                             $isChangeMql = true;
@@ -573,6 +591,10 @@ class control{
             }
         }
         //提交git
+        $allIncludeApi->save();
+        $gitAction = new githubClass();
+        $gitAction->add('--all');
+        $gitAction->commit('类'.$className.'设置了外键');
         $newCode = $phpInterpreter->getCode();
         if($oldCode!==$newCode){
             $this->pushGit('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode,'修改了表的后台'.$thisTableAdminInfo[0]['fileName']);

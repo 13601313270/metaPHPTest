@@ -428,6 +428,18 @@
                     html+= '</select>';
                     return html;
                 }
+                function getForeignKey(nowType){
+                    var html = '<select class="form-control"><option value="">无</option>';
+                    for(var i=0;i<getForeignKey.allType.length;i++){
+                        if(getForeignKey.allType[i].Name==nowType){
+                            html+= '<option selected value="'+getForeignKey.allType[i].Name+'">'+getForeignKey.allType[i].Name+'</option>';
+                        }else{
+                            html+= '<option value="'+getForeignKey.allType[i].Name+'">'+getForeignKey.allType[i].Name+'</option>';
+                        }
+                    }
+                    html+= '</select>';
+                    return html;
+                }
                 {*var allTableApiClass = {json_encode($tableApiClass)};*}
                 $('#dataAdminTab').click(function(){
                     $.post('mysqlAction.php',{
@@ -436,6 +448,7 @@
                     },function(data){
                         $('#dataAdmin').html('');
                         data = JSON.parse(data);
+                        getForeignKey.allType = data;
                         for(var i=0;i<data.length;i++){
                             $('#dataAdmin').append('<div class="panel panel-default" data-database="'+data[i].database+'" data-name="'+data[i].Name+'">'+
                                 '<div class="panel-heading">'+data[i].Name+'</div>'+
@@ -486,6 +499,7 @@
                                     '<th style="min-width: 100px">主键</th>' +
                                     '<th style="min-width: 100px">表内唯一</th>' +
                                     '<th style="min-width: 100px">列表隐藏</th>' +
+                                    '<th style="min-width: 100px">外键关联</th>' +
                                     '</tr></thead><tbody></tbody></table>');
                             for(var i in data.option){
                                 table.append($('<tr data-id="'+i+'">' +
@@ -503,6 +517,9 @@
                                         '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey"'+(data.option[i].primarykey===true?' checked="check"':'')+'></td>' +
                                         '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"'+(data.option[i].unique===true?' checked="check"':'')+'></td>' +
                                         '<td data-id="listShowType"><input type="checkbox" class="form-control" '+(data.option[i].listShowType==='hidden'?' checked="check"':'')+'></td>' +
+                                        '<td data-id="foreignKey">'+
+                                            getForeignKey(data.option[i].foreignKey)+
+                                        '</td>' +
                                     '</tr>'));
                             }
                             $('#showTableColumn>.panel>.panel-body').append(table);
@@ -691,6 +708,9 @@
                             '<td data-id="primarykey"><input type="radio" class="form-control" name="primarykey" '+(isHasAutoIncrement?'disabled="disabled"':'')+'></td>' +
                             '<td data-id="unique"><input type="checkbox" class="form-control" name="unique"></td>' +
                             '<td data-id="listShowType"><input type="checkbox" class="form-control"></td>' +
+                            '<td data-id="foreignKey">'+
+                                getForeignKey()+
+                            '</td>' +
                         '</tr>'));
                     }
                 </script>
