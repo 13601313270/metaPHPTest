@@ -19,7 +19,7 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'undefined'<<<<<<<true===true>>>>>>>changes
+            'title' => 'id',
         ),
         'title' => array(
             'dataType' => 'varchar',
