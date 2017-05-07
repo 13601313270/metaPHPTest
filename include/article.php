@@ -12,6 +12,16 @@ class article extends kod_db_mysqlSingle{
     protected $tableName = 'article';
     protected $key = 'id';
     protected $keyDataType = 'int';
-    public $foreignKey = array();
+    public $foreignKey = array(
+        'id' => '',
+        'title' => '',
+        'img' => '',
+        'ctime' => '',
+        'content' => '',
+        'type' => '',
+        'project' => '',
+        'good' => '',
+        'bad' => ''
+    );
 }
 
