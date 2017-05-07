@@ -368,9 +368,6 @@ class control{
         } elseif($arr['listShowType']==='false'||$arr['listShowType']===false){
             unset($arr['listShowType']);
         }
-        if($arr['foreignKey']==NULL){
-            unset($arr['foreignKey']);
-        }
         $arr['notNull'] = ($arr['notNull']==='true' || $arr['notNull']===true);
         $dataType = $this->allMysqlColType[$arr['dataType']]['saveType'];
         $temp = '`'.$columnName."` ".
