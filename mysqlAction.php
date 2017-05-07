@@ -439,10 +439,7 @@ class control{
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
         //include的api的外键字段
         $allIncludeApi = new classAction($className);
-        $isHasForeighKeys = $allIncludeApi->phpInterpreter->search('.class #$foreignKey')->toArray();
-        if(empty($isHasForeighKeys)){
-            $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
-        }
+        $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
         foreach($showCreateTable as $columnName=>$dbCanshu){
             if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
