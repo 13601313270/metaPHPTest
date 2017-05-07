@@ -594,6 +594,7 @@ class control{
         $gitAction->add('--all');
         $gitAction->commit('类'.$className.'设置了外键');
         $newCode = $phpInterpreter->getCode();
+        echo $newCode;exit;
         if($oldCode!==$newCode){
             file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode);
         }
