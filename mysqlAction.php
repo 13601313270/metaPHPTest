@@ -588,14 +588,19 @@ class control{
             }
         }
         //提交git
-        $allIncludeApi->save();
         $gitAction = new githubClass();
+        $gitAction->pull();
+        $allIncludeApi->save();
         $gitAction->add('--all');
         $gitAction->commit('类'.$className.'设置了外键');
         $newCode = $phpInterpreter->getCode();
         if($oldCode!==$newCode){
-            $this->pushGit('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode,'修改了表的后台'.$thisTableAdminInfo[0]['fileName']);
+            file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode);
         }
+        $gitAction->add('--all');
+        $gitAction->commit('后台'.$className.'设置了外键');
+        $gitAction->push();
+        $gitAction->branchClean();
     }
     //保存文件并提交git
     public function pushGit($file,$code,$message){
