@@ -4,7 +4,7 @@
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+    <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
     <div id="actionProgress" class="progress" style="border-radius: 0;">
@@ -23,5 +23,13 @@
         </div>
     </div>
     <section id="fileList">网页</section>
+    <section id="editor" style="width: 400px;height:400px;">
+        {$tplFileContent}
+    </section>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/twilight");
+        editor.session.setMode("ace/mode/javascript");
+    </script>
 </body>
 </html>

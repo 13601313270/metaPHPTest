@@ -8,5 +8,5 @@
  */
 include_once('../include.php');
 $page=new kod_web_page();
+$page->title = '标题';
 $page->fetch('index.tpl');
-echo 'afss';exit;
