@@ -508,9 +508,13 @@ class control{
                 }
                 if($isChangeMql||$isChangeAdmin){
                     if($isChangeMql){
+                        if($option[$columnName]['AUTO_INCREMENT']===true){
+                            $sql.= ',ADD PRIMARY KEY (`'.$columnName.'`)';
+                        }
                         $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
                         echo $sql."\n";
                         $mysqlResult = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
+                        var_dump($mysqlResult);
                     }
                     if(($isChangeMql&&$mysqlResult>-1)||$isChangeAdmin){
                         $tempData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
