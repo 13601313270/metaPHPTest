@@ -12,6 +12,6 @@ class test4 extends kod_db_mysqlSingle{
     protected $tableName = 'test4';
     protected $key = 'id';
     protected $keyDataType = 'int';
-    public $foreignKey = array('content' => 'articleType');
+    public $foreignKey = array();
 }
 
