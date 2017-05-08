@@ -4,7 +4,8 @@
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="ace/src/ext-language_tools.js"></script>
 </head>
 <body>
     <div id="actionProgress" class="progress" style="border-radius: 0;">
@@ -23,13 +24,38 @@
         </div>
     </div>
     <section id="fileList">网页</section>
-    <section id="editor" style="width: 400px;height:400px;">
-        {$tplFileContent}
-    </section>
+    <section id="editor" style="width: 50%;height:400px;float: left;">{htmlspecialchars($tplFileContent)}</section>
     <script>
+        var languageTools = ace.require("ace/ext/language_tools");
         var editor = ace.edit("editor");
+        editor.$blockScrolling = Infinity;
+        editor.setFontSize(16);
+        editor.getSession().setMode("ace/mode/html");
         editor.setTheme("ace/theme/twilight");
-        editor.session.setMode("ace/mode/javascript");
+
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
+        languageTools.addCompleter({
+            getCompletions: function (editor, session, pos, prefix, callback) {
+                console.log(prefix);
+                callback(null, [
+                    {
+                        name: "test",
+                        value: "test(sadfadsf)",
+                        caption: "testcap",
+                        meta: 'function',
+                        type: "local",
+                        score: 1000 // 让test排在最上面
+                    }
+                ]);
+            }
+        });
     </script>
+    <section style="width: 50%;height:400px;float: left;">
+        <iframe id="tpl" src="http/{$file}" style="width: 100%;height:100%;border: solid 1px #b2b2b2;"></iframe>
+    </section>
 </body>
 </html>
