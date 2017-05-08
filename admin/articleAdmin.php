@@ -19,7 +19,8 @@ class articleAdmin extends kod_web_mysqlAdmin{
             'dataType' => 'int',
             'maxLength' => 11,
             'notNull' => true,
-            'title' => 'id'
+            'title' => 'id',
+            'AUTO_INCREMENT' => true
         ),
         'title' => array(
             'dataType' => 'varchar',
