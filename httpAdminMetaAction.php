@@ -12,77 +12,100 @@ class githubClass extends githubAction{
     public $webRootDir = '/var/www/html/metaPHPTest';
     public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
 }
-$metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
-$search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
-$kod_web_pageObj = $search[0]['object1']['name'];
-$httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
-$gitAction = new githubClass();
-if($_POST['action']=='rename'){
-    if(in_array($_POST['name'],scandir('./http/'))){
-        $isHasExist = new metaSearch($httpFileConfig[0]['object2']);
-        $isHasExist = $isHasExist->search('child .arrayValue key:filter([data='.$_POST['name'].'])')->parent()->toArray();
-        if(count($isHasExist)>0){
-            $isHasExist[0]['value']['data'] = $_POST['title'];
-        }else{
-            $httpFileConfig[0]['object2']['child'][] = array(
-                'type'=>'arrayValue',
-                'key'=>array(
-                    'type'=>'string',
-                    'borderStr'=>"'",
-                    'data'=>$_POST['name'],
-                ),
-                'value'=>array(
-                    'type'=>'string',
-                    'borderStr'=>"'",
-                    'data'=>$_POST['title'],
-                ),
-            );
-        }
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->checkout($gitAction->runLocalBranch);
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->branchClean();
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->pull();
-        echo date('Y-m-d H:i:s')."\n";
-        file_put_contents('./httpAdmin.php',$metaApi->getCode());
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->add('--all');
-        $gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->push();
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->branchClean();
-        echo date('Y-m-d H:i:s')."\n";
-        $gitAction->checkout($gitAction->runLocalBranch);
-    }
-}elseif($_POST['action']=='getBranch'){
-    $result = $gitAction->createBranch('-a',false);
-    echo json_encode($result);
-}elseif($_POST['action']=='checkout'){
-    $gitAction->branchClean();
-    $branchName = $_POST['sName'];
-    if(preg_match('/^\S{7}$/',$branchName)){
-        $result = $gitAction->checkout($branchName);
+class control{
+    private $gitAction;
+    public function __construct()
+    {
+        $this->gitAction = new githubClass();
+        $func = $_POST['action'];
+        $result = $this->$func();
         echo json_encode($result);
-    }else{
-        $allExistBranch = $gitAction->createBranch('-a',false);
-        if(in_array('  '.$branchName,$allExistBranch)){
-            $branchName = str_replace('remotes/origin/','',$branchName);
-            $result = $gitAction->checkout($branchName);
-            echo json_encode($result);
+    }
+    private function setSessionState($program,$text){
+        session_start();
+        $_SESSION['program'] = array(
+            'program' =>$program,
+            'text' =>$text,
+        );
+        session_write_close();
+    }
+    public function rename(){
+        if(in_array($_POST['name'],scandir('./http/'))){
+            $metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
+            $search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
+            $kod_web_pageObj = $search[0]['object1']['name'];
+            $httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
+            $isHasExist = new metaSearch($httpFileConfig[0]['object2']);
+            $isHasExist = $isHasExist->search('child .arrayValue key:filter([data='.$_POST['name'].'])')->parent()->toArray();
+            if(count($isHasExist)>0){
+                $isHasExist[0]['value']['data'] = $_POST['title'];
+            }else{
+                $httpFileConfig[0]['object2']['child'][] = array(
+                    'type'=>'arrayValue',
+                    'key'=>array(
+                        'type'=>'string',
+                        'borderStr'=>"'",
+                        'data'=>$_POST['name'],
+                    ),
+                    'value'=>array(
+                        'type'=>'string',
+                        'borderStr'=>"'",
+                        'data'=>$_POST['title'],
+                    ),
+                );
+            }
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->checkout($this->gitAction->runLocalBranch);
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->branchClean();
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->pull();
+            echo date('Y-m-d H:i:s')."\n";
+            file_put_contents('./httpAdmin.php',$metaApi->getCode());
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->add('--all');
+            $this->gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->push();
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->branchClean();
+            echo date('Y-m-d H:i:s')."\n";
+            $this->gitAction->checkout($this->gitAction->runLocalBranch);
+            exit;
         }
     }
-}elseif($_POST['action']=='updateBranch'){
-    $gitAction->pull(true);
-    $result = $gitAction->exec('git remote prune origin');
-    echo json_encode($result);
-}elseif($_POST['action']=='pull'){
-    echo json_encode($gitAction->pull(true));
-}elseif($_POST['action']=='githubClean'){
-    $result = $gitAction->branchClean();
-    echo json_encode($result);
-}elseif($_POST['action'] == 'commitlog'){
-    $result = $gitAction->exec('git log --graph --pretty=format:"%h (%p) (%s) %an %ai"');
-    echo json_encode($result);
+    public function getBranch(){
+        return $this->gitAction->createBranch('-a',false);
+    }
+    public function checkout(){
+        $this->gitAction->branchClean();
+        $branchName = $_POST['sName'];
+        if(preg_match('/^\S{7}$/',$branchName)){
+            return $this->gitAction->checkout($branchName);
+        }else{
+            $allExistBranch = $this->gitAction->createBranch('-a',false);
+            if(in_array('  '.$branchName,$allExistBranch)){
+                $branchName = str_replace('remotes/origin/','',$branchName);
+                return $this->gitAction->checkout($branchName);
+            }
+        }
+    }
+    public function updateBranch(){
+        $this->setSessionState(10,'拉取最新代码');
+        $this->gitAction->pull(true);
+        $this->setSessionState(80,'清除编辑中的代码');
+        $result = $this->gitAction->exec('git remote prune origin');
+        $this->setSessionState(100,'清除编辑中的代码');
+        return $result;
+    }
+    public function pull(){
+        return $this->gitAction->pull(true);
+    }
+    public function githubClean(){
+        return $this->gitAction->branchClean();
+    }
+    public function commitlog(){
+        return $this->gitAction->exec('git log --graph --pretty=format:"%h (%p) (%s) %an %ai"');
+    }
 }
+$a = new control();
