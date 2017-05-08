@@ -89,6 +89,7 @@ class control{
         echo json_encode($data);
     }
     public function getDataApi(){
+        $this->setSessionState(1,'验证接口类是否是在');
         $className = $_POST['name'];
         //获得include文件夹全部接口类梗概信息
         $allIncludeApi = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
@@ -97,16 +98,19 @@ class control{
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$className.'])')->toArray();
         //如果没有则创建一个
         if(empty($thisTableApiInfo)){
+            $this->setSessionState(20,'准备生成接口类');
             $tableInfo = kod_db_mysqlDB::create()->runsql('show create table '.$className);
             if($tableInfo===-1){
                 $return = array();
                 foreach($this->allMysqlColType as $k=>$v){
                     $return[] = array_merge(array('type'=>$k),$v);
                 }
+                $this->setSessionState(100,'数据库中没有此表');
                 echo json_encode($return);exit;
             }else{
                 $tableInfo = current($tableInfo);
                 if(preg_match('/CREATE TABLE ".+?"\s*\(([\S|\s]*)\)$/',$tableInfo['Create Table'],$match)){
+                    $this->setSessionState(30,'正在分析数据库表信息');
                     $tableInfo = explode(',',$match[1]);
                     $primaryKey = array();//主键
                     $dataType = array();
@@ -130,6 +134,7 @@ class control{
                     }
                     if(!empty($primaryKey)){
                         //创建表对应的接口类
+                        $this->setSessionState(60,'正在创建接口类代码');
                         $newClass = classAction::createClass($className,'kod_db_mysqlSingle');
                         $temp = $newClass->phpInterpreter->search('.comments')->toArray();
                         $temp[0]['value'] = '*
@@ -144,11 +149,14 @@ class control{
                         $newClass->setProperty('keyDataType',array('type'=>'string','borderStr'=>"'",'data'=>in_array($primaryKey['dataType'],array('int','bigint'))?'int':'varchar'), 'protected');
                         //提交git
 //                        var_dump(  $newClass->phpInterpreter->getCode()  );exit;
+                        $this->setSessionState(70,'重置服务器环境');
                         $gitAction = new githubClass();
                         $gitAction->pull();
+                        $this->setSessionState(75,'覆盖代码');
                         file_put_contents('./include/'.$className.'.php',$newClass->phpInterpreter->getCode());
                         $gitAction->add('--all');
                         $gitAction->commit('增加了表'.$className.'的操作接口类');
+                        $this->setSessionState(75,'正在推送到代码库');
                         $gitAction->push();
                         $gitAction->branchClean();
 
@@ -156,13 +164,17 @@ class control{
                         $allIncludeApi = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
                         $metaSearchApi = new metaSearch($allIncludeApi);
                         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$className.'])')->toArray();
+                    }else{
+                        $this->setSessionState(100,'只支持有主键的表');
                     }
                 }
             }
         }
         echo json_encode($thisTableApiInfo[0]);
+        $this->setSessionState(100,'');
     }
     public function showTableAdmin(){
+        $this->setSessionState(1,'验证接口类是否存在');
         $return = array();
         $return['allMysqlColType'] = array();
         foreach($this->allMysqlColType as $k=>$v){
@@ -178,11 +190,12 @@ class control{
         $metaSearchApi = new metaSearch($allIncludeApi);
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$_POST['class'].'])')->toArray();
         if(empty($thisTableApiInfo)){
+            $this->setSessionState(100,'接口不存在');
             echo '接口不存在';exit;
         }
 
+        $this->setSessionState(20,'验证后台是否存在');
         $thisTableApiInfo = $thisTableApiInfo[0];
-        $className = $thisTableApiInfo['className'];
 
         //所有后台
         $allIncludeApi = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
@@ -191,6 +204,7 @@ class control{
         $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$thisTableApiInfo['className'].'])')->toArray();
         //如果不存在创建一个
         if(empty($thisTableAdminInfo)){
+            $this->setSessionState(30,'新建后台,生成代码');
             $adminClassName = $thisTableApiInfo['className'].'Admin';
             $newClass = classAction::createClass($adminClassName,'kod_web_mysqlAdmin');
             array_splice($newClass->phpInterpreter->codeMeta['child'],1,0,array(array(
@@ -284,8 +298,10 @@ class control{
                 'type'=>'objectFunction', 'object'=>'$adminObj', 'name'=>'run',
             );
             //写入文件系统
+            $this->setSessionState(40,'重置环境');
             $gitAction = new githubClass();
             $gitAction->pull();
+            $this->setSessionState(50,'覆盖代码文件');
             file_put_contents('./admin/'.$adminClassName.'.php',$newClass->phpInterpreter->getCode());
             file_put_contents('./admin/'.$adminClassName.'.tpl','{include file="../adminBase.tpl"}
 {block name="content"}
@@ -293,6 +309,7 @@ class control{
 {/block}');
             $gitAction->add('--all');
             $gitAction->commit('增加了表'.$thisTableApiInfo['className'].'的后台');
+            $this->setSessionState(70,'推送到代码库');
             $gitAction->push();
             $gitAction->branchClean();
 
@@ -300,6 +317,7 @@ class control{
             //找到这个表对应的后台
             $metaSearchApi = new metaSearch($allIncludeApi);
         }
+        $this->setSessionState(80,'获取代码库信息');
         $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$thisTableApiInfo['className'].'])')->toArray();
         $adminFileName = $thisTableAdminInfo[0]['fileName'];
         $return['adminFileName'] = 'admin/'.$adminFileName;
@@ -320,6 +338,7 @@ class control{
             $return['option'][$item['key']['data']] = $insert;
 
         }
+        $this->setSessionState(100,'');
         echo json_encode($return);exit;
     }
 
@@ -412,11 +431,12 @@ class control{
         echo $result;exit;
     }
     public function updateTableAdmin(){
+        $this->setSessionState(1,'获取参数');
         $tableName = $_POST['table'];
         $option = $_POST['option'];
 
         //找到这个表对应的接口类
-        $this->setSessionState(1,'查询是否存在接口');
+        $this->setSessionState(5,'查询是否存在接口');
         $allIncludeApiList = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
         $metaSearchApi = new metaSearch($allIncludeApiList);
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$tableName.'])')->toArray();
@@ -426,7 +446,7 @@ class control{
         $className = $thisTableApiInfo[0]['className'];
 
         //找到这个表对应的后台
-        $this->setSessionState(5,'查询是否存在后台');
+        $this->setSessionState(10,'查询是否存在后台');
         $allAdmin = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
         $metaSearchApi = new metaSearch($allAdmin);
         $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
@@ -441,7 +461,7 @@ class control{
         $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
         $numTemp = 1;
         foreach($showCreateTable as $columnName=>$dbCanshu){
-            $this->setSessionState(5+intval(50/count($showCreateTable))*$numTemp++,'处理字段'.$columnName);
+            $this->setSessionState(10+intval(40/count($showCreateTable))*$numTemp++,'处理字段'.$columnName);
             if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
                 $isChangeMql = false;//数据库是否产生变化,必然导致后台产生变化
