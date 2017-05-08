@@ -75,11 +75,14 @@
                 }
                 if(data.program==100){
                     $('#actionProgress>div').css('width','100%');
+                    $('#actionProgress>div').html(data.text);
                     setTimeout(function(){
                         $('#actionProgress>div').css('width','0%');
+                        $('#actionProgress>div').html('');
                     },1000);
                 }else{
                     $('#actionProgress>div').css('width',parseInt(data.program)+'%');
+                    $('#actionProgress>div').html(data.text);
                 }
             });
         }
@@ -648,17 +651,6 @@
         $('.fileName .btn').click(function(){
             var newName = prompt('请输入文件名');
             if(newName!==null){
-                $('#actionProgress>div').css('width','0%');
-                var interval = setInterval(function(){
-                    var nowPosition = parseInt($('#actionProgress>div').attr('aria-valuenow'));
-                    nowPosition++;
-                    if(nowPosition<90){
-                        $('#actionProgress>div').attr('aria-valuenow',nowPosition);
-                        $('#actionProgress>div').css('width',(nowPosition+1)+'%');
-                    }else{
-                        clearInterval(interval);
-                    }
-                },100);
                 post('httpAdminMetaAction.php',{
                     action:'rename',
                     name:$(this).data('id'),
@@ -667,8 +659,6 @@
                     data = data.replace(/\n/g,'<br/>');
                     data = data.replace(/\s/g,'&nbsp;');
                     $('#console .panel-body .accordion-inner').append($('<div>'+data+'</div>'));
-                    clearInterval(interval);
-                    $('#actionProgress>div').css('width','100%');
                     location.href = location.href;
                 });
             }

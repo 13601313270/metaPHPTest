@@ -30,6 +30,7 @@ class control{
         session_write_close();
     }
     public function rename(){
+        $this->setSessionState(1,'正在获取代码');
         if(in_array($_POST['name'],scandir('./http/'))){
             $metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
             $search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
@@ -37,6 +38,7 @@ class control{
             $httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
             $isHasExist = new metaSearch($httpFileConfig[0]['object2']);
             $isHasExist = $isHasExist->search('child .arrayValue key:filter([data='.$_POST['name'].'])')->parent()->toArray();
+            $this->setSessionState(10,'正在生成代码逻辑');
             if(count($isHasExist)>0){
                 $isHasExist[0]['value']['data'] = $_POST['title'];
             }else{
@@ -54,6 +56,7 @@ class control{
                     ),
                 );
             }
+            $this->setSessionState(30,'正在重置环境');
             echo date('Y-m-d H:i:s')."\n";
             $this->gitAction->checkout($this->gitAction->runLocalBranch);
             echo date('Y-m-d H:i:s')."\n";
@@ -61,18 +64,21 @@ class control{
             echo date('Y-m-d H:i:s')."\n";
             $this->gitAction->pull();
             echo date('Y-m-d H:i:s')."\n";
+            $this->setSessionState(50,'正在修改代码');
             file_put_contents('./httpAdmin.php',$metaApi->getCode());
             echo date('Y-m-d H:i:s')."\n";
             $this->gitAction->add('--all');
             $this->gitAction->commit('修改httpAdmin.php文件配置kod_web_page实例的httpFileConfig属性'.$_POST['name'].'改为'.$_POST['title']);
             echo date('Y-m-d H:i:s')."\n";
+            $this->setSessionState(80,'正在推送到线上库');
             $this->gitAction->push();
             echo date('Y-m-d H:i:s')."\n";
             $this->gitAction->branchClean();
             echo date('Y-m-d H:i:s')."\n";
             $this->gitAction->checkout($this->gitAction->runLocalBranch);
-            exit;
         }
+        $this->setSessionState(100,'修改完成');
+        exit;
     }
     public function getBranch(){
         return $this->gitAction->createBranch('-a',false);
