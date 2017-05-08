@@ -112,7 +112,7 @@
     </script>
 </head>
 <body>
-    <div id="actionProgress" class="progress" style="height: 10px;border-radius: 0;">
+    <div id="actionProgress" class="progress" style="border-radius: 0;">
         <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
     </div>
     <ul id="myTab" class="nav nav-tabs">
