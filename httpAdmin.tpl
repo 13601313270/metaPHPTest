@@ -81,8 +81,6 @@
                 }else{
                     $('#actionProgress>div').css('width',parseInt(data.program)+'%');
                 }
-                console.log('getSessionState:');
-                console.log(data);
             });
         }
         var actionState = {
@@ -101,7 +99,6 @@
                         actionState[actionId] = null;
                         return false;
                     }
-                    console.log(data);
                     callFunc(data);
                 });
                 setTimeout(function(){
@@ -821,7 +818,6 @@
                 $('#showTableColumn [data-id=primarykey]>input').removeAttr('disabled');
                 $('#showTableColumn [data-id=notNull]>input').removeAttr('disabled');
             }
-            console.log(selectType);
         });
     </script>
     <section id="console"  class="panel panel-default">
