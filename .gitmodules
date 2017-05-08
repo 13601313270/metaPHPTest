@@ -6,4 +6,4 @@
 	url = https://github.com/13601313270/kod.git
 [submodule "ace"]
 	path = ace
-	url = https://github.com/ajaxorg/ace.git
+	url = https://github.com/ajaxorg/ace-builds.git
