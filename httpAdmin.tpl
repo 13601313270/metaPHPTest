@@ -53,6 +53,63 @@
             background-color: #f5f5f5;
         }
     </style>
+    <script>
+        function reloadSessionStage(actionId,now,maxCount){
+            if(actionState[actionId]==null){
+                console.log(actionId+'已经销毁');
+            }
+            if(maxCount==undefined){
+                maxCount=0;
+            }
+            $.post('mysqlAction.php',{
+                action:'getSessionState',
+                now:now
+            },function(data){
+                data = JSON.parse(data);
+                if(data.program==100){
+                    console.log('进程完成');
+                }else{
+                    if(maxCount<30){
+                        reloadSessionStage(actionId,data.program,maxCount+1);
+                    }
+                }
+                if(data.program==100){
+                    $('#actionProgress>div').css('width','100%');
+                    setTimeout(function(){
+                        $('#actionProgress>div').css('width','0%');
+                    },1000);
+                }else{
+                    $('#actionProgress>div').css('width',parseInt(data.program)+'%');
+                }
+                console.log('getSessionState:');
+                console.log(data);
+            });
+        }
+        var actionState = {
+        };
+        function post(url,params,callFunc){
+            var actionId = parseInt(Math.random()*100000);
+            actionState[actionId] = true;
+            (function(actionId){
+                $.post(url,params,function(data){
+                    if(data===''){
+                        actionState[actionId] = null;
+                        return false;
+                    }
+                    var data2 = JSON.parse(data);
+                    if(data2.return == false){
+                        actionState[actionId] = null;
+                        return false;
+                    }
+                    console.log(data);
+                    callFunc(data);
+                });
+                setTimeout(function(){
+                    reloadSessionStage(actionId);
+                },20);
+            })(actionId);
+        }
+    </script>
 </head>
 <body>
     <div id="actionProgress" class="progress" style="height: 10px;border-radius: 0;">
@@ -122,7 +179,7 @@
                 </div>
                 <script>
                     $('#githubStateChange').click(function(){
-                        $.post('httpAdminMetaAction.php',{
+                        post('httpAdminMetaAction.php',{
                             action:'getBranch',
                         },function(data){
                             data = JSON.parse(data);
@@ -150,18 +207,16 @@
                     });
                     function checkout(){
                         var selectBranch = $(this).find('>a').attr('value');
-                        beginProgress(2);
                         if(selectBranch==undefined){
-                            $.post('httpAdminMetaAction.php',{
+                            post('httpAdminMetaAction.php',{
                                 action:'updateBranch',
                                 sName:selectBranch
                             },function(data){
                                 data = JSON.parse(data);
                                 initGitState();
-                                stopProgress();
                             });
                         }else{
-                            $.post('httpAdminMetaAction.php',{
+                            post('httpAdminMetaAction.php',{
                                 action:'checkout',
                                 sName:selectBranch
                             },function(data){
@@ -169,27 +224,23 @@
                                     data = JSON.parse(data);
                                 }
                                 initGitState();
-                                stopProgress();
                             });
                         }
                     }
                     $('#floatDom').on('click','>li',checkout);
                     $('#checkoutCommit').on('click','>li',checkout);
                     $('#githubPull').click(function(){
-                        beginProgress(4);
-                        $.post('httpAdminMetaAction.php',{
+                        post('httpAdminMetaAction.php',{
                             action:'pull'
                         },function(data){
                             data = JSON.parse(data);
                             initGitState();
-                            stopProgress();
                         });
                     });
                     {literal}
                     $('#commitlog').click(function(){
                         $('#commitlog').parent().find('ul').html('');
-                        beginProgress(2);
-                        $.post('httpAdminMetaAction.php',{
+                        post('httpAdminMetaAction.php',{
                             action:'commitlog'
                         },function(data){
                             data = JSON.parse(data);
@@ -322,22 +373,19 @@
                             $('#commitlog').parent().find('.dropdown-menu>canvas').attr('height', $('#commitlog').parent().find('ul li').length*26  );
                             $('#commitlog').parent().find('.dropdown-menu>canvas').attr('width',isTabMaxUse*10+4);
                             cxt.putImageData(tepData,0,0);
-                            stopProgress();
                         });
                     });
                     {/literal}
                     $('#githubClean').click(function(){
-                        beginProgress(2);
-                        $.post('httpAdminMetaAction.php',{
+                        post('httpAdminMetaAction.php',{
                             action:'githubClean'
                         },function(data){
                             data = JSON.parse(data);
                             initGitState();
-                            stopProgress();
                         });
                     });
                     function initGitState(){
-                        $.post('httpAdminMetaAction.php',{
+                        post('httpAdminMetaAction.php',{
                             action:'getBranch',
                         },function(data){
                             data = JSON.parse(data);
@@ -442,7 +490,7 @@
                 }
                 {*var allTableApiClass = {json_encode($tableApiClass)};*}
                 $('#dataAdminTab').click(function(){
-                    $.post('mysqlAction.php',{
+                    post('mysqlAction.php',{
                         action:'tables',
                         databases:'{$useDataBases[0]}'
                     },function(data){
@@ -471,7 +519,7 @@
                 });
                 //初始化表后台信息
                 function initTableInfo(database,tableName,option){
-                    $.post('mysqlAction.php',{
+                    post('mysqlAction.php',{
                         action:'getDataApi',
                         database:database,
                         name:tableName,
@@ -479,7 +527,7 @@
                     },function(data){
                         data = JSON.parse(data);
                         var className = data.className;
-                        $.post('mysqlAction.php',{
+                        post('mysqlAction.php',{
                             action:'showTableAdmin',
                             class:className,
                             option:option
@@ -560,7 +608,7 @@
                         $('#addTable>.panel-body>div:eq(0)').addClass('has-error');
                     }else{
                         $('#addTable>.panel-body>div:eq(0)').removeClass('has-error');
-                        $.post('mysqlAction.php',{
+                        post('mysqlAction.php',{
                             action:'getIsExistTable',
                             database:$(this).parents('.panel').data('database'),
                             name:newClassName,
@@ -600,26 +648,6 @@
     </div>
     <script>
         {literal}
-        function beginProgress(time){
-            $('#actionProgress>div').css('width','0%');
-            window.interval = setInterval(function(){
-                var nowPosition = parseFloat($('#actionProgress>div').attr('aria-valuenow'));
-                nowPosition +=(1/time);
-                if(nowPosition<90){
-                    $('#actionProgress>div').attr('aria-valuenow',nowPosition);
-                    $('#actionProgress>div').css('width',parseInt(nowPosition)+'%');
-                }else{
-                    clearInterval(interval);
-                }
-            },10);
-        }
-        function stopProgress(){
-            clearInterval(interval);
-            $('#actionProgress>div').css('width','100%');
-            setTimeout(function(){
-                $('#actionProgress>div').css('width','0%');
-            },1000);
-        }
         $('.fileName .btn').click(function(){
             var newName = prompt('请输入文件名');
             if(newName!==null){
@@ -634,7 +662,7 @@
                         clearInterval(interval);
                     }
                 },100);
-                $.post('httpAdminMetaAction.php',{
+                post('httpAdminMetaAction.php',{
                     action:'rename',
                     name:$(this).data('id'),
                     title:newName
@@ -745,7 +773,7 @@
                                 nowSate[columnName][shuxingName] = shuxingValue;
                             });
                         });
-                        $.post('mysqlAction.php',{
+                        post('mysqlAction.php',{
                             action:($('#showTableColumn').data('type')=='insert'?'insertTable':'updateTableAdmin'),
                             databases:'{$useDataBases[0]}',
                             table:$('#showTableColumn').data('id'),

@@ -5,6 +5,7 @@
  * Date: 2017/3/20
  * Time: 下午2:14
  */
+//ini_set('session.auto_start', 1);
 include_once('include.php');
 class githubClass extends githubAction{
     public $runLocalBranch = 'develop';
@@ -415,6 +416,7 @@ class control{
         $option = $_POST['option'];
 
         //找到这个表对应的接口类
+        $this->setSessionState(1,'查询是否存在接口');
         $allIncludeApiList = $this->getAllIncludeApi('./include/','kod_db_mysqlSingle','.property:filter(#$tableName) value data');
         $metaSearchApi = new metaSearch($allIncludeApiList);
         $thisTableApiInfo = $metaSearchApi->search('.kod_db_mysqlSingle:filter([tableName='.$tableName.'])')->toArray();
@@ -424,6 +426,7 @@ class control{
         $className = $thisTableApiInfo[0]['className'];
 
         //找到这个表对应的后台
+        $this->setSessionState(5,'查询是否存在后台');
         $allAdmin = $this->getAllIncludeApi('./admin/','kod_web_mysqlAdmin','#getMysqlDbHandle child .new className');
         $metaSearchApi = new metaSearch($allAdmin);
         $thisTableAdminInfo = $metaSearchApi->search('.kod_web_mysqlAdmin:filter([tableName='.$className.'])')->toArray();
@@ -431,13 +434,14 @@ class control{
         $oldCode = file_get_contents('./admin/'.$thisTableAdminInfo[0]['fileName']);
         $phpInterpreter = new phpInterpreter($oldCode);
 
-
         $classApi = new $className();
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
         //include的api的外键字段
         $allIncludeApi = new classAction($className);
         $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
+        $numTemp = 1;
         foreach($showCreateTable as $columnName=>$dbCanshu){
+            $this->setSessionState(5+intval(50/count($showCreateTable))*$numTemp++,'处理字段'.$columnName);
             if($dbCanshu['AUTO_INCREMENT']==true){unset($dbCanshu['primarykey']);}
             if(isset($option[$columnName])){
                 $isChangeMql = false;//数据库是否产生变化,必然导致后台产生变化
@@ -584,20 +588,24 @@ class control{
                 }
             }
         }
-        //提交git
+        $this->setSessionState(60,'修改接口类');
+//        提交git
         $gitAction = new githubClass();
         $gitAction->pull();
         $allIncludeApi->save();
         $gitAction->add('--all');
         $gitAction->commit('类'.$className.'设置了外键');
+        $this->setSessionState(70,'修改后台类');
         $newCode = $phpInterpreter->getCode();
         if($oldCode!==$newCode){
             file_put_contents('./admin/'.$thisTableAdminInfo[0]['fileName'],$newCode);
         }
         $gitAction->add('--all');
         $gitAction->commit('后台'.$className.'设置了外键');
+        $this->setSessionState(80,'push代码到代码库');
         $gitAction->push();
         $gitAction->branchClean();
+        $this->setSessionState(100,'');
     }
     //保存文件并提交git
     public function pushGit($file,$code,$message){
@@ -612,7 +620,43 @@ class control{
     public function __construct()
     {
         $func = $_POST['action'];
+        if($func!=='getSessionState'){
+            session_start();
+            if($_SESSION['program']['program']<100 && $_SESSION['program']['program']>0){
+                echo json_encode(array(
+                    'return'=>false,
+                    'text'=>'有操作正在运算中,请稍后再试',
+                ));exit;
+            }
+        }
         $this->$func();
+    }
+    //控制长操作进度
+    private function setSessionState($program,$text){
+        session_start();
+        $_SESSION['program'] = array(
+            'program' =>$program,
+            'text' =>$text,
+        );
+        session_write_close();
+    }
+    public function getSessionState(){
+        session_start();
+        $webStateNow = $_POST['now'];
+        $allTime = 10000000;//10秒
+        $per = 100000;//轮播间隔
+        for($i=0;$i<$allTime/$per;$i++){
+            usleep($per);
+            session_start();
+            $nowProgram = $_SESSION['program'];
+            session_write_close();
+            if($nowProgram['program']==100){
+                echo json_encode($nowProgram);exit;
+            }else if($webStateNow!=$nowProgram['program']){
+                echo json_encode($nowProgram);exit;
+            }
+        }
+        echo json_encode($nowProgram);exit;
     }
 }
 $a = new control();
