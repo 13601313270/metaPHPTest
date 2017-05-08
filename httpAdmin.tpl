@@ -143,11 +143,13 @@
                     <tbody>
                     {foreach $fileList as $file}
                         {if in_array($file,array('.'))}{continue}{/if}
+                        {if substr($file,-4)!=='.tpl'}
                         <tr>
-                            <td>{$file}</td>
+                            <td><a target="_blank" href="pageEditAdmin.php?file={$file}">{$file}</a></td>
                             <td class="fileName">{$httpFileConfig[$file]}<span data-id="{$file}" class="btn btn-default">修改</span></td>
                             <td></td>
                         </tr>
+                        {/if}
                     {/foreach}
                     </tbody>
                 </table>
