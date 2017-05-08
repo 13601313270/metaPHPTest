@@ -651,6 +651,10 @@
         $('.fileName .btn').click(function(){
             var newName = prompt('请输入文件名');
             if(newName!==null){
+<<<<<<< Updated upstream
+=======
+                $('#actionProgress>div').css('width','0%');
+>>>>>>> Stashed changes
                 post('httpAdminMetaAction.php',{
                     action:'rename',
                     name:$(this).data('id'),
