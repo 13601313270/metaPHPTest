@@ -12,6 +12,7 @@ $a = array('s'=>'ddd');
 $b = $a['s'];
 $page->id = $_GET['id'];
 $page->chid = $_GET['chid'];
+$page->data = article::create()->getByKey($_GET['id']);
 
 $page->title = '标题';
 $page->fetch('index.tpl');

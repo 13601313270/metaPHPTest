@@ -25,7 +25,9 @@ if(in_array($_GET['file'],scandir('./http/'))){
     $allGet = $metaApi->search('.arrayGet object:filter([name=$_GET])')->parent()->toArray();
     $allKeys = array();
     foreach($allGet as $v){
-        $allKeys[] = $v['key']['data'];
+        if(!in_array($v['key']['data'],$allKeys)){
+            $allKeys[] = $v['key']['data'];
+        }
     }
     $page->allGet = $allKeys;
 

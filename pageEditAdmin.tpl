@@ -81,65 +81,63 @@
             </div>
         </div>
     </div>
-
-    <section id="editor" style="width: 50%;height:400px;float: left;">{htmlspecialchars($tplFileContent)}</section>
-    <script>
-        var languageTools = ace.require("ace/ext/language_tools");
-        var editor = ace.edit("editor");
-        editor.$blockScrolling = Infinity;
-        editor.setFontSize(16);
-        editor.getSession().setMode("ace/mode/html");
-        editor.setTheme("ace/theme/twilight");
-
-        editor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: true,
-            enableLiveAutocompletion: true
-        });
-        languageTools.addCompleter({
-            getCompletions: function (editor, session, pos, prefix, callback) {
-                console.log(prefix);
-                callback(null, [
-                    {
-                        name: "test",
-                        value: "test(sadfadsf)",
-                        caption: "testcap",
-                        meta: 'function',
-                        type: "local",
-                        score: 1000 // 让test排在最上面
-                    }
-                ]);
-            }
-        });
-    </script>
-    <section id="pageShow" style="width: 50%;height:400px;float: left;position: relative;">
-        <style>
-            #split{
-                width: 10px;left:-5px;height:100%;position:absolute;background-color: black;opacity: 0;cursor: ew-resize;
-            }
-            #split:hover{
-                opacity: 1;
-            }
-        </style>
-        <div id="split"></div>
+    <div style="position:fixed;bottom:0;top:215px;left:0;right:0;">
+        <section id="editor" style="width: 50%;height:100%;float: left;">{htmlspecialchars($tplFileContent)}</section>
         <script>
-            $('#split').mousedown(function(){
-                var float = $('<div style="position: fixed;width: 100%;height:100%;top:0;left:0;z-index: 9999"></div>');
-                function mouseMove(event){
-                    $('body').append(float);
-                    var leftShowSplit = (event.pageX/document.documentElement.clientWidth*100).toFixed(2);
-                    $('#editor').width(leftShowSplit+'%');
-                    $('#pageShow').width((100-leftShowSplit)+'%');
-//                    pageShow
+            var languageTools = ace.require("ace/ext/language_tools");
+            var editor = ace.edit("editor");
+            editor.$blockScrolling = Infinity;
+            editor.setFontSize(16);
+            editor.getSession().setMode("ace/mode/html");
+            editor.setTheme("ace/theme/twilight");
+
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableSnippets: true,
+                enableLiveAutocompletion: true
+            });
+            languageTools.addCompleter({
+                getCompletions: function (editor, session, pos, prefix, callback) {
+                    console.log(prefix);
+                    callback(null, [
+                        {
+                            name: "test",
+                            value: "test(sadfadsf)",
+                            caption: "testcap",
+                            meta: 'function',
+                            type: "local",
+                            score: 1000 // 让test排在最上面
+                        }
+                    ]);
                 }
-                $('body').mousemove(mouseMove);
-                $('body').mouseup(function(){
-                    float.remove();
-                    $("body").unbind("mousemove",mouseMove);
-                });
             });
         </script>
-        <iframe id="tpl" src="http/{$file}" style="width: 100%;height:100%;border: solid 1px #b2b2b2;"></iframe>
-    </section>
+        <section id="pageShow" style="width: 50%;height:100%;float: left;position: relative;">
+            <style>
+                #split{
+                    width: 10px;left:-5px;height:100%;position:absolute;background-color: black;opacity: 0;cursor: ew-resize;
+                }
+            </style>
+            <div id="split"></div>
+            <script>
+                $('#split').mousedown(function(){
+                    var float = $('<div style="position: fixed;width: 100%;height:100%;top:0;left:0;z-index: 9999"></div>');
+                    function mouseMove(event){
+                        $('body').append(float);
+                        var leftShowSplit = (event.pageX/document.documentElement.clientWidth*100).toFixed(2);
+                        $('#editor').width(leftShowSplit+'%');
+                        $('#pageShow').width((100-leftShowSplit)+'%');
+//                    pageShow
+                    }
+                    $('body').mousemove(mouseMove);
+                    $('body').mouseup(function(){
+                        float.remove();
+                        $("body").unbind("mousemove",mouseMove);
+                    });
+                });
+            </script>
+            <iframe id="tpl" src="http/{$file}" style="width: 100%;height:100%;border: solid 1px #b2b2b2;"></iframe>
+        </section>
+    </div>
 </body>
 </html>
