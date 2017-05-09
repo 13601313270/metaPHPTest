@@ -8,5 +8,10 @@
  */
 include_once('../include.php');
 $page=new kod_web_page();
+$a = array('s'=>'ddd');
+$b = $a['s'];
+$page->id = $_GET['id'];
+$page->chid = $_GET['chid'];
+
 $page->title = '标题';
 $page->fetch('index.tpl');

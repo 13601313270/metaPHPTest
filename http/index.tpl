@@ -8,6 +8,7 @@
 </head>
 <body>
 <section>
+    我的id是{$id}
     {$title}
 </section>
 </body>
