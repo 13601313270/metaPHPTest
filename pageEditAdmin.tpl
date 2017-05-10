@@ -135,6 +135,9 @@
                         $("body").unbind("mousemove",mouseMove);
                     });
                 });
+                window.onbeforeunload=function(event){
+                    return '正在编辑状态';
+                }
             </script>
             <iframe id="tpl" src="http/{$file}" style="width: 100%;height:100%;border: solid 1px #b2b2b2;"></iframe>
         </section>
