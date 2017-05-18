@@ -38,7 +38,7 @@
             }
         </style>
         <div class="tab-content">
-            <div class="tab-pane fade in active" id="home">
+            <div class="tab-pane fade in active" id="home" style="width: 732px;">
                 <div class="panel panel-default" style="width:360px;">
                     <div class="panel-heading">网址</div>
                     <div class="panel-body">
@@ -64,7 +64,38 @@
                     </div>
                 </div>
                 <script>
+                    //更新控制器推送数据和,生成的html
+                    function reloadDataAndLastHtml(){
+                        var allGet = {
+                        };
+                        $('#mastGet .panel-body input').each(function(){
+                            allGet[$(this).data('id')] = $(this).val();
+                        });
+                        $.post('',{
+                            action:'runData',
+                            content:editor.getValue(),
+                            line:editor.selection.getRange().start,
+                            file:'{$file}',
+                            simulate:allGet
+                        },function(data){
+                            data = JSON.parse(data);
+                            allComplate = data.pushResult;
+                            var htmlList = data.html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
+                            if(htmlList[2]!=undefined){
+                                var bodyAttr = htmlList[2].split(' ');
+                                for(var i=0;i<bodyAttr.length;i++){
+                                    var key = bodyAttr[i].match(/(\S+)=['|"]([\S|\s]+)['|"]$/);
+                                    if(key){
+                                        $($('#tpl')[0].contentDocument).find('body').attr(key[1],key[2]);
+                                    }
+                                }
+                            }
+                            $($('#tpl')[0].contentDocument).find('head').html(htmlList[1]);
+                            $($('#tpl')[0].contentDocument).find('body').html(htmlList[3]);
+                        });
+                    }
                     $('#mastGet .panel-body input').on('change',function(){
+                        reloadDataAndLastHtml();
                         var allParams = [];
                         $('#mastGet .panel-body input').each(function(){
                             allParams.push($(this).data('id')+'='+$(this).val());
@@ -88,7 +119,8 @@
             var editor = ace.edit("editor");
             editor.$blockScrolling = Infinity;
             editor.setFontSize(16);
-            editor.getSession().setMode("ace/mode/html");
+//            editor.getSession().setMode("ace/mode/html");
+            editor.getSession().setMode("ace/mode/smarty");
             editor.setTheme("ace/theme/twilight");
 
             editor.setOptions({
@@ -96,19 +128,40 @@
                 enableSnippets: true,
                 enableLiveAutocompletion: true
             });
+
+            editor.getSession().on('change', function(e) {
+                if(e.action=='insert'){
+//                    console.log(e.lines);
+                }else{
+
+                }
+                reloadDataAndLastHtml();
+            });
+            var allComplate = [];
             languageTools.addCompleter({
                 getCompletions: function (editor, session, pos, prefix, callback) {
-                    console.log(prefix);
-                    callback(null, [
-                        {
-                            name: "test",
-                            value: "test(sadfadsf)",
-                            caption: "testcap",
-                            meta: 'function',
+                    var result = [];//搜索结果
+                    for(var i in allComplate){
+                        result.push({
+                            name: i,
+                            value: ('$'+i),//实际输出
+                            caption: '页面数据:'+i,//搜索浮层展示
+//                            meta: 'function',
                             type: "local",
                             score: 1000 // 让test排在最上面
+                        });
+                        for(var j in allComplate[i]){
+                            result.push({
+                                name: i,
+                                value: ('$'+i),//实际输出
+                                caption: '页面数据:'+i+'.'+j,//搜索浮层展示
+//                            meta: 'function',
+                                type: "local",
+                                score: 999 // 让test排在最上面
+                            });
                         }
-                    ]);
+                    }
+                    callback(null,result);
                 }
             });
         </script>
@@ -134,7 +187,6 @@
                         float.remove();
                         $("body").unbind("mousemove",mouseMove);
                     });
-                });
                 window.onbeforeunload=function(event){
                     return '正在编辑状态';
                 }
