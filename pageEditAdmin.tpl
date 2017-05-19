@@ -22,6 +22,7 @@
                 height:130px;
                 border-bottom:1px solid #ddd;
                 margin-bottom: 10px;
+                overflow-x: scroll;
             }
             .tab-content>.tab-pane>.panel{
                 float: left;
@@ -166,6 +167,18 @@
             });
         </script>
         <section id="pageShow" style="width: 50%;height:100%;float: left;position: relative;">
+            <div id="tplSize" class="panel panel-default" style="margin:10px 10px 0;">
+                <div class="panel-body" style="padding:5px;">
+                    <div class="input-group" style="width:200px;float:left;margin: 2px;">
+                        <div class="input-group-addon">宽度</div>
+                        <input class="form-control" data-id="id" placeholder="模拟宽度" value="1080">
+                    </div>
+                    <div class="input-group" style="width:200px;float:left;margin: 2px;">
+                        <div class="input-group-addon">高度</div>
+                        <input class="form-control" data-id="chid" placeholder="模拟高度" value="720">
+                    </div>
+                </div>
+            </div>
             <style>
                 #split{
                     width: 10px;left:-5px;height:100%;position:absolute;background-color: black;opacity: 0;cursor: ew-resize;
@@ -173,25 +186,45 @@
             </style>
             <div id="split"></div>
             <script>
-                $('#split').mousedown(function(){
+                $('#split').mousedown(function() {
                     var float = $('<div style="position: fixed;width: 100%;height:100%;top:0;left:0;z-index: 9999"></div>');
-                    function mouseMove(event){
+
+                    function mouseMove(event) {
                         $('body').append(float);
-                        var leftShowSplit = (event.pageX/document.documentElement.clientWidth*100).toFixed(2);
-                        $('#editor').width(leftShowSplit+'%');
-                        $('#pageShow').width((100-leftShowSplit)+'%');
-//                    pageShow
+                        var leftShowSplit = (event.pageX / document.documentElement.clientWidth * 100).toFixed(2);
+                        $('#editor').width(leftShowSplit + '%');
+                        $('#pageShow').width((100 - leftShowSplit) + '%');
+                        initTplScroll();
                     }
                     $('body').mousemove(mouseMove);
-                    $('body').mouseup(function(){
+                    $('body').mouseup(function () {
                         float.remove();
-                        $("body").unbind("mousemove",mouseMove);
+                        $("body").unbind("mousemove", mouseMove);
                     });
+                });
                 window.onbeforeunload=function(event){
                     return '正在编辑状态';
                 }
             </script>
-            <iframe id="tpl" src="http/{$file}" style="width: 100%;height:100%;border: solid 1px #b2b2b2;"></iframe>
+            <iframe id="tpl" src="http/{$file}" style="border: solid 1px #b2b2b2;"></iframe>
+            <script>
+                function initTplScroll(){
+                    var webWidth = $('#tplSize input:eq(0)').val();
+                    var webHeight = $('#tplSize input:eq(1)').val();
+                    $('#tpl').css('width',webWidth);
+                    $('#tpl').css('height',webHeight);
+                    var rightwidth = $('#pageShow').width();
+                    var padding=10;
+                    var scale = (rightwidth-padding*2)/webWidth;
+                    $('#tpl').css('transform','scale('+scale+')');
+                    $('#tpl').css('marginLeft',(webWidth-rightwidth)/-2);
+                    $('#tpl').css('marginTop',(1-scale)/-2*webHeight+10);
+                }
+                initTplScroll();
+                $(window).resize(function() {
+                    initTplScroll();
+                });
+            </script>
         </section>
     </div>
 </body>
