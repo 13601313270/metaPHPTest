@@ -14,8 +14,7 @@
     <div>
         <ul id="myTab" class="nav nav-tabs" style="padding: 0 5px;">
             <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
-            <li><a data-toggle="tab" href="#gitAdmin">第二个</a></li>
-            <li><a data-toggle="tab" href="#dataAdmin">第三个</a></li>
+            <li><a data-toggle="tab" href="#gitAdmin">通用模块</a></li>
         </ul>
         <style>
             .tab-content{
@@ -64,58 +63,58 @@
                         {/foreach}
                     </div>
                 </div>
-                <script>
-                    //更新控制器推送数据和,生成的html
-                    function reloadDataAndLastHtml(){
-                        var allGet = {
-                        };
-                        $('#mastGet .panel-body input').each(function(){
-                            allGet[$(this).data('id')] = $(this).val();
-                        });
-                        $.post('',{
-                            action:'runData',
-                            content:editor.getValue(),
-                            line:editor.selection.getRange().start,
-                            file:'{$file}',
-                            simulate:allGet
-                        },function(data){
-                            data = JSON.parse(data);
-                            allComplate = data.pushResult;
-                            var htmlList = data.html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
-                            if(htmlList[2]!=undefined){
-                                var bodyAttr = htmlList[2].split(' ');
-                                for(var i=0;i<bodyAttr.length;i++){
-                                    var key = bodyAttr[i].match(/(\S+)=['|"]([\S|\s]+)['|"]$/);
-                                    if(key){
-                                        $($('#tpl')[0].contentDocument).find('body').attr(key[1],key[2]);
-                                    }
-                                }
-                            }
-                            $($('#tpl')[0].contentDocument).find('head').html(htmlList[1]);
-                            $($('#tpl')[0].contentDocument).find('body').html(htmlList[3]);
-                        });
-                    }
-                    $('#mastGet .panel-body input').on('change',function(){
-                        reloadDataAndLastHtml();
-                        var allParams = [];
-                        $('#mastGet .panel-body input').each(function(){
-                            allParams.push($(this).data('id')+'='+$(this).val());
-                        });
-                        $('#tpl').attr('src','http/{$file}?'+allParams.join('&'));
-                    })
-                </script>
             </div>
             <div class="tab-pane fade" id="gitAdmin">
-                <section>2</section>
-            </div>
-            <div class="tab-pane fade" id="dataAdmin">
-                <section>3</section>
+                {foreach $allModule as $mod}
+                    <div class="panel panel-default" style="width:150px;float:left;">
+                        <div class="panel-heading">{$mod}</div>
+                        <div class="panel-body"></div>
+                    </div>
+                {/foreach}
             </div>
         </div>
     </div>
     <div style="position:fixed;bottom:0;top:215px;left:0;right:0;">
         <section id="editor" style="width: 50%;height:100%;float: left;">{htmlspecialchars($tplFileContent)}</section>
         <script>
+            //更新控制器推送数据和,生成的html
+            function reloadDataAndLastHtml(){
+                var allGet = {
+                };
+                $('#mastGet .panel-body input').each(function(){
+                    allGet[$(this).data('id')] = $(this).val();
+                });
+                $.post('',{
+                    action:'runData',
+                    content:editor.getValue(),
+                    line:editor.selection.getRange().start,
+                    file:'{$file}',
+                    simulate:allGet
+                },function(data){
+                    data = JSON.parse(data);
+                    allComplate = data.pushResult;
+                    var htmlList = data.html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
+                    if(htmlList[2]!=undefined){
+                        var bodyAttr = htmlList[2].split(' ');
+                        for(var i=0;i<bodyAttr.length;i++){
+                            var key = bodyAttr[i].match(/(\S+)=['|"]([\S|\s]+)['|"]$/);
+                            if(key){
+                                $($('#tpl')[0].contentDocument).find('body').attr(key[1],key[2]);
+                            }
+                        }
+                    }
+                    $($('#tpl')[0].contentDocument).find('head').html(htmlList[1]);
+                    $($('#tpl')[0].contentDocument).find('body').html(htmlList[3]);
+                });
+            }
+            $('#mastGet .panel-body input').on('change',function(){
+                reloadDataAndLastHtml();
+                var allParams = [];
+                $('#mastGet .panel-body input').each(function(){
+                    allParams.push($(this).data('id')+'='+$(this).val());
+                });
+                $('#tpl').attr('src','http/{$file}?'+allParams.join('&'));
+            });
             var languageTools = ace.require("ace/ext/language_tools");
             var editor = ace.edit("editor");
             editor.$blockScrolling = Infinity;

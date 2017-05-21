@@ -41,6 +41,15 @@ class control{
             $tplFile = $tplFile[0]['property'][0]['data'];
             $page->tplFile = $tplFile;
 
+            //加载所有通用模块
+            $allModule = array();
+            foreach(scandir('./http/commonModule/') as $name){
+                if( substr($name,-8)=='.mod.tpl' ){
+                    $allModule[] = substr($name,0,-8);
+                }
+            }
+            $page->allModule = $allModule;
+
             //使用的GET参数
             $allGet = $metaApi->search('.arrayGet object:filter([name=$_GET])')->parent()->toArray();
             $allKeys = array();
@@ -176,6 +185,7 @@ class control{
         $evalMetaCodeApi->run();
         $string = ob_get_contents();
         ob_clean();
+        echo $string;exit;
         echo json_encode(array(
             'pushResult'=>$tpl_vars,
             'html'=>$string,
