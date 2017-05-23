@@ -38,7 +38,26 @@
             }
         </style>
         <div class="tab-content">
-            <div class="tab-pane fade in active" id="home" style="width: 732px;">
+            <div class="tab-pane fade in active" id="home" style="width: 908px;">
+                <div class="panel panel-default" style="width:170px;">
+                    <div class="panel-heading">操作</div>
+                    <div class="panel-body">
+                        <button class="btn btn-default" onclick="save()">
+                            <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span>保存
+                        </button>
+                        <script>
+                            function save(){
+                                $.post('',{
+                                    action:'save',
+                                    content:editor.getValue(),
+                                    file:'{$file}',
+                                },function(data){
+                                    console.log(data);
+                                });
+                            }
+                        </script>
+                    </div>
+                </div>
                 <div class="panel panel-default" style="width:360px;">
                     <div class="panel-heading">网址</div>
                     <div class="panel-body">
@@ -127,7 +146,7 @@
             </script>
         </div>
     </div>
-    <div style="position:fixed;bottom:0;top:215px;left:0;right:0;">
+    <div style="position:fixed;bottom:0;top:215px;left:0;right:0;border-bottom: solid 1px #5d5d5d;">
         <section id="editor" style="width: 50%;height:100%;float: left;">{htmlspecialchars($tplFileContent)}</section>
         <script>
             //更新控制器推送数据和,生成的html

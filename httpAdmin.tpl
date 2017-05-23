@@ -117,7 +117,7 @@
     </div>
     <ul id="myTab" class="nav nav-tabs">
         <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
-        <li><a href="#gitAdmin" data-toggle="tab">运行环境git状态</a></li>
+        <li><a href="#gitAdmin" data-toggle="tab" onclick="initGitState()">运行环境git状态</a></li>
         <li><a id="dataAdminTab" href="#dataAdmin" data-toggle="tab">数据</a></li>
         <li class="dropdown">
             <a href="#" id="myTabDrop1" class="dropdown-toggle"
@@ -158,36 +158,43 @@
         <div class="tab-pane fade" id="gitAdmin" style="padding-top: 10px;">
             <section id="github" class="container">
                 <div class="panel panel-default">
-                    <div class="panel-body">
-                        当前正在<span id="githubState"></span>版本
-                        <div class="btn-group">
-                            <button id="githubStateChange" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                切换到分支<span class="caret"></span>
-                            </button>
-                            <ul id="floatDom" class="dropdown-menu"></ul>
-                        </div>
-                        <div class="btn-group">
-                            <button id="commitlog" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                重置到节点<span class="caret"></span>
-                            </button>
-                            <div class="dropdown-menu" style="height:400px;overflow-y: scroll;width: 400px;">
-                                <canvas style="position:absolute;left:0;"></canvas>
-                                <ul id="checkoutCommit"></ul>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            当前正在<span id="githubState"></span>版本
+                            <div class="btn-group">
+                                <button id="githubStateChange" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    切换到分支<span class="caret"></span>
+                                </button>
+                                <ul id="floatDom" class="dropdown-menu"></ul>
                             </div>
-                        </div>
-                        <button id="githubClean" type="button" class="btn btn-default">重置</button>
-                        <button id="githubPull" type="button" class="btn btn-default">拉取</button>
-                    </div>
+                            <div class="btn-group">
+                                <button id="commitlog" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    重置到节点<span class="caret"></span>
+                                </button>
+                                <div class="dropdown-menu" style="height:400px;overflow-y: scroll;width: 400px;">
+                                    <canvas style="position:absolute;left:0;"></canvas>
+                                    <ul id="checkoutCommit"></ul>
+                                </div>
+                            </div>
+                            <button id="githubClean" type="button" class="btn btn-default">重置</button>
+                            <button id="githubPull" type="button" class="btn btn-default">拉取</button>
+                        </li>
+                        <li class="list-group-item" id="diffFile">
+                            未commit文件
+                        </li>
+                    </ul>
                 </div>
                 <script>
                     $('#githubStateChange').click(function(){
                         post('httpAdminMetaAction.php',{
                             action:'getBranch',
                         },function(data){
+                            console.log(data);
                             data = JSON.parse(data);
+                            var allBranch = data.branch;
                             $('#floatDom').html('');
-                            for(var i=0;i<data.length;i++){
-                                var branchItem = data[i];
+                            for(var i=0;i<allBranch.length;i++){
+                                var branchItem = allBranch[i];
                                 if(branchItem.substring(0,1)!=='*'){
                                     if(branchItem.substring(0,16)!=='  remotes/origin'){
                                         $('#floatDom').append('<li><a href="#" value="'+branchItem.substring(2)+'">本地:'+branchItem.substring(2)+'</a></li>');
@@ -195,8 +202,8 @@
                                 }
                             }
                             $('#floatDom').append('<li role="separator" class="divider"></li>');
-                            for(var i=0;i<data.length;i++){
-                                var branchItem = data[i];
+                            for(var i=0;i<allBranch.length;i++){
+                                var branchItem = allBranch[i];
                                 if(branchItem.substring(0,1)!=='*'){
                                     if(branchItem.substring(0,16)=='  remotes/origin'){
                                         $('#floatDom').append('<li><a href="#" value="'+branchItem.substring(2)+'">公共:'+branchItem.substring(17)+'</a></li>');
@@ -391,15 +398,20 @@
                             action:'getBranch',
                         },function(data){
                             data = JSON.parse(data);
-                            for(var i=0;i<data.length;i++){
-                                var branchItem = data[i];
+                            var allBranch = data.branch;
+                            var allDiff = data.diff;
+                            $('#diffFile').html('');
+                            for(var i=0;i<allDiff.length;i++){
+                                $('#diffFile').append($('<div>'+allDiff[i]+'</div>'));
+                            }
+                            for(var i=0;i<allBranch.length;i++){
+                                var branchItem = allBranch[i];
                                 if(branchItem.substring(0,1)=='*'){
                                     $('#githubState').html(branchItem.substring(2));
                                 }
                             }
                         });
                     }
-                    initGitState();
                 </script>
             </section>
         </div>

@@ -180,5 +180,28 @@ class control{
             'html'=>$string,
         ));exit;
     }
+    public function save(){
+        $metaApi = new phpInterpreter(file_get_contents('./http/'.$_POST['file']));
+        $PageObj = $metaApi->search('.= [className=kod_web_page]')->parent()->toArray();
+        $PageObj = $PageObj[0]['object1']['name'];
+        $tplFile = $metaApi->search('.objectFunction:filter(#fetch) object:filter([name='.$PageObj.'])')->parent()->toArray();//删除fetch输出调用
+
+        $runApi = new evalMetaCode(array(
+            'type'=>'returnEvalValue',
+            'key'=>array('type'=>'string','data'=>'tplFile'),
+            'value'=>$tplFile[0]['property'][0],
+        ),array());
+        $result = $runApi->run();
+        $tplFile = $result['tplFile'];
+        try{
+            if(file_put_contents('./http/'.$tplFile,$_POST['content'])){
+                echo json_encode(array('result'=>true));
+            }else{
+                echo json_encode(array('result'=>false));
+            }
+        }catch (Exception $e){
+            echo json_encode(array('result'=>false,'message'=>$e->getMessage()));
+        }
+    }
 }
 $a = new control();

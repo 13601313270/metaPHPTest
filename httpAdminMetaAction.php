@@ -81,7 +81,11 @@ class control{
         exit;
     }
     public function getBranch(){
-        return $this->gitAction->createBranch('-a',false);
+        $allBranch = $this->gitAction->createBranch('-a',false);
+        return array(
+            'branch'=>$allBranch,
+            'diff'=>$this->gitAction->exec('git diff --name-status'),
+        );
     }
     public function checkout(){
         $this->gitAction->branchClean();
