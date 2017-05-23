@@ -14,7 +14,7 @@
     <div>
         <ul id="myTab" class="nav nav-tabs" style="padding: 0 5px;">
             <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
-            <li><a data-toggle="tab" href="#gitAdmin">通用模块</a></li>
+            <li><a data-toggle="tab" href="#modAdmin">通用模块</a></li>
         </ul>
         <style>
             .tab-content{
@@ -64,14 +64,67 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="gitAdmin">
+            <style>
+                #modAdmin{
+                    padding-left: 5px;
+                }
+                #modAdmin>div{
+                    width:180px;height:120px;float:left;
+                }
+                #modAdmin>div>.panel-body{
+                    padding-left: 10px;
+                }
+            </style>
+            <div class="tab-pane fade" id="modAdmin">
                 {foreach $allModule as $mod}
-                    <div class="panel panel-default" style="width:150px;float:left;">
-                        <div class="panel-heading">{$mod}</div>
-                        <div class="panel-body"></div>
+                    <div class="panel panel-default" data-name="{$mod.name}">
+                        <div class="panel-heading">{$mod.name}</div>
+                        <div class="panel-body">
+                            {foreach $mod.callArgs as $args}
+                                <div data-name="{$args.name}" data-default="{$args.default}">{$args.name}:
+                                    {if isset($args.default)}
+                                        默认值{$args.default}
+                                    {else}
+                                        必填
+                                    {/if}
+                                </div>
+                            {/foreach}
+                        </div>
                     </div>
                 {/foreach}
             </div>
+            <script>
+                {literal}
+                $('#modAdmin>.panel').click(function(){
+                    var returnStr = '';
+                    //计算缩进位置
+                    var selectRange = editor.getSelectionRange();
+                    selectRange.start.row-=2;
+                    var preText = editor.session.getTextRange(selectRange);
+                    preText = preText.match(/(\n)(\s*).*\n(\s*)$/);
+                    if(preText!==null){
+                        var preLineTextTab = preText[2];
+                        var selectRange = editor.getSelectionRange();
+                        selectRange.start.column=0;
+                        if( editor.session.getTextRange(selectRange).match(/^\s*$/) ){
+                            editor.session.remove(selectRange);
+                            returnStr += preLineTextTab;
+                        }
+                    }
+                    //添加内容
+                    returnStr += '{include file="'+$(this).data('name')+'.mod.tpl"';
+                    $(this).find('>.panel-body>div').each(function(){
+                        if($(this).data('default')){
+                            returnStr += ' '+$(this).data('name')+"='"+$(this).data('default')+"'";
+                        }else{
+                            returnStr += ' '+$(this).data('name')+"='*'";
+                        }
+                    });
+                    returnStr+='}';
+                    editor.insert(returnStr);
+                });
+                {/literal}
+            </script>
         </div>
     </div>
     <div style="position:fixed;bottom:0;top:215px;left:0;right:0;">
@@ -218,6 +271,7 @@
                     $('#tpl').css('transform','scale('+scale+')');
                     $('#tpl').css('marginLeft',(webWidth-rightwidth)/-2);
                     $('#tpl').css('marginTop',(1-scale)/-2*webHeight+10);
+                    editor.resize();
                 }
                 initTplScroll();
                 $(window).resize(function() {
