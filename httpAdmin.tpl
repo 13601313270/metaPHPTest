@@ -398,8 +398,8 @@
                             action:'commit',
                             message:'这是一次修改页面'
                         },function(data){
-                            console.log(data);
                             data = JSON.parse(data);
+                            console.log(data);
                         });
                     }
                     function initGitState(){
