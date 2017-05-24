@@ -119,7 +119,10 @@ class control{
         return $this->gitAction->commit($_POST['message']);
     }
     public function push(){
-        return $this->gitAction->push();
+        $this->setSessionState(1,'正在push');
+        $result = $this->gitAction->push();
+        $this->setSessionState(100,'push完成');
+        return $result;
     }
     public function githubClean(){
         return $this->gitAction->branchClean();
