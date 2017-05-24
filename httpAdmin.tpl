@@ -403,6 +403,7 @@
                             },function(data){
                                 data = JSON.parse(data);
                                 console.log(data);
+                                initGitState();
                             });
                         }
                     }
@@ -412,6 +413,7 @@
                         },function(data){
                             data = JSON.parse(data);
                             console.log(data);
+                            initGitState();
                         });
                     }
                     function initGitState(){
