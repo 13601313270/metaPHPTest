@@ -85,6 +85,7 @@ class control{
         return array(
             'branch'=>$allBranch,
             'diff'=>$this->gitAction->exec('git diff --name-status'),
+            'commit'=>$this->gitAction->exec('git cherry -v'),
         );
     }
     public function checkout(){

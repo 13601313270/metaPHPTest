@@ -182,6 +182,7 @@
                         <li class="list-group-item" id="diffFile">
                             未commit文件
                         </li>
+                        <li class="list-group-item" id="commitLog"></li>
                     </ul>
                 </div>
                 <script>
@@ -394,9 +395,20 @@
                         });
                     });
                     function commit(){
+                        var message = window.prompt('做了什么？');
+                        if(message){
+                            post('httpAdminMetaAction.php',{
+                                action:'commit',
+                                message:message
+                            },function(data){
+                                data = JSON.parse(data);
+                                console.log(data);
+                            });
+                        }
+                    }
+                    function push(){
                         post('httpAdminMetaAction.php',{
-                            action:'commit',
-                            message:'这是一次修改页面'
+                            action:'push',
                         },function(data){
                             data = JSON.parse(data);
                             console.log(data);
@@ -409,11 +421,19 @@
                             data = JSON.parse(data);
                             var allBranch = data.branch;
                             var allDiff = data.diff;
+
                             $('#diffFile').html('');
                             for(var i=0;i<allDiff.length;i++){
                                 $('#diffFile').append($('<div>'+allDiff[i]+'</div>'));
                             }
                             $('#diffFile').append($('<button type="button" class="btn btn-default" onclick="commit()">commit</button>'));
+
+                            var commitLog = data.commit;
+                            $('#commitLog').html('');
+                            for(var i=0;i<commitLog.length;i++){
+                                $('#commitLog').append($('<div>'+commitLog[i]+'</div>'));
+                            }
+                            $('#commitLog').append($('<button type="button" class="btn btn-default" onclick="push()">push</button>'));
                             for(var i=0;i<allBranch.length;i++){
                                 var branchItem = allBranch[i];
                                 if(branchItem.substring(0,1)=='*'){
