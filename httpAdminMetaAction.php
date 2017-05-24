@@ -81,7 +81,9 @@ class control{
         exit;
     }
     public function getBranch(){
+        $this->setSessionState(1,'正在获取分支');
         $allBranch = $this->gitAction->createBranch('-a',false);
+        $this->setSessionState(100,'获取完成');
         return array(
             'branch'=>$allBranch,
             'diff'=>$this->gitAction->exec('git diff --name-status'),
