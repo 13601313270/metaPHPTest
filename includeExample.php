@@ -15,21 +15,25 @@ date_default_timezone_set('PRC');
 define("webDIR",dirname(__FILE__)."/http/");//网站根目录
 define("KOD_SMARTY_TEMPLATE_DIR",dirname(__FILE__)."/http/");
 define("KOD_REWRITE_HTML_LINK",true);
-define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/html/smarty_cache');
+define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/smarty_cache');
 
 define('KOD_MYSQL_SERVER','118.190.95.219');
 define('KOD_MYSQL_USER','root');
 define('KOD_MYSQL_PASSWORD','1082322$%&whr309568486');
 define('KOD_COMMENT_MYSQLDB','dbName');
 
+/*
+ * 设置memcache
+ * */
+//define('KOD_MEMCACHE_OPEN',true);
+//define('KOD_MEMCACHE_HOST','***');//默认值是localhost
+//define('KOD_MEMCACHE_PORT',***);//默认值是11211
+
 define("KOD_SMARTY_CSS_DIR",dirname(__FILE__)."/cssCreate/");
 define('KOD_SMARTY_CSS_HOST','http://118.190.95.234/metaPHPTest/cssCreate/');
 
 define('KOD_METAPHP_OPEN',false);
 include_once('metaPHP/include.php');
-
-
-
 spl_autoload_register(function($model){
     $classAutoLoad = array(
         'projectClass' => 'include/project.php',
@@ -41,6 +45,8 @@ spl_autoload_register(function($model){
     );
     if(isset($classAutoLoad[$model])){
         include_once $classAutoLoad[$model];
+    }elseif(strpos($model,'kod_')===false && strpos($model,'Smarty_')===false){
+        include_once 'include/'.$model.'.php';
     }
 });
 

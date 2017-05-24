@@ -1,0 +1,18 @@
+<?php
+/**
+ *
+ *
+ * User: 王浩然
+ * Date: 2017/04/25
+ * Time: 00:37
+ */
+class kodMod_commonModule_temp extends kod_web_smartyModController{
+    public function init($iId){
+        echo '22222';
+    }
+    public function finish($aData)
+    {
+        echo 'finish';
+        // TODO: Implement finish() method.
+    }
+}
