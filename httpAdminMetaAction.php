@@ -116,6 +116,9 @@ class control{
         $this->gitAction->add('.');
         return $this->gitAction->commit($_POST['message']);
     }
+    public function push(){
+        return $this->gitAction->push();
+    }
     public function githubClean(){
         return $this->gitAction->branchClean();
     }
