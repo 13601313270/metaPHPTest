@@ -12,7 +12,9 @@
         body{
         }
     </style>
-
+    {include file="commonModule/head.mod.tpl" title='*' isBeen='4'}
+    {include file="commonModule/head.mod.tpl" title='*' isBeen='4'}
+    {include file="commonModule/temp.mod.tpl" iId='*'}
     {include file="commonModule/head.mod.tpl" title='标题'}
     {foreach $article as $k=>$v}
         {$k}

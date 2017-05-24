@@ -393,6 +393,15 @@
                             initGitState();
                         });
                     });
+                    function commit(){
+                        post('httpAdminMetaAction.php',{
+                            action:'commit',
+                            message:'这是一次修改页面'
+                        },function(data){
+                            console.log(data);
+                            data = JSON.parse(data);
+                        });
+                    }
                     function initGitState(){
                         post('httpAdminMetaAction.php',{
                             action:'getBranch',
@@ -404,6 +413,7 @@
                             for(var i=0;i<allDiff.length;i++){
                                 $('#diffFile').append($('<div>'+allDiff[i]+'</div>'));
                             }
+                            $('#diffFile').append($('<button type="button" class="btn btn-default" onclick="commit()">commit</button>'));
                             for(var i=0;i<allBranch.length;i++){
                                 var branchItem = allBranch[i];
                                 if(branchItem.substring(0,1)=='*'){

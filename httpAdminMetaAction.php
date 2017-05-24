@@ -111,6 +111,10 @@ class control{
     public function pull(){
         return $this->gitAction->pull(true);
     }
+    public function commit(){
+        $this->gitAction->add('.');
+        return $this->gitAction->commit($_POST['message']);
+    }
     public function githubClean(){
         return $this->gitAction->branchClean();
     }
