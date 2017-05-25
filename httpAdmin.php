@@ -1,3 +1,4 @@
+!!html;
 <?php
 
 /**
@@ -12,6 +13,7 @@ $page=new kod_web_page();
 $page->fileList=scandir('./http/');
 $page->httpFileConfig=array(
     'index.php' => '首页',
-    'index.tpl' => '首页模板'
+    'index.tpl' => '首页模板',
+    'test.php' => '测试页面'
 );
 $page->fetch('httpAdmin.tpl');
