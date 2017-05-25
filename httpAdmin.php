@@ -15,6 +15,7 @@ $page->httpFileConfig=array(
     'index.tpl' => '首页模板',
     'test.php' => '测试页面',
     'ddd.php' => '单独的',
-    'adsf.php' => '额外'
+    'adsf.php' => '额外',
+    'ww.php' => 'ww.php'
 );
 $page->fetch('httpAdmin.tpl');
