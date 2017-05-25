@@ -142,7 +142,7 @@
                     <thead></thead>
                     <tbody>
                     {foreach $fileList as $file}
-                        {if in_array($file,array('.'))}{continue}{/if}
+                        {if in_array($file,array('.','commonModule'))}{continue}{/if}
                         {if substr($file,-4)!=='.tpl'}
                         <tr>
                             <td><a target="_blank" href="pageEditAdmin.php?file={$file}">{$file}</a></td>
@@ -151,6 +151,24 @@
                         </tr>
                         {/if}
                     {/foreach}
+                    <tr>
+                        <script>
+                            function createPage(dom){
+                                var allTd = $(dom).parents('tr').find('>td>input');
+                                console.log(allTd);
+                                $.post('mysqlAction.php',{
+                                    action:'createPage',
+                                    fileName:allTd.eq(0).val(),
+                                    title:allTd.eq(1).val(),
+                                },function(data){
+                                    console.log(data);
+                                });
+                            }
+                        </script>
+                        <td><input class="form-control" placeholder="新增文件名"></td>
+                        <td><input class="form-control" placeholder="名称"></td>
+                        <td><button type="button" class="btn btn-default" onclick="createPage(this)">新增</button></td>
+                    </tr>
                     </tbody>
                 </table>
             </section>
