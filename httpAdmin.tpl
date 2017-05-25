@@ -155,13 +155,13 @@
                         <script>
                             function createPage(dom){
                                 var allTd = $(dom).parents('tr').find('>td>input');
-                                console.log(allTd);
                                 post('mysqlAction.php',{
                                     action:'createPage',
                                     fileName:allTd.eq(0).val(),
                                     title:allTd.eq(1).val(),
                                 },function(data){
-                                    console.log(data);
+                                    //运行完,进行刷新
+                                    location.href = location.href;
                                 });
                             }
                         </script>
