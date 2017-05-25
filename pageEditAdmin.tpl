@@ -15,29 +15,30 @@
         <ul id="myTab" class="nav nav-tabs" style="padding: 0 5px;">
             <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
             <li><a data-toggle="tab" href="#modAdmin">通用模块</a></li>
+            <li><a data-toggle="tab" href="#templateAdmin">通用模板</a></li>
         </ul>
         <style>
-            .tab-content{
+            #toolTip{
                 height:130px;
                 border-bottom:1px solid #ddd;
                 margin-bottom: 10px;
                 overflow-x: scroll;
             }
-            .tab-content>.tab-pane>.panel{
+            #toolTip>.tab-pane>.panel{
                 float: left;
                 margin: 3px;
             }
-            .tab-content>.tab-pane>.panel>.panel-heading{
+            #toolTip>.tab-pane>.panel>.panel-heading{
                 padding: 3px 3px 3px 10px;
             }
-            .tab-content>.tab-pane>.panel>.panel-body{
+            #toolTip>.tab-pane>.panel>.panel-body{
                 padding: 3px;
             }
-            .tab-content>.tab-pane .input-group{
+            #toolTip>.tab-pane .input-group{
                 margin: 1px;
             }
         </style>
-        <div class="tab-content">
+        <div id="toolTip" class="tab-content">
             <div class="tab-pane fade in active" id="home" style="width: 908px;">
                 <div class="panel panel-default" style="width:170px;">
                     <div class="panel-heading">操作</div>
@@ -49,7 +50,7 @@
                             function save(){
                                 $.post('',{
                                     action:'save',
-                                    content:editor.getValue(),
+                                    tplContent:tplEditor.getValue(),
                                     file:'{$file}',
                                 },function(data){
                                     console.log(data);
@@ -117,16 +118,16 @@
                 $('#modAdmin>.panel').click(function(){
                     var returnStr = '';
                     //计算缩进位置
-                    var selectRange = editor.getSelectionRange();
+                    var selectRange = tplEditor.getSelectionRange();
                     selectRange.start.row-=2;
-                    var preText = editor.session.getTextRange(selectRange);
+                    var preText = tplEditor.session.getTextRange(selectRange);
                     preText = preText.match(/(\n)(\s*).*\n(\s*)$/);
                     if(preText!==null){
                         var preLineTextTab = preText[2];
-                        var selectRange = editor.getSelectionRange();
+                        var selectRange = tplEditor.getSelectionRange();
                         selectRange.start.column=0;
-                        if( editor.session.getTextRange(selectRange).match(/^\s*$/) ){
-                            editor.session.remove(selectRange);
+                        if( tplEditor.session.getTextRange(selectRange).match(/^\s*$/) ){
+                            tplEditor.session.remove(selectRange);
                             returnStr += preLineTextTab;
                         }
                     }
@@ -140,14 +141,32 @@
                         }
                     });
                     returnStr+='}';
-                    editor.insert(returnStr);
+                    tplEditor.insert(returnStr);
                 });
                 {/literal}
             </script>
+            <div class="tab-pane fade" id="templateAdmin">
+
+            </div>
         </div>
     </div>
     <div style="position:fixed;bottom:0;top:215px;left:0;right:0;border-bottom: solid 1px #5d5d5d;">
-        <section id="editor" style="width: 50%;height:100%;float: left;">{htmlspecialchars($tplFileContent)}</section>
+        <div id="pageCodes" style="width: 50%;height:100%;float: left;position:relative;">
+            <ul class="nav nav-tabs" style="padding: 0 5px;">
+                <li class="active"><a href="#tplCode" data-toggle="tab">.tpl</a></li>
+                <li><a data-toggle="tab" href="#phpCode">.php</a></li>
+            </ul>
+            <div class="tab-content" style="position:absolute;top:42px;bottom:0;width: 100%;">
+                <div class="tab-pane fade in active" id="tplCode" style="width: 100%;height: 100%;">
+                    <section id="tplEditor" style="height: 100%;">{htmlspecialchars($tplFileContent)}</section>
+                </div>
+                <div class="tab-pane fade" id="phpCode">
+                    <section id="phpEditor" style="height: 100%;">{htmlspecialchars($phpFileContent)}</section>
+                </div>
+            </div>
+        </div>
+
+
         <script>
             //更新控制器推送数据和,生成的html
             function reloadDataAndLastHtml(){
@@ -158,13 +177,14 @@
                 });
                 $.post('',{
                     action:'runData',
-                    content:editor.getValue(),
-                    line:editor.selection.getRange().start,
+                    tplContent:tplEditor.getValue(),
+                    phpContent:phpEditor.getValue(),
+                    line:tplEditor.selection.getRange().start,
                     file:'{$file}',
                     simulate:allGet
                 },function(data){
                     data = JSON.parse(data);
-                    allComplate = data.pushResult;
+                    allTplComplate = data.pushResult;
                     var htmlList = data.html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
                     if(htmlList[2]!=undefined){
                         var bodyAttr = htmlList[2].split(' ');
@@ -187,33 +207,38 @@
                 });
                 $('#tpl').attr('src','http/{$file}?'+allParams.join('&'));
             });
-            var languageTools = ace.require("ace/ext/language_tools");
-            var editor = ace.edit("editor");
-            editor.$blockScrolling = Infinity;
-            editor.setFontSize(16);
-//            editor.getSession().setMode("ace/mode/html");
-            editor.getSession().setMode("ace/mode/smarty");
-            editor.setTheme("ace/theme/twilight");
+            //初始化编辑器
+            function initEditor(id,language,addCompleter){
+                var languageTools = ace.require("ace/ext/language_tools");
+                window[id] = ace.edit(id);
+                window[id].$blockScrolling = Infinity;
+                window[id].setFontSize(16);
+//            window[id].getSession().setMode("ace/mode/html");
+                window[id].getSession().setMode(language);
+                window[id].setTheme("ace/theme/twilight");
+                window[id].setOptions({
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
+                });
 
-            editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableSnippets: true,
-                enableLiveAutocompletion: true
-            });
-
-            editor.getSession().on('change', function(e) {
-                if(e.action=='insert'){
+                window[id].getSession().on('change', function(e) {
+                    if(e.action=='insert'){
 //                    console.log(e.lines);
-                }else{
+                    }else{
 
+                    }
+                    reloadDataAndLastHtml();
+                });
+                if(addCompleter!==undefined){
+                    languageTools.addCompleter(addCompleter);
                 }
-                reloadDataAndLastHtml();
-            });
-            var allComplate = [];
-            languageTools.addCompleter({
-                getCompletions: function (editor, session, pos, prefix, callback) {
+            }
+            var allTplComplate = [];
+            initEditor('tplEditor','ace/mode/smarty',{
+                getCompletions: function (tplEditor, session, pos, prefix, callback) {
                     var result = [];//搜索结果
-                    for(var i in allComplate){
+                    for(var i in allTplComplate){
                         result.push({
                             name: i,
                             value: ('$'+i),//实际输出
@@ -222,7 +247,7 @@
                             type: "local",
                             score: 1000 // 让test排在最上面
                         });
-                        for(var j in allComplate[i]){
+                        for(var j in allTplComplate[i]){
                             result.push({
                                 name: i,
                                 value: ('$'+i),//实际输出
@@ -235,7 +260,8 @@
                     }
                     callback(null,result);
                 }
-            });
+            });//"ace/mode/smarty"  "ace/mode/html"  "ace/mode/php"
+            initEditor('phpEditor','ace/mode/php');
         </script>
         <section id="pageShow" style="width: 50%;height:100%;float: left;position: relative;">
             <div id="tplSize" class="panel panel-default" style="margin:10px 10px 0;">
@@ -256,14 +282,14 @@
                 }
             </style>
             <div id="split"></div>
+            <iframe id="tpl" src="http/{$file}" style="border: solid 1px #b2b2b2;"></iframe>
             <script>
                 $('#split').mousedown(function() {
                     var float = $('<div style="position: fixed;width: 100%;height:100%;top:0;left:0;z-index: 9999"></div>');
-
                     function mouseMove(event) {
                         $('body').append(float);
                         var leftShowSplit = (event.pageX / document.documentElement.clientWidth * 100).toFixed(2);
-                        $('#editor').width(leftShowSplit + '%');
+                        $('#pageCodes').width(leftShowSplit + '%');
                         $('#pageShow').width((100 - leftShowSplit) + '%');
                         initTplScroll();
                     }
@@ -276,9 +302,6 @@
                 window.onbeforeunload=function(event){
                     return '正在编辑状态';
                 }
-            </script>
-            <iframe id="tpl" src="http/{$file}" style="border: solid 1px #b2b2b2;"></iframe>
-            <script>
                 function initTplScroll(){
                     var webWidth = $('#tplSize input:eq(0)').val();
                     var webHeight = $('#tplSize input:eq(1)').val();
@@ -290,7 +313,7 @@
                     $('#tpl').css('transform','scale('+scale+')');
                     $('#tpl').css('marginLeft',(webWidth-rightwidth)/-2);
                     $('#tpl').css('marginTop',(1-scale)/-2*webHeight+10);
-                    editor.resize();
+                    tplEditor.resize();
                 }
                 initTplScroll();
                 $(window).resize(function() {

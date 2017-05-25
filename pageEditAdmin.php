@@ -94,11 +94,12 @@ class control{
             }
             $page->allGet = $allKeys;
             $page->tplFileContent = file_get_contents('./http/'.$page->tplFile);
+            $page->phpFileContent = file_get_contents('./http/'.$page->file);
             $page->fetch('pageEditAdmin.tpl');
         }
     }
     public function runData(){
-        $metaApi = new phpInterpreter(file_get_contents('./http/'.$_POST['file']));
+        $metaApi = new phpInterpreter($_POST['phpContent']);
         $PageObj = $metaApi->search('.= [className=kod_web_page]')->parent()->toArray();
         $PageObj = $PageObj[0]['object1']['name'];
         $line = $_POST['line'];
@@ -157,7 +158,7 @@ class control{
         }
         $compiler->smarty->_current_file = $template->source->filepath;
 
-        $_content = $_POST['content'];
+        $_content = $_POST['tplContent'];
         $_content = $compiler->preFilter($_content);
         $_content = $compiler->doCompile($_content, true);
         $_content = $compiler->postFilter($_content);
@@ -194,7 +195,7 @@ class control{
         $result = $runApi->run();
         $tplFile = $result['tplFile'];
         try{
-            if(file_put_contents('./http/'.$tplFile,$_POST['content'])){
+            if(file_put_contents('./http/'.$tplFile,$_POST['tplContent'])){
                 echo json_encode(array('result'=>true));
             }else{
                 echo json_encode(array('result'=>false));

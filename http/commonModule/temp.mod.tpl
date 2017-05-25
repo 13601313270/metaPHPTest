@@ -2,4 +2,7 @@
     .temp{
     }
 </style>
-<div class="temp">temp1{$title}</div>
+<div class="temp">
+    temp1{$title}
+    <img src="{$img}">
+</div>
