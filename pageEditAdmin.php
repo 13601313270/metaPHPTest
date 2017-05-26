@@ -103,7 +103,6 @@ class control{
         $PageObj = $metaApi->search('.= [className=kod_web_page]')->parent()->toArray();
         $PageObj = $PageObj[0]['object1']['name'];
         $line = $_POST['line'];
-//        print_r($line);exit;
         //执行脚本,计算出所有推送到前端的变量
         if($_POST['simulate']){
             $allPushParams = $metaApi->search('.objectParams object:filter(#'.$PageObj.')')->parent()->parent()->toArray();
@@ -162,6 +161,7 @@ class control{
         $_content = $compiler->preFilter($_content);
         $_content = $compiler->doCompile($_content, true);
         $_content = $compiler->postFilter($_content);
+        $_content = $compiler->blockOrFunctionCode.$_content;
 
         $compiler->parent_compiler = null;
         $compiler->parser = null;
