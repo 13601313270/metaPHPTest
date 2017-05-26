@@ -195,7 +195,9 @@ class control{
         $result = $runApi->run();
         $tplFile = $result['tplFile'];
         try{
-            if(file_put_contents('./http/'.$tplFile,$_POST['tplContent'])){
+            $result = file_put_contents('./http/'.$tplFile,$_POST['tplContent'])
+                || file_put_contents('./http/'.$_POST['file'],$_POST['phpContent']);
+            if($result){
                 echo json_encode(array('result'=>true));
             }else{
                 echo json_encode(array('result'=>false));

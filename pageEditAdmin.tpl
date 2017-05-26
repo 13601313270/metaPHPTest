@@ -51,6 +51,7 @@
                                 $.post('',{
                                     action:'save',
                                     tplContent:tplEditor.getValue(),
+                                    phpContent:phpEditor.getValue(),
                                     file:'{$file}',
                                 },function(data){
                                     console.log(data);
