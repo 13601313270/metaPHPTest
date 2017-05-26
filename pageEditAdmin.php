@@ -196,7 +196,7 @@ class control{
         $tplFile = $result['tplFile'];
         try{
             $result = file_put_contents('./http/'.$tplFile,$_POST['tplContent'])
-                || file_put_contents('./http/'.$_POST['file'],$_POST['phpContent']);
+                && file_put_contents('./http/'.$_POST['file'],$_POST['phpContent']);
             if($result){
                 echo json_encode(array('result'=>true));
             }else{
