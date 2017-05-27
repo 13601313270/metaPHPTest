@@ -105,25 +105,26 @@ class control{
         $line = $_POST['line'];
         //执行脚本,计算出所有推送到前端的变量
         if($_POST['simulate']){
-            $allPushParams = $metaApi->search('.objectParams object:filter(#'.$PageObj.')')->parent()->parent()->toArray();
-            foreach($allPushParams as $k=>$v){
-                $allPushParams[$k] = array(
-                    'type'=>'returnEvalValue',
-                    'key'=>array(
-                        'type'=>'string',
-                        'data'=>$v['object1']['name']
-                    ),
-                    'value'=>$v['object2'],
-                );
-            }
             $tplFile = $metaApi->search('.objectFunction:filter(#fetch) object:filter([name='.$PageObj.'])')->parent()->toArray();//删除fetch输出调用
             $evalObj = new evalMetaCode(array(),array('$_GET'=>$_POST['simulate']));
             $template = $evalObj->base($tplFile[0]['property'][0]);
-            $tplFile[0] = null;
+            $tplFile[0] = array(
+                'type'=>'returnEvalValue',
+                'key'=>array(
+                    'type'=>'string',
+                    'data'=>'pushValue'
+                ),
+                'value'=>$tplFile[0]['object'],
+            );
             $evalObj = new evalMetaCode($metaApi->codeMeta,array(
                 '$_GET'=>$_POST['simulate']
             ));
             $pushResult = $evalObj->run();
+            $pushResult_ = array();
+            foreach($pushResult['pushValue'] as $k=>$v){
+                $pushResult_[$k] = $v;
+            }
+            $pushResult = $pushResult_;
         }else{
             $pushResult = array();
         }
