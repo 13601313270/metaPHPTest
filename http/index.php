@@ -10,7 +10,7 @@ $page=new kod_web_page();
 
 $page->id = $_GET['id'];
 $page->chid = $_GET['chid'];
-$page->article = article::create()->getByKey(3);
+$page->article = article::create()->getByKey($page->id);
 
 $page->title = '标题';
 $page->fetch('index.tpl');
