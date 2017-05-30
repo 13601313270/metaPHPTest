@@ -112,7 +112,10 @@ class control{
         return $result;
     }
     public function pull(){
-        return $this->gitAction->pull(true);
+        $this->setSessionState(10,'正在拉取');
+        $result = $this->gitAction->pull(true);
+        $this->setSessionState(100,'拉取完成');
+        return $result;
     }
     public function commit(){
         $this->gitAction->add('.');
