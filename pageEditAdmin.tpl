@@ -147,8 +147,150 @@
                 {/literal}
             </script>
             <div class="tab-pane fade" id="templateAdmin">
-
+                <style>
+                    #templateAdmin{
+                        padding-left: 5px;
+                    }
+                    #templateAdmin>div{
+                        width:180px;height:120px;float:left;
+                    }
+                    #templateAdmin>div>.panel-body{
+                        padding-left: 10px;
+                    }
+                </style>
+                {foreach $allTemplage as $mod}
+                    <div class="panel panel-default" data-name="{$mod.name}" data-html="{htmlspecialchars($mod.tplContent)}">
+                        <div class="panel-heading">{$mod.name}</div>
+                        <div class="panel-body">
+                            {foreach $mod.callArgs as $args}
+                                <div data-name="{$args.name}" data-default="{$args.default}">{$args.name}:
+                                    {if isset($args.default)}
+                                        默认值{$args.default}
+                                    {else}
+                                        必填
+                                    {/if}
+                                </div>
+                            {/foreach}
+                        </div>
+                    </div>
+                {/foreach}
+                <div id="tmpChangeAdmin" style="display:none;width:100%;height:100%;position:fixed;top:0;left:0;background-color:rgba(0, 0, 0, 0.5);z-index:2;">
+                    <div style="position:absolute;top:30px;left:7%;width: 35%;height: 400px;background: white;">
+                        <iframe id="tmpOld"></iframe>
+                    </div>
+                    <div id="tmpOldBlocks" class="ondragover" style="position:absolute;top:30px;left:43%;width: 6.5%;height: 400px;background: white;" ondrop="drop(event)" ondragover="allowDrop(event)"><h4>内容</h4></div>
+                    <div id="tmpNewBlocks" style="position:absolute;top:30px;left: 50.5%;width: 6.5%;height: 400px;background: white;"><h4>区域</h4></div>
+                    <div style="position:absolute;top:30px;left:58%;width: 35%;height: 400px;background: white;">
+                        <button class="btn btn-default" onclick="tplEditor.setValue(getNewTplContent()),$('#tmpChangeAdmin').hide(),tplEditor.selection.clearSelection()">
+                            <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span>迁移
+                        </button>
+                        <button class="btn btn-default" onclick="save()">取消</button>
+                        <iframe id="tmpNew"></iframe>
+                    </div>
+                </div>
             </div>
+            <script>
+                {literal}
+                    function allowDrop(ev){
+                        ev.preventDefault();
+                    }
+
+                    function drag(ev){
+                        ev.dataTransfer.setData("Text",ev.target.id);
+                    }
+
+                    function drop(ev){
+                        ev.preventDefault();
+                        var data=ev.dataTransfer.getData("Text");
+                        if($(ev.target).is('.ondragover')){
+                            $(ev.target).append($('#'+data));
+                        }else{
+                            $(ev.target).parents('.ondragover').append($('#'+data));
+                        }
+
+                        $.post('',{
+                            action:'runData',
+                            tplContent:getNewTplContent(),
+                            phpContent:phpEditor.getValue(),
+                            line:tplEditor.selection.getRange().start,
+                            file:'{$file}',
+                            simulate:allGet()
+                        },function(data){
+                            data = JSON.parse(data);
+                            initIframeByHtml($('#tmpNew'),data.html);
+                            initTplScroll($('#tmpNew'));
+                        });
+                    }
+                    function getNewTplContent(){
+                        var newTplContent = '{extends file=\''+$('#tmpNew').data('id')+'.layout.tpl\'}';
+                        $('#tmpNewBlocks>div').each(function(){
+                            newTplContent+='\n{block name='+$(this).data('id')+'}';
+                            var allChild = $(this).find('>div');
+                            if(allChild.length>0){
+                                allChild.each(function(){
+                                    newTplContent+=$(this).data('html');
+                                });
+                            }else{
+                                newTplContent += '<div style="min-width: 100px;font-size: 30px;border: solid 1px blue;background-color: rgba(0, 135, 255, 0.41);">'+$(this).data('id')+'</div>';
+                            }
+                            newTplContent+='{/block}';
+                        });
+                        return newTplContent;
+                    }
+
+                $('#templateAdmin>.panel').click(function(){
+                    $('#tmpChangeAdmin').show();
+                    var tplContent = tplEditor.getValue();
+                    var match = tplContent.match(/^\{extends file='(\S+).layout.tpl'\}\s*(\{block name=[^\}]+\}[\s|\S]*\{\/block\})*$/);
+                    if(match!==null){
+                        //替换模板
+                        var tplFile = match[1];
+                        var allOldTmpBlockHtmls = match[2].match(/\{block name=[^\}]+\}[\s|\S]*?\{\/block\}/g);
+                        $('#tmpOldBlocks').html('<h4>内容</h4>');
+                        for(var i=0;i<allOldTmpBlockHtmls.length;i++){
+                            var temp = allOldTmpBlockHtmls[i].match(/\{block name=(\S+)\}([\s|\S]*?)\{\/block}/);
+                            var appendDom = $('<div id="blockDrop'+i+'" draggable="true" ondragstart="drag(event)" style="margin: 5px;border: solid 1px #c1c1c1;border-radius: 4px;line-height: 30px;text-align: center;cursor: move;">'+temp[1]+'</div>');
+                            appendDom.attr('data-html',temp[2]);
+                            $('#tmpOldBlocks').append(appendDom);
+                        }
+//                        var tmpHtmlNow = $('[data-name="'+tplFile+'"]').data('html');
+                        $.post('',{
+                            action:'runData',
+                            tplContent:tplContent,
+                            phpContent:phpEditor.getValue(),
+                            line:tplEditor.selection.getRange().start,
+                            file:'{$file}',
+                            simulate:allGet()
+                        },function(data){
+                            data = JSON.parse(data);
+                            initIframeByHtml($('#tmpOld'),data.html);
+                            initTplScroll($('#tmpOld'));
+                        });
+                        $('#tmpNew').attr('data-id',$(this).data('name'));
+                        var allNewTplContent = $(this).data('html').match(/\{block name=[^\}]+\}[\s|\S]*?\{\/block\}/g);
+                        $('#tmpNewBlocks').html('<h4>区域</h4>');
+                        for(var i=0;i<allNewTplContent.length;i++){
+                            var temp = allNewTplContent[i].match(/\{block name=(\S+)\}([\s|\S]*?)\{\/block}/);
+                            $('#tmpNewBlocks').append('<div data-id="'+temp[1]+'" class="ondragover" ondrop="drop(event)" ondragover="allowDrop(event)" style="padding: 2px;margin: 2px;border: solid 1px #a9a7a7;border-radius: 4px;"><h4>'+temp[1]+'</h4></div>');
+                        }
+                        $.post('',{
+                            action:'runData',
+                            tplContent:getNewTplContent(),
+                            phpContent:phpEditor.getValue(),
+                            line:tplEditor.selection.getRange().start,
+                            file:'{$file}',
+                            simulate:allGet()
+                        },function(data){
+                            data = JSON.parse(data);
+                            initIframeByHtml($('#tmpNew'),data.html);
+                            initTplScroll($('#tmpNew'));
+                        });
+                    }else{
+                        //原始html改为模板嵌套
+                    }
+                });
+                {/literal}
+            </script>
         </div>
     </div>
     <div style="position:fixed;bottom:0;top:215px;left:0;right:0;border-bottom: solid 1px #5d5d5d;">
@@ -167,38 +309,49 @@
             </div>
         </div>
 
-
         <script>
+            function initIframeByHtml(iframeDom,html){
+                var htmlList = html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
+                if(htmlList[2]!=undefined){
+                    var bodyAttr = htmlList[2].split(' ');
+                    for(var i=0;i<bodyAttr.length;i++){
+                        var key = bodyAttr[i].match(/(\S+)=['|"]([\S|\s]+)['|"]$/);
+                        if(key){
+                            $($(iframeDom)[0].contentDocument).find('body').attr(key[1],key[2]);
+                        }
+                    }
+                }
+                $($(iframeDom)[0].contentDocument).find('head').html(htmlList[1]);
+                $($(iframeDom)[0].contentDocument).find('body').html(htmlList[3]);
+            }
             //更新控制器推送数据和,生成的html
-            function reloadDataAndLastHtml(){
+            function allGet(){
                 var allGet = {
                 };
                 $('#mastGet .panel-body input').each(function(){
                     allGet[$(this).data('id')] = $(this).val();
                 });
-                $.post('',{
-                    action:'runData',
-                    tplContent:tplEditor.getValue(),
-                    phpContent:phpEditor.getValue(),
-                    line:tplEditor.selection.getRange().start,
-                    file:'{$file}',
-                    simulate:allGet
-                },function(data){
-                    data = JSON.parse(data);
-                    allTplComplate = data.pushResult;
-                    var htmlList = data.html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
-                    if(htmlList[2]!=undefined){
-                        var bodyAttr = htmlList[2].split(' ');
-                        for(var i=0;i<bodyAttr.length;i++){
-                            var key = bodyAttr[i].match(/(\S+)=['|"]([\S|\s]+)['|"]$/);
-                            if(key){
-                                $($('#tpl')[0].contentDocument).find('body').attr(key[1],key[2]);
-                            }
-                        }
-                    }
-                    $($('#tpl')[0].contentDocument).find('head').html(htmlList[1]);
-                    $($('#tpl')[0].contentDocument).find('body').html(htmlList[3]);
-                });
+                return allGet;
+            }
+            function reloadDataAndLastHtml(){
+                if(tplEditor.getValue()!==''){
+                    $.post('',{
+                        action:'runData',
+                        tplContent:tplEditor.getValue(),
+                        phpContent:phpEditor.getValue(),
+                        line:tplEditor.selection.getRange().start,
+                        file:'{$file}',
+                        simulate:allGet()
+                    },function(data){
+                        data = JSON.parse(data);
+                        allTplComplate = data.pushResult;
+                        initIframeByHtml($('#tpl'),data.html);
+                    });
+                }else{
+                    $($('#tpl')[0].contentDocument).find('head').html('');
+                    $($('#tpl')[0].contentDocument).find('body').html('');
+                }
+
             }
             $('#mastGet .panel-body input').on('change',function(){
                 reloadDataAndLastHtml();
@@ -292,7 +445,8 @@
                         var leftShowSplit = (event.pageX / document.documentElement.clientWidth * 100).toFixed(2);
                         $('#pageCodes').width(leftShowSplit + '%');
                         $('#pageShow').width((100 - leftShowSplit) + '%');
-                        initTplScroll();
+                        initTplScroll($('#tpl'));
+                        tplEditor.resize();
                     }
                     $('body').mousemove(mouseMove);
                     $('body').mouseup(function () {
@@ -303,22 +457,22 @@
                 window.onbeforeunload=function(event){
                     return '正在编辑状态';
                 }
-                function initTplScroll(){
+                function initTplScroll(dom){
                     var webWidth = $('#tplSize input:eq(0)').val();
                     var webHeight = $('#tplSize input:eq(1)').val();
-                    $('#tpl').css('width',webWidth);
-                    $('#tpl').css('height',webHeight);
-                    var rightwidth = $('#pageShow').width();
+                    $(dom).css('width',webWidth);
+                    $(dom).css('height',webHeight);
+                    var rightwidth = $(dom).parent().width();
                     var padding=10;
                     var scale = (rightwidth-padding*2)/webWidth;
-                    $('#tpl').css('transform','scale('+scale+')');
-                    $('#tpl').css('marginLeft',(webWidth-rightwidth)/-2);
-                    $('#tpl').css('marginTop',(1-scale)/-2*webHeight+10);
-                    tplEditor.resize();
+                    $(dom).css('transform','scale('+scale+')');
+                    $(dom).css('marginLeft',(webWidth-rightwidth)/-2);
+                    $(dom).css('marginTop',(1-scale)/-2*webHeight+10);
                 }
-                initTplScroll();
+                initTplScroll($('#tpl'));
                 $(window).resize(function() {
-                    initTplScroll();
+                    initTplScroll($('#tpl'));
+                    tplEditor.resize();
                 });
             </script>
         </section>

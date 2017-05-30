@@ -59,7 +59,6 @@ class control{
                         $className = 'kodMod_'.implode('_',explode('/',$itemModNam));
                         $modController = new $className();
                         if(method_exists($modController,'init')){
-
                             $method = new ReflectionMethod($className, 'init');
                             foreach($method->getParameters() as $v){
                                 $argsName = $v->getName();
@@ -84,6 +83,41 @@ class control{
                 }
             }
             $page->allModule = $allModule;
+            //加载所有通用模板
+            $allTemplage = array();
+            foreach(scandir('./http/template/') as $name){
+                if( substr($name,-11)=='.layout.tpl' ){
+                    $itemModNam = 'template/'.substr($name,0,-11);
+                    $callArgs = array();
+                    if(file_exists(webDIR.$itemModNam.'.layout.php')){
+                        include_once(webDIR.$itemModNam.'.layout.php');
+                        $className = 'kodTmp_'.implode('_',explode('/',$itemModNam));
+                        $layoutController = new $className();
+                        if(method_exists($layoutController,'init')){
+                            $method = new ReflectionMethod($className, 'init');
+                            foreach($method->getParameters() as $v){
+                                $argsName = $v->getName();
+                                if($v->isOptional()){
+                                    $callArgs[] = array(
+                                        'name'=>$argsName,
+                                        'default'=>$v->getDefaultValue()
+                                    );
+                                }else{
+                                    $callArgs[] = array(
+                                        'name'=>$argsName,
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    $allTemplage[] = array(
+                        'name'=>$itemModNam,
+                        'callArgs'=>$callArgs,
+                        'tplContent'=>file_get_contents('./http/template/'.$name)
+                    );
+                }
+            }
+            $page->allTemplage = $allTemplage;
             //使用的GET参数
             $allGet = $metaApi->search('.arrayGet object:filter([name=$_GET])')->parent()->toArray();
             $allKeys = array();
