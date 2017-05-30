@@ -184,7 +184,7 @@
                         <button class="btn btn-default" onclick="tplEditor.setValue(getNewTplContent()),$('#tmpChangeAdmin').hide(),tplEditor.selection.clearSelection()">
                             <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span>迁移
                         </button>
-                        <button class="btn btn-default" onclick="save()">取消</button>
+                        <button class="btn btn-default" onclick="$('#tmpChangeAdmin').hide()">取消</button>
                         <iframe id="tmpNew"></iframe>
                     </div>
                 </div>
