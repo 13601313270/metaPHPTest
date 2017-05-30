@@ -8,7 +8,7 @@
     <script src="ace/src/ext-language_tools.js"></script>
 </head>
 <body>
-    <div id="actionProgress" class="progress" style="border-radius: 0;">
+    <div id="actionProgress" class="progress" style="border-radius: 0;margin-bottom: 5px;">
         <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
     </div>
     <div>
@@ -21,7 +21,6 @@
             #toolTip{
                 height:130px;
                 border-bottom:1px solid #ddd;
-                margin-bottom: 10px;
                 overflow-x: scroll;
             }
             #toolTip>.tab-pane>.panel{
@@ -36,6 +35,15 @@
             }
             #toolTip>.tab-pane .input-group{
                 margin: 1px;
+            }
+            #toolTipHide{
+                position:absolute;z-index:2;width: 100%;height: 10px;text-align: center;margin-top: -5px;
+            }
+            #toolTipHide:hover{
+                background-color: #c2c2c2;
+            }
+            #toolTipHide>span{
+                margin-top: -3px;
             }
         </style>
         <div id="toolTip" class="tab-content">
@@ -292,8 +300,26 @@
                 {/literal}
             </script>
         </div>
+        <div id="toolTipHide">
+            <span class="glyphicon glyphicon-chevron-up"></span>
+        </div>
+        <script>
+            $('#toolTipHide').click(function(){
+                console.log($('#pageCodes').parent().css('top'));
+                if($('#pageCodes').parent().css('top')=='215px'){
+                    $('#toolTipHide').css('top',5);
+                    $('#toolTipHide').html('<span class="glyphicon glyphicon-chevron-down"></span>');
+                    $('#pageCodes').parent().css('top',10);
+                }else{
+                    $('#toolTipHide').css('top','auto');
+                    $('#toolTipHide').html('<span class="glyphicon glyphicon-chevron-up"></span>');
+                    $('#pageCodes').parent().css('top',215);
+                }
+                tplEditor.resize();
+            });
+        </script>
     </div>
-    <div style="position:fixed;bottom:0;top:215px;left:0;right:0;border-bottom: solid 1px #5d5d5d;">
+    <div style="position:fixed;bottom:0;top:215px;left:0;right:0;border-bottom: solid 1px #5d5d5d;z-index: 2;background-color: white;">
         <div id="pageCodes" style="width: 50%;height:100%;float: left;position:relative;">
             <ul class="nav nav-tabs" style="padding: 0 5px;">
                 <li class="active"><a href="#tplCode" data-toggle="tab">.tpl</a></li>
