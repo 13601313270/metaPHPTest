@@ -8,8 +8,9 @@
 </head>
 <body>
 {include file="commonModule/head.mod.tpl" type=1}
+这个是后台模板
 <section>
-    {block name=nav}{/block}
+    {block name=hehe}{/block}
     {block name=body}{/block}
 </section>
 {include file="commonModule/bottom.mod.tpl"}

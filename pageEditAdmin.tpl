@@ -347,7 +347,9 @@
                         }
                     }
                 }
-                $($(iframeDom)[0].contentDocument).find('head').html(htmlList[1]);
+                if($($(iframeDom)[0].contentDocument).find('head').html()!=htmlList[1]){
+                    $($(iframeDom)[0].contentDocument).find('head').html(htmlList[1]);
+                }
                 $($(iframeDom)[0].contentDocument).find('body').html(htmlList[3]);
             }
             //更新控制器推送数据和,生成的html
@@ -388,6 +390,7 @@
                 $('#tpl').attr('src','http/{$file}?'+allParams.join('&'));
             });
             //初始化编辑器
+            var lastWriteTime = (new Date()).getTime();//最后一次输入编辑器的时间
             function initEditor(id,language,addCompleter){
                 var languageTools = ace.require("ace/ext/language_tools");
                 window[id] = ace.edit(id);
@@ -401,14 +404,21 @@
                     enableSnippets: true,
                     enableLiveAutocompletion: true
                 });
-
                 window[id].getSession().on('change', function(e) {
+                    lastWriteTime = (new Date()).getTime();
                     if(e.action=='insert'){
 //                    console.log(e.lines);
                     }else{
 
                     }
-                    reloadDataAndLastHtml();
+                    var timeLimit = 200;
+                    $('#tpl').css('opacity',0.2);
+                    window.setTimeout(function(){
+                        if((new Date()).getTime()-lastWriteTime>timeLimit*0.9){
+                            reloadDataAndLastHtml();
+                            $('#tpl').css('opacity',1);
+                        }
+                    },timeLimit);
                 });
                 if(addCompleter!==undefined){
                     languageTools.addCompleter(addCompleter);
