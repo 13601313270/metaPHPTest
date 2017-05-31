@@ -241,5 +241,17 @@ class control{
             echo json_encode(array('result'=>false,'message'=>$e->getMessage()));
         }
     }
+    public function saveImg(){
+        $file = $_POST['file'];
+        $base64 = $_POST['content'];
+        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64, $result)){
+//            $type = $result[2];
+            $new_file = "./metaPHPCacheFile/".$file;
+            if (file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64)))){
+                echo true;
+            }
+        }
+        echo false;
+    }
 }
 $a = new control();

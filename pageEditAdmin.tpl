@@ -6,6 +6,7 @@
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="ace/src/ext-language_tools.js"></script>
+    <script src="//cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
 </head>
 <body>
     <div id="actionProgress" class="progress" style="border-radius: 0;margin-bottom: 5px;">
@@ -182,7 +183,7 @@
                         </div>
                     </div>
                 {/foreach}
-                <div id="tmpChangeAdmin" style="display:none;width:100%;height:100%;position:fixed;top:0;left:0;background-color:rgba(0, 0, 0, 0.5);z-index:2;">
+                <div id="tmpChangeAdmin" style="display:none;width:100%;height:100%;position:fixed;top:0;left:0;background-color:rgba(0, 0, 0, 0.5);z-index:3;">
                     <div style="position:absolute;top:30px;left:7%;width: 35%;height: 400px;background: white;">
                         <iframe id="tmpOld"></iframe>
                     </div>
@@ -509,6 +510,37 @@
                     initTplScroll($('#tpl'));
                     tplEditor.resize();
                 });
+                function saveImg(file,content,callBack){
+                    $.post('',{
+                        action:'saveImg',
+                        file:file,
+                        content:content
+                    },function(data){
+                        callBack(data);
+                    });
+                    /*
+                    if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
+                        $type = $result[2];
+                        $new_file = "./test.{$type}";
+                        if (file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)))){
+                            echo '新文件保存成功：', $new_file;
+                        }
+
+                    }
+                    */
+                }
+//                html2canvas($("[data-name='commonModule/head']"), {
+//                    onrendered: function (canvas) {
+//                        var url = canvas.toDataURL();
+////                        saveImg('modDrawing/tempFile.png',url,function(result){
+////                            console.log(result);
+////                        });
+//                        //以下代码为下载此图片功能
+//                        //var triggerDownload = $("<a>").attr("href", url).attr("download", "异常信息.png").appendTo("body");
+//                        //  triggerDownload[0].click();
+//                        //  triggerDownload.remove();
+//                    }
+//                });
             </script>
         </section>
     </div>
