@@ -305,7 +305,6 @@
         </div>
         <script>
             $('#toolTipHide').click(function(){
-                console.log($('#pageCodes').parent().css('top'));
                 if($('#pageCodes').parent().css('top')=='215px'){
                     $('#toolTipHide').css('top',5);
                     $('#toolTipHide').html('<span class="glyphicon glyphicon-chevron-down"></span>');
