@@ -1,12 +1,13 @@
 <html>
 <head>
-    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="ace/src/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="ace/src/ext-language_tools.js"></script>
-    <script src="//cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    {*<script src="//cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>*}
+    <script src="//cdn.bootcss.com/html2canvas/0.4.1/html2canvas.js"></script>
 </head>
 <body>
     <div id="actionProgress" class="progress" style="border-radius: 0;margin-bottom: 5px;">
@@ -161,14 +162,15 @@
                         padding-left: 5px;
                     }
                     #templateAdmin>div{
-                        width:180px;height:120px;float:left;
+                        width:180px;height:120px;float:left;background-size: auto 89px;background-position-y: 27px;background-repeat: no-repeat;
+
                     }
                     #templateAdmin>div>.panel-body{
                         padding-left: 10px;
                     }
                 </style>
                 {foreach $allTemplage as $mod}
-                    <div class="panel panel-default" data-name="{$mod.name}" data-html="{htmlspecialchars($mod.tplContent)}">
+                    <div class="panel panel-default" data-name="{$mod.name}" data-html="{htmlspecialchars($mod.tplContent)}" style="background-image: url('./metaPHPCacheFile/{$mod.name}.png')">
                         <div class="panel-heading">{$mod.name}</div>
                         <div class="panel-body">
                             {foreach $mod.callArgs as $args}
@@ -190,10 +192,30 @@
                     <div id="tmpOldBlocks" class="ondragover" style="position:absolute;top:30px;left:43%;width: 6.5%;height: 400px;background: white;" ondrop="drop(event)" ondragover="allowDrop(event)"><h4>内容</h4></div>
                     <div id="tmpNewBlocks" style="position:absolute;top:30px;left: 50.5%;width: 6.5%;height: 400px;background: white;"><h4>区域</h4></div>
                     <div style="position:absolute;top:30px;left:58%;width: 35%;height: 400px;background: white;">
-                        <button class="btn btn-default" onclick="tplEditor.setValue(getNewTplContent()),$('#tmpChangeAdmin').hide(),tplEditor.selection.clearSelection()">
-                            <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span>迁移
-                        </button>
-                        <button class="btn btn-default" onclick="$('#tmpChangeAdmin').hide()">取消</button>
+                        <div style="margin: 10px 10px 0 10px;">
+                            <button class="btn btn-default" onclick="tplEditor.setValue(getNewTplContent()),$('#tmpChangeAdmin').hide(),tplEditor.selection.clearSelection()">
+                                <span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span>迁移
+                            </button>
+                            <button class="btn btn-default" onclick="$('#tmpChangeAdmin').hide()">取消</button>
+                            <script>
+                                function setImage(){
+                                    createImageDataByDom($("#tmpNew").contents().find('body'),function(data){
+                                        $.post('',{
+                                            action:'saveImg',
+                                            file:$('#tmpNew').data('id')+'.png',
+                                            content:data
+                                        },function(result){
+                                            if(result==1){
+                                                alert('设置成功');
+                                            }else{
+                                                alert('设置失败');
+                                            }
+                                        });
+                                    });
+                                }
+                            </script>
+                            <button class="btn btn-default" onclick="setImage()">设为封面</button>
+                        </div>
                         <iframe id="tmpNew"></iframe>
                     </div>
                 </div>
@@ -510,37 +532,29 @@
                     initTplScroll($('#tpl'));
                     tplEditor.resize();
                 });
-                function saveImg(file,content,callBack){
-                    $.post('',{
-                        action:'saveImg',
-                        file:file,
-                        content:content
-                    },function(data){
-                        callBack(data);
+                function createImageDataByDom(dom,funccallback){
+                    dom.find('img').each(function(){
+                        this.crossOrigin = "*";
+                        var canvas = document.createElement("canvas");
+                        canvas.width = this.width;
+                        canvas.height = this.height;
+                        var ctx = canvas.getContext("2d");
+                        ctx.drawImage(this, 0, 0, this.width, this.height);
+                        var data = canvas.toDataURL("image/png");
+                        $(this).data('url',$(this).attr('src'));
+                        $(this).attr('src',data);
                     });
-                    /*
-                    if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)){
-                        $type = $result[2];
-                        $new_file = "./test.{$type}";
-                        if (file_put_contents($new_file, base64_decode(str_replace($result[1], '', $base64_image_content)))){
-                            echo '新文件保存成功：', $new_file;
+                    html2canvas(dom[0], {
+                        onrendered: function (canvas) {
+                            var url = canvas.toDataURL();
+                            funccallback(url);
+                            dom.find('img').each(function(){
+                                $(this).attr('src',$(this).data('url'));
+                                $(this).data('url','');
+                            });
                         }
-
-                    }
-                    */
+                    });
                 }
-//                html2canvas($("[data-name='commonModule/head']"), {
-//                    onrendered: function (canvas) {
-//                        var url = canvas.toDataURL();
-////                        saveImg('modDrawing/tempFile.png',url,function(result){
-////                            console.log(result);
-////                        });
-//                        //以下代码为下载此图片功能
-//                        //var triggerDownload = $("<a>").attr("href", url).attr("download", "异常信息.png").appendTo("body");
-//                        //  triggerDownload[0].click();
-//                        //  triggerDownload.remove();
-//                    }
-//                });
             </script>
         </section>
     </div>
