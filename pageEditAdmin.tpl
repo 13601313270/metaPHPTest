@@ -100,10 +100,16 @@
                     padding-left: 5px;
                 }
                 #modAdmin>div{
-                    width:180px;height:120px;float:left;
+                    position:relative;width:180px;height:120px;float:left;background-size: auto 89px;background-position-y: 27px;background-repeat: no-repeat;
                 }
                 #modAdmin>div>.panel-body{
                     padding-left: 10px;
+                }
+                #modAdmin>div:hover .panel-heading{
+                    opacity: 0;
+                }
+                #modAdmin>div:hover .panel-body{
+                    opacity: 0;
                 }
             </style>
             <div class="tab-pane fade" id="modAdmin">
@@ -125,7 +131,60 @@
                 {/foreach}
             </div>
             <script>
+                var file = '{$file}';
                 {literal}
+                //验证图片是否存在
+                function isImgLoad(imageUrl,callBack){
+                    var image = new Image();
+                    image.onload = function(){
+                        callBack(true);
+                    }
+                    image.onerror = function(){
+                        callBack(false);
+                    }
+                    image.src = imageUrl;
+                }
+                //尝试加载模块的展示图
+                $('#modAdmin>div').each(function(){
+                    var dom = $(this);
+                    isImgLoad('./commonModule/'+dom.data('name')+'.png',function(result){
+                        if(result==true){
+                            dom.css('backgroundImage','url(./commonModule/'+dom.data('name')+'.png)');
+                        }else{
+                            var iframe = $('<iframe></iframe>');
+                            iframe.css({
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                left: 0,
+                                top: 0,
+                                border:'none',
+                            });
+                            dom.find('.panel-body').append(iframe);
+
+                            $.post('',{
+                                action:'runData',
+                                tplContent:'<html><head></head><body>{include file="'+dom.data('name')+'.mod.tpl" iId=1}</body></html>',
+                                phpContent:"<?php include_once('../include.php');$page=new kod_web_page();$page->name='sss';$page->fetch('index.tpl')",
+//                                phpContent:"<?php include_once('../include.php');",
+                                file:file,
+                                simulate:allGet()
+                            },function(data){
+                                try{
+                                    data = JSON.parse(data);
+                                    console.log(data.html);
+//                                initIframeByHtml(iframe,data.html);
+//                                initTplScroll($('#tmpNew'));
+                                }catch (e){
+
+                                }
+                            });
+
+//                            $($(iframeDom)[0].contentDocument).find('body').append()
+
+                        }
+                    });
+                });
                 $('#modAdmin>.panel').click(function(){
                     var returnStr = '';
                     //计算缩进位置
@@ -163,7 +222,6 @@
                     }
                     #templateAdmin>div{
                         width:180px;height:120px;float:left;background-size: auto 89px;background-position-y: 27px;background-repeat: no-repeat;
-
                     }
                     #templateAdmin>div>.panel-body{
                         padding-left: 10px;
@@ -323,6 +381,7 @@
                 {/literal}
             </script>
         </div>
+
         <div id="toolTipHide">
             <span class="glyphicon glyphicon-chevron-up"></span>
         </div>
@@ -332,10 +391,14 @@
                     $('#toolTipHide').css('top',5);
                     $('#toolTipHide').html('<span class="glyphicon glyphicon-chevron-down"></span>');
                     $('#pageCodes').parent().css('top',10);
+                    $('#myTab').hide();
+                    $('#toolTip').hide();
                 }else{
                     $('#toolTipHide').css('top','auto');
                     $('#toolTipHide').html('<span class="glyphicon glyphicon-chevron-up"></span>');
                     $('#pageCodes').parent().css('top',215);
+                    $('#myTab').show();
+                    $('#toolTip').show();
                 }
                 tplEditor.resize();
             });
@@ -359,7 +422,7 @@
 
         <script>
             function initIframeByHtml(iframeDom,html){
-                var htmlList = html.match(/<html>\s*<head>([\S|\s]+)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
+                var htmlList = html.match(/<html>\s*<head>([\S|\s]*)<\/head>\s*<body(\s[^>]*)?>([\S|\s]+)<\/body>\s*<\/html>/);
                 if(htmlList[2]!=undefined){
                     var bodyAttr = htmlList[2].split(' ');
                     for(var i=0;i<bodyAttr.length;i++){
@@ -555,6 +618,32 @@
                         }
                     });
                 }
+                //获取元素内所有的注释元素
+                function getCommentNodes(e){
+                    var r=[],o,s;
+                    s=document.createTreeWalker(e,NodeFilter.SHOW_COMMENT,null,null);
+                    while(o=s.nextNode())r.push(o);
+                    return r;
+                }
+//                isImgLoad('./commonModule/commonModule/bottom.png',function(result){
+//                    console.log(result);
+//                });
+//                getCommentNodes(document)
+
+                //生成模块的现在显示图片
+//                allComment = getCommentNodes($("#tpl").contents().find('body')[0]);
+//                var commonNode = allComment[0];
+//                if(commonNode.nodeValue.match(/useMod (\S+)$/)!==null){
+//                    var nodeName = commonNode.nodeValue.match(/useMod (\S+)$/)[1]
+//
+//                    console.log($(commonNode).nextAll(':not(style)').eq(0));
+//                    createImageDataByDom($(commonNode).nextAll(':not(style)').eq(0),function(data){
+//                        console.log(data);
+//                        var w=window.open('about:blank','image from canvas');
+//                        w.document.write("<img src='"+data+"' alt='from canvas'/>");
+//                    });
+//                    console.log('是'+nodeName+'类型的');
+//                }
             </script>
         </section>
     </div>

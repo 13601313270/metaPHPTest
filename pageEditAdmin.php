@@ -202,8 +202,9 @@ class control{
         $compiler->parent_compiler = null;
         $compiler->parser = null;
 
+        //添加一个html注释,好让前端程序知道某一段html是通过模块include添加的
+        $_content = preg_replace('/(<\?php \$_smarty_tpl->_subTemplateRender\("file:(\S+?)")/','<!--useMod $2-->$1',$_content);
         //开始执行生成的php代码
-        echo $_content;exit;
         $metaApi = new phpInterpreter($_content);
         $runApi = new evalMetaCode($metaApi->codeMeta,array(
             '$_smarty_tpl'=>$template

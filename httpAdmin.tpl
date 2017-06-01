@@ -142,7 +142,7 @@
                     <thead></thead>
                     <tbody>
                     {foreach $fileList as $file}
-                        {if in_array($file,array('.','commonModule'))}{continue}{/if}
+                        {if in_array($file,array('.','commonModule','template'))}{continue}{/if}
                         {if substr($file,-4)!=='.tpl'}
                         <tr>
                             <td><a target="_blank" href="pageEditAdmin.php?file={$file}">{$file}</a></td>
