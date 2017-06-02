@@ -11,6 +11,8 @@
 这个是后台模板
 <section>
     {block name=hehe}{/block}
+</section>
+<section>
     {block name=body}{/block}
 </section>
 {include file="commonModule/bottom.mod.tpl"}

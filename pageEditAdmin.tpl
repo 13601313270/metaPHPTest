@@ -358,7 +358,6 @@
                             appendDom.attr('data-html',temp[2]);
                             $('#tmpOldBlocks').append(appendDom);
                         }
-//                        var tmpHtmlNow = $('[data-name="'+tplFile+'"]').data('html');
                         $.post('',{
                             action:'runData',
                             tplContent:tplContent,

@@ -10,6 +10,8 @@
 {include file="commonModule/head.mod.tpl" type=1}
 <section>
     {block name=nav}{/block}
+</section>
+<section>
     {block name=body}{/block}
 </section>
 {include file="commonModule/bottom.mod.tpl"}

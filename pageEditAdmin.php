@@ -194,6 +194,10 @@ class control{
         $compiler->smarty->_current_file = $template->source->filepath;
 
         $_content = $_POST['tplContent'];
+        //添加一个html注释,好让前端程序知道某一段html是通过模块可以模板修改的
+        $_content = preg_replace('/({block name=(\S+)})/','$1<!--blockBegin name($2)-->',$_content);
+        $_content = preg_replace('/({\/block})/','<!--blockEnd-->$1',$_content);
+
         $_content = $compiler->preFilter($_content);
         $_content = $compiler->doCompile($_content, true);
         $_content = $compiler->postFilter($_content);
