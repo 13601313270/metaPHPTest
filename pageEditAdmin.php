@@ -218,8 +218,9 @@ class control{
         $template->_cleanUp();
         $string = ob_get_contents();
         ob_clean();
+        $pushResult['SCRIPT_NAME'] = $template->tpl_vars['SCRIPT_NAME']->value;
         echo json_encode(array(
-            'pushResult'=>$template->tpl_vars,
+            'pushResult'=>$pushResult,
             'html'=>$string,
         ));exit;
     }
