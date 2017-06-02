@@ -1,6 +1,6 @@
 <style>
     #bottom{
-        width:100%; height:100px; background-color: grey;padding: 20px;
+        box-sizing:border-box;min-width:350px;width:100%; height:100px; background-color: grey;padding: 20px;
     }
     #bottom>div{
         float: left;height: 30px;margin-right: 10px;

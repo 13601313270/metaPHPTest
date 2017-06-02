@@ -1,8 +1,9 @@
 <style>
     .temp{
+        min-width: 400px;;
     }
 </style>
 <div class="temp">
-    temp1{$title}
-    <img src="{$img}">
+    <p>temp1{$title}</p>
+    <img src="{$img}" style="width: 90%;">
 </div>

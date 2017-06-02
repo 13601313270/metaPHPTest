@@ -23,11 +23,12 @@
             #toolTip{
                 height:130px;
                 border-bottom:1px solid #ddd;
-                overflow-x: scroll;
+                /*overflow-x: scroll;*/
             }
             #toolTip>.tab-pane>.panel{
                 float: left;
                 margin: 3px;
+                overflow: hidden;
             }
             #toolTip>.tab-pane>.panel>.panel-heading{
                 padding: 3px 3px 3px 10px;
@@ -102,14 +103,17 @@
                 #modAdmin>div{
                     position:relative;width:180px;height:120px;float:left;background-size: auto 89px;background-position-y: 27px;background-repeat: no-repeat;
                 }
-                #modAdmin>div>.panel-body{
-                    padding-left: 10px;
+                #modAdmin>.panel>.panel-body{
+                    padding: 0!important;position:absolute;z-index: 5;background-color: rgba(255, 255, 255, 0.8);
                 }
-                #modAdmin>div:hover .panel-heading{
-                    opacity: 0;
+                #modAdmin>.panel:hover{
+                    overflow: inherit;
                 }
-                #modAdmin>div:hover .panel-body{
-                    opacity: 0;
+                #modAdmin>.panel>iframe{
+                    position:absolute;left: 0;top:27px;border:none;opacity: 0.4;z-index: 4;transform-origin: top left;
+                }
+                #modAdmin>.panel:hover iframe{
+                    border:solid 1px black;background-color: white;box-shadow:0 0 40px 10px #616161;z-index: 6;opacity: 1;transform:scale(1)
                 }
             </style>
             <div class="tab-pane fade" id="modAdmin">
@@ -133,6 +137,19 @@
             <script>
                 var file = '{$file}';
                 {literal}
+                $('#modAdmin>.panel').hover(function(){
+                    var innerBodyWidth = $($(this).find('iframe')[0].contentDocument).find('body>:not(style)').css('width');
+                    var innerBodyHeight = $($(this).find('iframe')[0].contentDocument).find('body>:not(style)').css('height');
+                    $(this).find('iframe').css('width',innerBodyWidth);
+                    $(this).find('iframe').css('height',innerBodyHeight);
+                    $(this).find('iframe').css({
+                        transform:('scale(1)')
+                    });
+                },function(){
+                    $(this).find('iframe').css({
+                        transform:('scale('+$(this).find('iframe').data('scale')+')')
+                    });
+                });
                 //验证图片是否存在
                 function isImgLoad(imageUrl,callBack){
                     var image = new Image();
@@ -152,19 +169,13 @@
                             dom.css('backgroundImage','url(./commonModule/'+dom.data('name')+'.png)');
                         }else{
                             var iframe = $('<iframe></iframe>');
-                            iframe.css({
-                                position: 'absolute',
-                                width: '100%',
-                                height: '100%',
-                                left: 0,
-                                top: 0,
-                                border:'none',
-                            });
-                            dom.find('.panel-body').append(iframe);
-
+//                            iframe.css({
+//                                transform:'scale(0.5)'
+//                            });
+                            dom.append(iframe);
                             $.post('',{
                                 action:'runData',
-                                tplContent:'<html><head></head><body>{include file="'+dom.data('name')+'.mod.tpl" iId=1}</body></html>',
+                                tplContent:'<html><head></head><body style="margin:0">{include file="'+dom.data('name')+'.mod.tpl" iId=1}</body></html>',
                                 phpContent:"<?php include_once('../include.php');$page=new kod_web_page();$page->name='sss';$page->fetch('index.tpl')",
 //                                phpContent:"<?php include_once('../include.php');",
                                 file:file,
@@ -172,9 +183,14 @@
                             },function(data){
                                 try{
                                     data = JSON.parse(data);
-                                    console.log(data.html);
-//                                initIframeByHtml(iframe,data.html);
-//                                initTplScroll($('#tmpNew'));
+                                    initIframeByHtml(iframe,data.html);
+                                    var width = $($(iframe)[0].contentDocument).find('body>:not(style)').css('width');
+                                    if(parseInt(width)>0){
+                                        $(iframe).css({
+                                            transform:('scale('+(parseInt($(iframe).parents('.panel:eq(0)').width())/parseInt(width))+')')
+                                        });
+                                        $(iframe).data('scale',(parseInt($(iframe).parents('.panel:eq(0)').width())/parseInt(width)));
+                                    }
                                 }catch (e){
 
                                 }

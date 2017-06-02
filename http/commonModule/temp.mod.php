@@ -11,7 +11,5 @@ class kodMod_commonModule_temp extends kod_web_smartyModController{
     }
     public function finish($aData)
     {
-        echo 'finish';
-        // TODO: Implement finish() method.
     }
 }
