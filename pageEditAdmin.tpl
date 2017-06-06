@@ -18,6 +18,7 @@
             <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
             <li><a data-toggle="tab" href="#modAdmin">通用模块</a></li>
             <li><a data-toggle="tab" href="#templateAdmin">通用模板</a></li>
+            <li><a data-toggle="tab" href="#templateData">前端数据</a></li>
         </ul>
         <style>
             #toolTip{
@@ -317,7 +318,7 @@
                             action:'runData',
                             tplContent:getNewTplContent(),
                             phpContent:phpEditor.getValue(),
-                            line:tplEditor.selection.getRange().start,
+                            tplLine:tplEditor.selection.getRange().start,
                             file:'{$file}',
                             simulate:allGet()
                         },function(data){
@@ -362,7 +363,7 @@
                             action:'runData',
                             tplContent:tplContent,
                             phpContent:phpEditor.getValue(),
-                            line:tplEditor.selection.getRange().start,
+                            tplLine:tplEditor.selection.getRange().start,
                             file:'{$file}',
                             simulate:allGet()
                         },function(data){
@@ -381,7 +382,7 @@
                             action:'runData',
                             tplContent:getNewTplContent(),
                             phpContent:phpEditor.getValue(),
-                            line:tplEditor.selection.getRange().start,
+                            tplLine:tplEditor.selection.getRange().start,
                             file:'{$file}',
                             simulate:allGet()
                         },function(data){
@@ -395,6 +396,7 @@
                 });
                 {/literal}
             </script>
+            <div class="tab-pane fade" id="templateData">前端使用的数据</div>
         </div>
 
         <div id="toolTipHide">
@@ -467,19 +469,69 @@
                         action:'runData',
                         tplContent:tplEditor.getValue(),
                         phpContent:phpEditor.getValue(),
-                        line:tplEditor.selection.getRange().start,
+                        tplLine:tplEditor.selection.getRange().start,
+                        phpLine:phpEditor.selection.getRange().start,
+                        onEditor:onEditor,
                         file:'{$file}',
                         simulate:allGet()
                     },function(data){
-                        data = JSON.parse(data);
-                        allTplComplate = data.pushResult;
-                        initIframeByHtml($('#tpl'),data.html);
+                        try{
+                            data = JSON.parse(data);
+                        }catch(e){
+                            initIframeByHtml($('#tpl'),'<html><head></head><body>'+data+'</body></html>');
+                            return;
+                        }
+                        if(data.debug===true){
+                            if(data.type=='objectParams'){
+                                if(onEditor == 'php'){
+                                    allPhpComplate = [];
+                                }else{
+                                    allTplComplate = [];//搜索结果
+                                }
+
+                                console.log(data.data);
+                                for(var i in data.data){
+                                    var item = {
+                                        name: i,
+                                        value: i,//实际输出
+                                        dataValue:data.data[i],
+                                        caption: (i+'(属性:'+data.data[i]+')'),//搜索浮层展示
+//                                        meta: 'function',
+                                        type: "local",
+                                        score: 1000 // 让test排在最上面
+                                    };
+                                    if(onEditor == 'php'){
+                                        allPhpComplate.push(item);
+                                    }else{
+                                        allTplComplate.push(item);
+                                    }
+                                }
+                                if(onEditor == 'php'){
+                                    phpEditor.completer.showPopup(phpEditor)
+                                }else{
+                                    tplEditor.completer.showPopup(tplEditor)
+                                }
+                            }
+                        }else{
+                            allTplComplate = [];//搜索结果
+                            for(var i in data.pushResult){
+                                allTplComplate.push({
+                                    name: i,
+                                    value: '$'+i,//实际输出
+                                    dataValue:data.pushResult[i],
+                                    caption: ('$'+i+'(页面数据)'),//搜索浮层展示
+//                                    meta: 'function',
+                                    type: "local",
+                                    score: 1000 // 让test排在最上面
+                                });
+                            }
+                            initIframeByHtml($('#tpl'),data.html);
+                        }
                     });
                 }else{
                     $($('#tpl')[0].contentDocument).find('head').html('');
                     $($('#tpl')[0].contentDocument).find('body').html('');
                 }
-
             }
             $('#mastGet .panel-body input').on('change',function(){
                 reloadDataAndLastHtml();
@@ -504,54 +556,120 @@
                     enableSnippets: true,
                     enableLiveAutocompletion: true
                 });
-                window[id].getSession().on('change', function(e) {
-                    lastWriteTime = (new Date()).getTime();
-                    if(e.action=='insert'){
-//                    console.log(e.lines);
-                    }else{
-
-                    }
-                    var timeLimit = 200;
-                    $('#tpl').css('opacity',0.2);
-                    window.setTimeout(function(){
-                        if((new Date()).getTime()-lastWriteTime>timeLimit*0.9){
-                            reloadDataAndLastHtml();
-                            $('#tpl').css('opacity',1);
+                {literal}
+                    window[id].getSession().on('change', function(e) {
+                        lastWriteTime = (new Date()).getTime();
+                        if(e.action=='insert'){
+                        }else{
                         }
-                    },timeLimit);
-                });
+                        var timeLimit = 200;
+                        $('#tpl').css('opacity',0.2);
+                        window.setTimeout(function(){
+                            if((new Date()).getTime()-lastWriteTime>timeLimit*0.9){
+                                reloadDataAndLastHtml();
+                                $('#tpl').css('opacity',1);
+                            }
+                        },timeLimit);
+                        return 'asfasdf';
+                    });
+                {/literal}
                 if(addCompleter!==undefined){
+//                    languageTools.setCompleters(addCompleter);
                     languageTools.addCompleter(addCompleter);
                 }
             }
             var allTplComplate = [];
+            var allPhpComplate = [];
+            {literal}
+            //所有自动填充
+            var allAutoEndStr = [
+                ['if',' $0}\n{/if}'],
+                ['foreach',' $0 as }\n{/foreach}'],
+            ];
             initEditor('tplEditor','ace/mode/smarty',{
                 getCompletions: function (tplEditor, session, pos, prefix, callback) {
-                    var result = [];//搜索结果
-                    for(var i in allTplComplate){
-                        result.push({
-                            name: i,
-                            value: ('$'+i),//实际输出
-                            caption: '页面数据:'+i,//搜索浮层展示
-//                            meta: 'function',
-                            type: "local",
-                            score: 1000 // 让test排在最上面
-                        });
-                        for(var j in allTplComplate[i]){
-                            result.push({
-                                name: i,
-                                value: ('$'+i),//实际输出
-                                caption: '页面数据:'+i+'.'+j,//搜索浮层展示
-//                            meta: 'function',
-                                type: "local",
-                                score: 999 // 让test排在最上面
+                    console.log(this.getTagCompletions);
+                    if(onEditor=='tpl'){
+                        for(var i=0;i<allAutoEndStr.length;i++){
+                            allTplComplate.push({
+                                name: allAutoEndStr[i][0],
+                                value: allAutoEndStr[i][0],//实际输出
+                                snippet: allAutoEndStr[i][0] + allAutoEndStr[i][1],
+                                caption: allAutoEndStr[i][0],//搜索浮层展示
+//                        meta: 'function',
+                                type: "tag",
+                                close:'<end>',
+                                score: 100 // 让test排在最上面
                             });
                         }
+                        callback(null,allTplComplate);
+                    }else{
+                        callback(null,allPhpComplate);
                     }
-                    callback(null,result);
+                },
+                getDocTooltip:function(data){
+//                    for(var i=0;i<allTplComplate.length;i++){
+//                        return data.value
+//                        return '<div>afsadfads</div>';
+//                    }
+                    if(data.dataValue instanceof Array){
+                    }else if(data.dataValue instanceof Object){
+                        var returnHtml = "对象{\n";
+                        for(var i in data.dataValue){
+                            returnHtml += "\t"+i+':'+data.dataValue[i].toString().substr(0,20)+"\n";
+                        }
+                        returnHtml += "}";
+                        return returnHtml;
+                    }else{
+                        if(data.dataValue!==undefined){
+                            return data.dataValue;
+                        }
+                    }
+//                    callback('<div>afsadfads</div>');
+
                 }
             });//"ace/mode/smarty"  "ace/mode/html"  "ace/mode/php"
+            setTimeout(function(){
+                tplEditor.getSession().getMode().$behaviour.add("smartyAutoclosing", "insertion", function (state, action, editor, session, text) {
+                    if (text == '}') {
+                        var position = editor.getSelectionRange().start;
+                        var thisLineText = tplEditor.getValue().split("\n")[position.row].substr(0,position.column);
+                        var typeName = thisLineText.match(/\{([^\{|\s|\/][^\{|\s]+)([^\}]*)$/);
+                        if(typeName!==null && ['if','foreach'].indexOf(typeName[1])>-1){
+                            if(typeName[2]==''){
+                                return {
+                                    text: " }\n" + thisLineText.match(/^\s*/)[0]+"{/" + typeName[1] + "}",
+                                    selection: [1, 1]
+                                };
+                            }else{
+                                return {
+                                    text: "}\n" + thisLineText.match(/^\s*/)[0]+"{/" + typeName[1] + "}",
+                                    selection: [1, 1]
+                                };
+                            }
+                        }
+                    }
+                });
+            },1000);
+            {/literal}
             initEditor('phpEditor','ace/mode/php');
+            //监听光标改动事件
+            var onEditor = 'tpl';//当前正在的
+            tplEditor.selection.on('changeSelection',function(){
+                onEditor = 'tpl';
+//                console.log(tplEditor.selection.getRange());
+            });
+
+            phpEditor.selection.on('changeSelection',function(){
+                onEditor = 'php';
+//                console.log(tplEditor.selection.getRange());
+            });
+
+
+//            editor.on("changeSelection", this.changeListener);
+//            editor.on("blur", this.blurListener);
+//            editor.on("mousedown", this.mousedownListener);
+//            editor.on("mousewheel", this.mousewheelListener);
         </script>
         <section id="pageShow" style="width: 50%;height:100%;float: left;position: relative;">
             <div id="tplSize" class="panel panel-default" style="margin:10px 10px 0;">

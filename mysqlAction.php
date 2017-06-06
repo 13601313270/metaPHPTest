@@ -53,7 +53,7 @@ class control{
     private function getAllIncludeApi($folder,$classType,$classSplitColumn){
         $gitAction = new githubClass();
         $headCommit = $gitAction->exec('git rev-parse HEAD');
-        $allIncludeApi = kod_db_memcache::returnCacheOrSave('allIncludeApi:'.$folder.':'.$classType.":".$classSplitColumn,function()use($folder,$headCommit,$classType,$classSplitColumn){
+        $allIncludeApi = kod_db_memcache::returnCacheOrSave('allIncludeApi:'.$folder.':'.$classType.":".str_replace(' ','',$classSplitColumn),function()use($folder,$headCommit,$classType,$classSplitColumn){
             $fileList = scandir($folder);
             $allDataApi = array(
                 'version'=>$headCommit,

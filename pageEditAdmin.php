@@ -133,11 +133,54 @@ class control{
             $page->fetch('pageEditAdmin.tpl');
         }
     }
+    public static function debug($data,$type){
+        if($type==''){
+
+        }else{
+            ob_clean();
+            echo json_encode(array(
+                'debug'=>true,
+                'type'=>$type,
+                'data'=>$data
+            ));exit;
+        }
+    }
     public function runData(){
-        $metaApi = new phpInterpreter($_POST['phpContent']);
+        $phpLine = $_POST['phpLine'];
+        $phpContent = $_POST['phpContent'];
+        //如果对php文件进行了修改,则尝试进行语法提示
+        if($_POST['onEditor']=='php'){
+            $writePosition = -1;
+            for($i=0 ; $i<$phpLine['row'] ; $i++){
+                $writePosition = mb_strpos($phpContent,"\n",$writePosition+1);
+            }
+            $writePosition += $phpLine['column']+1;
+            $runTimeWrite = mb_substr($phpContent,0,$writePosition);
+            //获取变量属性
+            if(preg_match('/\$$/',$runTimeWrite,$match)){
+                $runTimeWrite = preg_replace('/\$$/','#debug(variable,callStack)#',$runTimeWrite);
+            }elseif(preg_match('/->$/',$runTimeWrite,$match)){
+                $runTimeWrite = preg_replace('/->$/','->#debug(variable,callStack)#',$runTimeWrite);
+            }
+            $_content = $runTimeWrite;
+            $metaApi = new phpInterpreter($_content);
+            $evalObj = new evalMetaCode($metaApi->codeMeta,array(
+                '$_GET'=>$_POST['simulate']
+            ));
+            $pushResult = $evalObj->run();
+            if(isset($pushResult['debug'])){
+                ob_clean();
+                echo json_encode(array(
+                    'debug'=>true,
+                    'type'=>'objectParams',
+                    'data'=>$pushResult['debug']['variable']
+                ));exit;
+            }
+        }
+        $metaApi = new phpInterpreter($phpContent);
         $PageObj = $metaApi->search('.= [className=kod_web_page]')->parent()->toArray();
         $PageObj = $PageObj[0]['object1']['name'];
-        $line = $_POST['line'];
+        $tplLine = $_POST['tplLine'];
         //执行脚本,计算出所有推送到前端的变量
         if($_POST['simulate']){
             $tplFile = $metaApi->search('.objectFunction:filter(#fetch) object:filter([name='.$PageObj.'])')->parent()->toArray();//删除fetch输出调用
@@ -194,6 +237,25 @@ class control{
         $compiler->smarty->_current_file = $template->source->filepath;
 
         $_content = $_POST['tplContent'];
+
+        //如果对tpl文件进行了修改,则尝试进行语法提示
+        if($_POST['onEditor']=='tpl'){
+            //找到用户tpl文件输入点
+            $writePosition = -1;
+            for($i=0 ; $i<$tplLine['row'] ; $i++){
+                $writePosition = mb_strpos($_content,"\n",$writePosition+1);
+            }
+            $writePosition += $tplLine['column']+1;
+            $runTimeWrite = mb_substr($_content,0,$writePosition);
+            //获取变量属性
+            if(preg_match('/(\$[A-z|_][A-z|_|0-9]*)\.$/',$runTimeWrite,$match)){
+                $runTimeWrite = preg_replace('/(\$[A-z|_][A-z|_|0-9]*)\.$/','control::debug($1,\'objectParams\')',$runTimeWrite);
+                $_content = $runTimeWrite.mb_substr($_content,$writePosition);
+            }
+        }
+
+
+
         //添加一个html注释,好让前端程序知道某一段html是通过模块可以模板修改的
         $_content = preg_replace('/({block name=(\S+)})/','$1<!--blockBegin name($2)-->',$_content);
         $_content = preg_replace('/({\/block})/','<!--blockEnd-->$1',$_content);
@@ -213,12 +275,13 @@ class control{
         $runApi = new evalMetaCode($metaApi->codeMeta,array(
             '$_smarty_tpl'=>$template
         ));
+//        $runApi->run();exit;
         ob_start();
         $runApi->run();
         $template->_cleanUp();
         $string = ob_get_contents();
         ob_clean();
-        $pushResult['SCRIPT_NAME'] = $template->tpl_vars['SCRIPT_NAME']->value;
+//        $pushResult['SCRIPT_NAME'] = $template->tpl_vars['SCRIPT_NAME']->value;
         echo json_encode(array(
             'pushResult'=>$pushResult,
             'html'=>$string,
