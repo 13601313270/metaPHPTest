@@ -18,7 +18,7 @@
             <li class="active"><a href="#home" data-toggle="tab">页面</a></li>
             <li><a data-toggle="tab" href="#modAdmin">通用模块</a></li>
             <li><a data-toggle="tab" href="#templateAdmin">通用模板</a></li>
-            <li><a data-toggle="tab" href="#templateData">前端数据</a></li>
+            <li><a data-toggle="tab" href="#templateDataEditor">前端数据</a></li>
         </ul>
         <style>
             #toolTip{
@@ -396,7 +396,7 @@
                 });
                 {/literal}
             </script>
-            <div class="tab-pane fade" id="templateData">前端使用的数据</div>
+            <div class="tab-pane fade" id="templateDataEditor" style="width:100%;height:130px;">前端使用的数据</div>
         </div>
 
         <div id="toolTipHide">
@@ -463,6 +463,18 @@
                 });
                 return allGet;
             }
+//            initEditor('templateDataEditor','ace/mode/json');
+
+            var templateDataEditor = ace.edit('templateDataEditor');
+            templateDataEditor.$blockScrolling = Infinity;
+            templateDataEditor.setFontSize(16);
+            templateDataEditor.setReadOnly(true);
+            templateDataEditor.getSession().setMode('ace/mode/json');
+            templateDataEditor.setTheme("ace/theme/twilight");
+
+            function initPushResultHtml(pushResult){
+                templateDataEditor.setValue(JSON.stringify(pushResult, undefined, 4));
+            }
             function reloadDataAndLastHtml(){
                 if(tplEditor.getValue()!==''){
                     $.post('',{
@@ -512,6 +524,7 @@
                             }
                         }else{
                             allTplComplate = [];//搜索结果
+                            initPushResultHtml(data.pushResult);
                             for(var i in data.pushResult){
                                 allTplComplate.push({
                                     name: i,
@@ -586,7 +599,7 @@
             ];
             initEditor('tplEditor','ace/mode/smarty',{
                 getCompletions: function (tplEditor, session, pos, prefix, callback) {
-                    console.log(this.getTagCompletions);
+//                    console.log(this.getTagCompletions);
                     if(onEditor=='tpl'){
                         for(var i=0;i<allAutoEndStr.length;i++){
                             allTplComplate.push({
