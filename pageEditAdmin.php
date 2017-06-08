@@ -161,6 +161,8 @@ class control{
                 $runTimeWrite = preg_replace('/\$$/','#debug(variable,callStack)#',$runTimeWrite);
             }elseif(preg_match('/->$/',$runTimeWrite,$match)){
                 $runTimeWrite = preg_replace('/->$/','->#debug(variable,callStack)#',$runTimeWrite);
+            }elseif(preg_match('/\[$/',$runTimeWrite,$match)){
+                $runTimeWrite = preg_replace('/\[$/','[#debug(variable,callStack)#',$runTimeWrite);
             }
             $_content = $runTimeWrite;
             $metaApi = new phpInterpreter($_content);
@@ -275,7 +277,6 @@ class control{
         $runApi = new evalMetaCode($metaApi->codeMeta,array(
             '$_smarty_tpl'=>$template
         ));
-//        $runApi->run();exit;
         ob_start();
         $runApi->run();
         $template->_cleanUp();

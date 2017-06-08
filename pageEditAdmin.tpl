@@ -488,8 +488,6 @@
                                 }else{
                                     allTplComplate = [];//搜索结果
                                 }
-
-                                console.log(data.data);
                                 for(var i in data.data){
                                     var item = {
                                         name: i,
@@ -613,6 +611,12 @@
 //                        return '<div>afsadfads</div>';
 //                    }
                     if(data.dataValue instanceof Array){
+                        var returnHtml = "数组[\n";
+                        for(var i in data.dataValue){
+                            returnHtml += "\t"+data.dataValue[i].toString().substr(0,20)+",\n";
+                        }
+                        returnHtml += "]";
+                        return returnHtml;
                     }else if(data.dataValue instanceof Object){
                         var returnHtml = "对象{\n";
                         for(var i in data.dataValue){
