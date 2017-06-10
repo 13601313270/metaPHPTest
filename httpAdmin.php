@@ -12,6 +12,10 @@ $page=new kod_web_page();
 $page->fileList=scandir('./http/');
 $page->httpFileConfig=array(
     'index.php' => '首页',
-    'index.tpl' => '首页模板'
+    'index.tpl' => '首页模板',
+    'test.php' => '测试页面',
+    'ddd.php' => '单独的',
+    'adsf.php' => '额外',
+    'ww.php' => 'ww.php'
 );
 $page->fetch('httpAdmin.tpl');

@@ -1,1 +1,1 @@
-<div>{$titleName}头部{$title}</div>
+<div>{$headTitle}</div>

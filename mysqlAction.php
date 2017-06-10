@@ -53,7 +53,7 @@ class control{
     private function getAllIncludeApi($folder,$classType,$classSplitColumn){
         $gitAction = new githubClass();
         $headCommit = $gitAction->exec('git rev-parse HEAD');
-        $allIncludeApi = kod_db_memcache::returnCacheOrSave('allIncludeApi:'.$folder.':'.$classType.":".$classSplitColumn,function()use($folder,$headCommit,$classType,$classSplitColumn){
+        $allIncludeApi = kod_db_memcache::returnCacheOrSave('allIncludeApi:'.$folder.':'.$classType.":".str_replace(' ','',$classSplitColumn),function()use($folder,$headCommit,$classType,$classSplitColumn){
             $fileList = scandir($folder);
             $allDataApi = array(
                 'version'=>$headCommit,
@@ -644,7 +644,7 @@ class control{
     public function __construct()
     {
         $func = $_POST['action'];
-        if($func!=='getSessionState'){
+        if(false && $func!=='getSessionState'){
             session_start();
             if($_SESSION['program']['program']<100 && $_SESSION['program']['program']>0){
                 echo json_encode(array(
@@ -682,5 +682,76 @@ class control{
         }
         echo json_encode($nowProgram);exit;
     }
+
+    public function createPage(){
+        $this->setSessionState(0,'正在生成代码逻辑');
+        if(preg_match('/(.*).php/',$_POST['fileName'],$match)){
+            $name = $match[1];
+            $phpPath = './http/'.$name.'.php';
+            $tplName = $name.'.tpl';
+            $tplPath = './http/'.$tplName;
+            if(file_exists($phpPath)){
+                echo json_encode(array(
+                    'result'=>false,'message'=>'file exist'
+                ));exit;
+            }else{
+                $metaApi = new phpInterpreter(file_get_contents('./httpAdmin.php'));
+                $search = $metaApi->search('.= object2:filter([className=kod_web_page])')->parent()->toArray();
+                $kod_web_pageObj = $search[0]['object1']['name'];
+                $httpFileConfig = $metaApi->search('.= object1:filter(.objectParams):filter(#httpFileConfig) object:filter(#'.$kod_web_pageObj.')')->parent()->parent()->toArray();
+                $this->setSessionState(10,'正在生成代码逻辑');
+                $httpFileConfig[0]['object2']['child'][] = array(
+                    'type'=>'arrayValue',
+                    'key'=>array(
+                        'type'=>'string',
+                        'borderStr'=>"'",
+                        'data'=>$name.'.php',
+                    ),
+                    'value'=>array(
+                        'type'=>'string',
+                        'borderStr'=>"'",
+                        'data'=>$_POST['title'],
+                    ),
+                );
+                $this->setSessionState(30,'正在写入文件');
+                file_put_contents('./httpAdmin.php',$metaApi->getCode());
+                file_put_contents($phpPath,'<?php
+/**
+ * Created by PhpStorm.
+ * User: metaPHP
+ * Date: '.date('Y-m-d').'
+ * Time: '.date('H-i-s').'
+ */
+include_once(\'../include.php\');
+$page=new kod_web_page();
+
+$page->fetch(\''.$tplName.'\');');
+                file_put_contents($tplPath,'<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
+    <link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script type="application/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+    <script type="application/javascript" src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+</body>
+</html>');
+                $this->setSessionState(40,'正在进行commit');
+                $gitAction = new githubClass();
+                $gitAction->add('--all');
+                $gitAction->commit('增加了页面:'.$name.'.php');
+                $this->setSessionState(70,'正在push到远程');
+                $gitAction->push();
+                $gitAction->branchClean();
+                $this->setSessionState(90,'正在获取最新代码');
+                $gitAction->pull();
+                $this->setSessionState(100,'完成');
+            }
+        }
+    }
+
 }
 $a = new control();
