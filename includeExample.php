@@ -17,9 +17,9 @@ define("KOD_SMARTY_TEMPLATE_DIR",dirname(__FILE__)."/http/");
 define("KOD_REWRITE_HTML_LINK",true);
 define('KOD_SMARTY_COMPILR_DIR',dirname(__FILE__).'/smarty_cache');
 
-define('KOD_MYSQL_SERVER','118.190.95.219');
+define('KOD_MYSQL_SERVER','127.0.0.1');
 define('KOD_MYSQL_USER','root');
-define('KOD_MYSQL_PASSWORD','1082322$%&whr309568486');
+define('KOD_MYSQL_PASSWORD','*');
 define('KOD_COMMENT_MYSQLDB','dbName');
 
 /*
@@ -28,10 +28,10 @@ define('KOD_COMMENT_MYSQLDB','dbName');
 define('KOD_MEMCACHE_TYPE_MEMCACHE',1);
 define('KOD_MEMCACHE_TYPE_MEMCACHED',2);
 
-//define('KOD_MEMCACHE_OPEN',true);
-//define('KOD_MEMCACHE_TYPE',KOD_MEMCACHE_TYPE_MEMCACHED);//KOD_MEMCACHE_TYPE_MEMCACHE,KOD_MEMCACHE_TYPE_MEMCACHED,二选一
-//define('KOD_MEMCACHE_HOST','***');//默认值是localhost
-//define('KOD_MEMCACHE_PORT',***);//默认值是11211
+define('KOD_MEMCACHE_OPEN',true);
+define('KOD_MEMCACHE_TYPE',KOD_MEMCACHE_TYPE_MEMCACHED);//KOD_MEMCACHE_TYPE_MEMCACHE,KOD_MEMCACHE_TYPE_MEMCACHED,二选一
+define('KOD_MEMCACHE_HOST','*');//默认值是localhost
+define('KOD_MEMCACHE_PORT','*');//默认值是11211
 
 define("KOD_SMARTY_CSS_DIR",dirname(__FILE__)."/cssCreate/");
 define('KOD_SMARTY_CSS_HOST','http://118.190.95.234/metaPHPTest/cssCreate/');
