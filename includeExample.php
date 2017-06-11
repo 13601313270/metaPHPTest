@@ -41,12 +41,7 @@ define('KOD_METAPHP_OPEN',false);
 //控制器层的自动加载函数,自动启环节执行完毕后将释放这个函数,防止模板层拥有全部权限.进行权限控制
 function kod_ControlAutoLoad($model){
     $classAutoLoad = array(
-        'projectClass' => 'include/project.php',
-        'mem' => 'include/mem.php',
-        'pvClass' => 'include/pv.php',
-        'articleTypeClass' => 'include/articleType.php',
-//        'article' => 'include/article.php',
-        'webObjectbase' => 'include/webObjectbase.php',
+//        'projectClass' => 'include/project.php',
     );
     if(isset($classAutoLoad[$model])){
         include_once $classAutoLoad[$model];
