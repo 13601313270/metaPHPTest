@@ -2,3 +2,5 @@
 /cssCreate/*
 /smarty_cache/*
 /include.php
+/rewrite.conf
+/index.php
