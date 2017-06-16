@@ -141,8 +141,10 @@
                 $('#modAdmin>.panel').hover(function(){
                     var innerBodyWidth = $($(this).find('iframe')[0].contentDocument).find('body>:not(style)').css('width');
                     var innerBodyHeight = $($(this).find('iframe')[0].contentDocument).find('body>:not(style)').css('height');
-                    $(this).find('iframe').css('width',innerBodyWidth);
-                    $(this).find('iframe').css('height',innerBodyHeight);
+                    if( $(this).find('iframe').css('width')<=innerBodyWidth ){
+                        $(this).find('iframe').css('width',innerBodyWidth);
+                        $(this).find('iframe').css('height',innerBodyHeight);
+                    }
                     $(this).find('iframe').css({
                         transform:('scale(1)')
                     });
@@ -176,7 +178,11 @@
                             dom.append(iframe);
                             $.post('',{
                                 action:'runData',
-                                tplContent:'<html><head></head><body style="margin:0">{include file="'+dom.data('name')+'.mod.tpl" iId=1}</body></html>',
+                                tplContent:'<html><head>' +
+                                    '<link href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">'+
+                                    '<script src="//cdn.bootcss.com/jquery/3.2.1/jquery.js"><\/script>'+
+                                    '<script src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"><\/script>'+
+                                '</head><body style="margin:0">{include file="'+dom.data('name')+'.mod.tpl" iId=1}</body></html>',
                                 phpContent:"<?php include_once('../include.php');$page=new kod_web_page();$page->name='sss';$page->fetch('index.tpl')",
 //                                phpContent:"<?php include_once('../include.php');",
                                 file:file,
