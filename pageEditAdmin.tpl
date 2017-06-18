@@ -556,7 +556,7 @@
             $('#mastGet .panel-body input').each(function(){
                 allParams.push($(this).data('id')+'='+$(this).val());
             });
-            $('#tpl').attr('src','http/{$file}?'+allParams.join('&'));
+            $('#tpl').attr('src','{$file}?'+allParams.join('&'));
         });
         //初始化编辑器
         var lastWriteTime = (new Date()).getTime();//最后一次输入编辑器的时间
