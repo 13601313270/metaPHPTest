@@ -34,11 +34,26 @@ class control{
             $this->main();
         }
     }
+    private function getRewriteUrl($path){
+        //获取rewrite的网址
+        $rewriteApi = new phpInterpreter(file_get_contents('index.php'));
+        $configFile = $rewriteApi->search('.staticFunction:filter(#init) property 0');
+        $evalObj = new evalMetaCode(current($configFile->toArray()),array(
+            '$_GET'=>$_POST['simulate'],
+            '__FILE__'=>dirname(__FILE__).'/index.php',
+        ));
+        $rewriteConfFile = $evalObj->run();
+        $class = $rewriteApi->search('.class:filter([extends=kod_tool_config])');
+        $classMeta = $class->toArray();
+        $classMeta[0]['name'] = 'newRewriteConfig';//重新生成一个类
+        $aaa = new evalMetaCode($classMeta[0],array());
+        $aaa->run();
+        newRewriteConfig::init($rewriteConfFile);
+        return newRewriteConfig::getUrlByPath($path);
+    }
     public function main(){
         $page=new kod_web_page();
         if(in_array($_GET['file'],scandir('./http/'))){
-            $page->file = $_GET['file'];
-
             $metaApi = new phpInterpreter(file_get_contents('./http/'.$_GET['file']));
             $PageObj = $metaApi->search('.= [className=kod_web_page]')->parent()->toArray();
             $PageObj = $PageObj[0]['object1']['name'];
@@ -128,8 +143,13 @@ class control{
                 }
             }
             $page->allGet = $allKeys;
+
+            //获取rewrite的网址
+            $page->file = $this->getRewriteUrl($_GET['file']);
+
+            //配置代码
             $page->tplFileContent = file_get_contents('./http/'.$page->tplFile);
-            $page->phpFileContent = file_get_contents('./http/'.$page->file);
+            $page->phpFileContent = file_get_contents('./http/'.$_GET['file']);
             $page->fetch('pageEditAdmin.tpl');
         }
     }
