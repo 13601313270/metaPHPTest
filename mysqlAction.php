@@ -344,7 +344,7 @@ class control{
 
     public function getIsExistTable(){
         $tableInfo = kod_db_mysqlDB::create()->runsql('show create table '.$_POST['name']);
-        if($tableInfo===-1){
+        if($tableInfo===-1 || $tableInfo===false){
             $return = array();
             foreach($this->allMysqlColType as $k=>$v){
                 $return[] = array_merge(array('type'=>$k),$v);
