@@ -1,5 +1,16 @@
 {extends file='template/main.layout.tpl'}
+{block name="nav"}
+    这个是导航
+{/block}
 {block name=body}
-    我的HTML页面内容在这里{$article.title}
-    {include file="commonModule/temp.mod.tpl" iId=1}
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="row">1</div>
+            <div class="row">2</div>
+        </div>
+        <div class="col-xs-6">菜单</div>
+    </div>
+    <div class="row">
+        我的HTML页面内容在这里{$article.title}
+    </div>
 {/block}

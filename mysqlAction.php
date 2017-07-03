@@ -100,7 +100,7 @@ class control{
         if(empty($thisTableApiInfo)){
             $this->setSessionState(20,'准备生成接口类');
             $tableInfo = kod_db_mysqlDB::create()->runsql('show create table '.$className);
-            if($tableInfo===-1){
+            if($tableInfo===-1||$tableInfo===false){
                 $return = array();
                 foreach($this->allMysqlColType as $k=>$v){
                     $return[] = array_merge(array('type'=>$k),$v);
@@ -109,7 +109,7 @@ class control{
                 echo json_encode($return);exit;
             }else{
                 $tableInfo = current($tableInfo);
-                if(preg_match('/CREATE TABLE ".+?"\s*\(([\S|\s]*)\)$/',$tableInfo['Create Table'],$match)){
+                if(preg_match('/CREATE TABLE [`|"].+?[`|"]\s*\(([\S|\s]*)\)/',$tableInfo['Create Table'],$match)){
                     $this->setSessionState(30,'正在分析数据库表信息');
                     $tableInfo = explode(',',$match[1]);
                     $primaryKey = array();//主键
@@ -344,7 +344,7 @@ class control{
 
     public function getIsExistTable(){
         $tableInfo = kod_db_mysqlDB::create()->runsql('show create table '.$_POST['name']);
-        if($tableInfo===-1 || $tableInfo===false){
+        if($tableInfo===-1||$tableInfo===false){
             $return = array();
             foreach($this->allMysqlColType as $k=>$v){
                 $return[] = array_merge(array('type'=>$k),$v);

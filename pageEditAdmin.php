@@ -69,15 +69,21 @@ class control{
                 if( substr($name,-8)=='.mod.tpl' ){
                     $itemModNam = 'commonModule/'.substr($name,0,-8);
                     $callArgs = array();
+                    $insert = array(
+                        'type'=>'include',
+                        'name'=>$itemModNam,
+                        'html'=>file_get_contents('./http/commonModule/'.$name),
+                    );
                     if(file_exists(webDIR.$itemModNam.'.mod.php')){
                         include_once(webDIR.$itemModNam.'.mod.php');
                         $className = 'kodMod_'.implode('_',explode('/',$itemModNam));
                         $modController = new $className();
+                        $insert['type'] = $modController->type;
+                        $insert['title'] = $modController->title;
                         if(method_exists($modController,'init')){
                             $method = new ReflectionMethod($className, 'init');
                             foreach($method->getParameters() as $v){
                                 $argsName = $v->getName();
-
                                 if($v->isOptional()){
                                     $callArgs[] = array(
                                         'name'=>$argsName,
@@ -91,11 +97,8 @@ class control{
                             }
                         }
                     }
-                    $allModule[] = array(
-                        'name'=>$itemModNam,
-                        'html'=>file_get_contents('./http/commonModule/'.$name),
-                        'callArgs'=>$callArgs
-                    );
+                    $insert['callArgs']=$callArgs;
+                    $allModule[] = $insert;
                 }
             }
             $page->allModule = $allModule;
@@ -145,7 +148,8 @@ class control{
             $page->allGet = $allKeys;
 
             //获取rewrite的网址
-            $page->file = $this->getRewriteUrl($_GET['file']);
+            $page->url = $this->getRewriteUrl($_GET['file']);
+            $page->file = $_GET['file'];
 
             //配置代码
             $page->tplFileContent = file_get_contents('./http/'.$page->tplFile);
@@ -291,7 +295,7 @@ class control{
         $compiler->parser = null;
 
         //添加一个html注释,好让前端程序知道某一段html是通过模块include添加的
-        $_content = preg_replace('/(<\?php \$_smarty_tpl->_subTemplateRender\("file:(\S+?)")/','<!--useMod $2-->$1',$_content);
+        $_content = preg_replace('/(<\?php \$_smarty_tpl->_subTemplateRender\("file:(\S+?)",[\s|\S]+?\);)/','<!--useMod $2-->$1 ?><!--useModEnd $2--><?php ',$_content);
         //开始执行生成的php代码
         $metaApi = new phpInterpreter($_content);
         $runApi = new evalMetaCode($metaApi->codeMeta,array(

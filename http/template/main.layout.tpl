@@ -7,13 +7,31 @@
     <script type="application/javascript" src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-{include file="commonModule/head.mod.tpl" type=1}
-<section>
-    {block name=nav}{/block}
-</section>
-<section>
-    {block name=body}{/block}
-</section>
-{include file="commonModule/bottom.mod.tpl"}
+<div class="container">
+    <header class="row">
+        <div class="col-xs-12">
+            {include file="commonModule/head.mod.tpl" type=1}
+        </div>
+    </header>
+    <nav class="row">
+        <div class="col-xs-12">
+            {block name=nav}{/block}
+        </div>
+    </nav>
+    <section class="row">
+        <div class="col-xs-8">
+            {block name=body}{/block}
+        </div>
+        <div class="col-xs-4">
+            右侧
+            {include file="commonModule/temp.mod.tpl" iId=1}
+        </div>
+    </section>
+    <footer class="row">
+        <div class="col-xs-12">
+            {include file="commonModule/bottom.mod.tpl"}
+        </div>
+    </footer>
+</div>
 </body>
 </html>
