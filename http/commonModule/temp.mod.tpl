@@ -1,6 +1,6 @@
 <style>
     .temp{
-        min-width: 400px;;
+        width: 100%;
     }
 </style>
 <div class="temp">

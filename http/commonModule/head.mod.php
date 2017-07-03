@@ -7,6 +7,7 @@
  * Time: 00:37
  */
 class kodMod_commonModule_head extends kod_web_smartyModController{
+    public $title='通用头部';
     public function init($type){
         if($type==1){
             $this->assign('headTitle','我是第一种类型');
