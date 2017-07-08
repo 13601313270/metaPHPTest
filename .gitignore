@@ -4,3 +4,5 @@
 /include.php
 /rewrite.conf
 /index.php
+cssCreate/
+smarty_cache/
