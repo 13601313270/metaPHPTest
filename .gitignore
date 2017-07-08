@@ -1,6 +1,4 @@
-/metaPHPCacheFile/*
-/cssCreate/*
-/smarty_cache/*
+metaPHPCacheFile/
 /include.php
 /rewrite.conf
 /index.php
