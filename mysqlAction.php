@@ -7,11 +7,13 @@
  */
 //ini_set('session.auto_start', 1);
 include_once('include.php');
+define("webRootBase",dirname(KOD_SMARTY_TEMPLATE_DIR));
+define("webRootBaseCachePath",webRootBase.'/metaPHPCacheFile');
 class githubClass extends githubAction{
     public $runLocalBranch = 'develop';
     public $originBranch = 'origin/develop';
-    public $webRootDir = '/var/www/html/metaPHPTest';
-    public $cachePath = '/var/www/html/metaPHPTest/metaPHPCacheFile';
+    public $webRootDir = webRootBase;
+    public $cachePath = webRootBaseCachePath;
 }
 
 class control{
