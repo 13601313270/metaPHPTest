@@ -275,14 +275,14 @@ class control{
                         'type'=>'=',
                         'object1'=>array('type'=>'variable','name'=>'$adminHtml'),
                         'object2'=>array(
-                            'type'=>'objectFunction', 'object'=>'$this', 'name'=>'getAdminHtml',
+                            'type'=>'objectFunction', 'object'=>array('type'=>'$this'), 'name'=>'getAdminHtml',
                             'property'=>array(
-                                array('type'=>'objectParams', 'object'=>array('name'=>'$this'), 'name'=>'dbColumn',)
+                                array('type'=>'objectParams', 'object'=>array('type'=>'$this'), 'name'=>'dbColumn',)
                             ),
                         ),
                     ),
                     array(
-                        'type'=>'objectFunction','object'=>'$this','name'=>'assign',
+                        'type'=>'objectFunction','object'=>array('type'=>'$this'),'name'=>'assign',
                         'property'=>array(
                             array('type'=>'string','data'=>'adminHtml','borderStr'=>"'"),
                             array('type'=>'variable','name'=>'$adminHtml'),
@@ -458,6 +458,19 @@ class control{
 
         $classApi = new $className();
         $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
+        //查看新增的字段,修改mysql
+        $isHasNewColumn = false;
+        foreach($option as $k=>$v){
+            if(!isset($showCreateTable[$k])){
+                unset($option[$k]['name']);
+                $v['dataType'] = $this->allMysqlColType[$v['dataType']]['saveType'];
+                kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($classApi->addColumnSql($v));
+                $isHasNewColumn = true;
+            }
+        }
+        if($isHasNewColumn){
+            $showCreateTable = $classApi->showCreateTable();//数据库中存储的表结构
+        }
         //include的api的外键字段
         $allIncludeApi = new classAction($className);
         $allIncludeApi->setProperty('foreignKey', array('type'=>'array','child'=>array()), 'public');
@@ -482,7 +495,6 @@ class control{
                 foreach (array_diff(array_keys($dbCanshu),array_keys($option[$columnName])) as $item) {
                     if(in_array($item,array('primarykey','unique'))){
                         $dropIndexSql = 'ALTER TABLE `'.$tableName.'` DROP '.($item=='primarykey'?'primary key':('INDEX '.$columnName) );
-                        echo $dropIndexSql."\n";
                         if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
                             $option[$columnName][$item] = true;
                         }
@@ -495,7 +507,6 @@ class control{
                     if($kk=='dataType' && in_array($vv,array('int','bigint'))){
                         if($option[$columnName]['AUTO_INCREMENT']==true && $dbCanshu['AUTO_INCREMENT']==true  ){
                             if(!in_array($dbCanshu[$kk],array('int','bigint'))){
-                                echo $kk.";";
                                 $isChangeMql = true;
                             }
                         }elseif($option[$columnName]['AUTO_INCREMENT']!==$dbCanshu['AUTO_INCREMENT']){
@@ -506,7 +517,6 @@ class control{
                     }elseif($kk=='primarykey'){
                         if($vv!=$dbCanshu[$kk]){
                             $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD PRIMARY KEY(`'.$columnName.'`)';
-                            echo $dropIndexSql."\n";
                             if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
                                 unset($option[$columnName]['primarykey']);
                             }
@@ -514,7 +524,6 @@ class control{
                     }elseif($kk=='unique'){
                         if($vv!=$dbCanshu[$kk]){
                             $dropIndexSql = 'ALTER TABLE `'.$tableName.'` ADD UNIQUE(`'.$columnName.'`)';
-                            echo $dropIndexSql."\n";
                             if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($dropIndexSql)==-1){
                                 unset($option[$columnName]['unique']);
                             }
@@ -534,18 +543,24 @@ class control{
                             $sql.= ',ADD PRIMARY KEY (`'.$columnName.'`)';
                         }
                         $sql = 'ALTER TABLE `'.$tableName.'` MODIFY '.$sql;
-                        echo $sql."\n";
                         $mysqlResult = kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql);
-                        var_dump($mysqlResult);
                     }
                     if(($isChangeMql&&$mysqlResult>-1)||$isChangeAdmin){
-                        $tempData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
-                        $tempApi = new metaSearch($tempData);
+                        $oneColumnData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
+                        if(empty($oneColumnData)){
+                            $tmp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child')->toArray();
+                            $tmp[0][] = array(
+                                'type'=>'arrayValue',
+                                'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$columnName),
+                                'value'=>array('type'=>'array','child'=>array())
+                            );
+                            $oneColumnData = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
+                        }
+                        $tempApi = new metaSearch($oneColumnData);
                         foreach($option[$columnName] as $canshu=>$canshuVal){
-                            $tempData2 = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
-                            if(empty($tempData2)){//新增属性
+                            $canshuDataArr = $tempApi->search('value child key:filter([data='.$canshu.'])')->parent()->toArray();
+                            if(empty($canshuDataArr)){//新增属性
                                 if($canshuVal==''){continue;}
-                                $canshuMeta = $tempApi->search('value child')->toArray();
                                 if(in_array($canshu,array('notNull','AUTO_INCREMENT','unique'))){
                                     $valueType = 'bool';
                                 }elseif($canshu=='maxLength'){
@@ -561,7 +576,7 @@ class control{
                                 }else{
                                     $valueType = 'string';
                                 }
-                                $canshuMeta[0][] = array(
+                                $oneColumnData[0]['value']['child'][] = array(
                                     'type'=>'arrayValue',
                                     'key'=>array('type'=>'string','borderStr'=>'\'','data'=>$canshu),
                                     'value'=>array(
@@ -571,9 +586,9 @@ class control{
                             }
                             else{
                                 if($canshuVal==''){
-                                    $tempData2[0] = null;
+                                    $canshuDataArr[0] = null;
                                 }else{
-                                    if($tempData2[0]['key']['data']=='dataType'){
+                                    if($canshuDataArr[0]['key']['data']=='dataType'){
                                         if($option[$columnName]['AUTO_INCREMENT']==true){
                                             $canshuVal = 'int';
                                             $canshuMeta = $tempApi->search('value child')->toArray();
@@ -590,16 +605,16 @@ class control{
                                                 $temp3[0] = null;
                                             }
                                         }
-                                    }elseif($tempData2[0]['key']['data']=='default'){
+                                    }elseif($canshuDataArr[0]['key']['data']=='default'){
                                         if($option[$columnName]['dataType']=='int'){
-                                            $tempData2[0]['value']['type'] = 'int';
+                                            $canshuDataArr[0]['value']['type'] = 'int';
                                         }elseif($option[$columnName]['dataType']=='bool'){
-                                            $tempData2[0]['value']['type'] = 'bool';
+                                            $canshuDataArr[0]['value']['type'] = 'bool';
                                         }else{
-                                            $tempData2[0]['value']['type'] = 'string';
+                                            $canshuDataArr[0]['value']['type'] = 'string';
                                         }
                                     }
-                                    $tempData2[0]['value']['data'] = $canshuVal;
+                                    $canshuDataArr[0]['value']['data'] = $canshuVal;
                                 }
                             }
                         }
@@ -607,7 +622,6 @@ class control{
                 }
             }else{
                 $sql = 'alter table `'.$tableName.'` drop column `'.$columnName.'`';
-                echo $sql."\n";
                 if(kod_db_mysqlDB::create(KOD_COMMENT_MYSQLDB)->runsql($sql)>-1){
                     $temp = $phpInterpreter->search('.class:filter([extends=kod_web_mysqlAdmin]) #$dbColumn value child key:filter([data='.$columnName.'])')->parent()->toArray();
                     $temp[0] = null;
